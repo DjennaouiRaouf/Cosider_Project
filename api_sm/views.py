@@ -16,6 +16,7 @@ class CSRFView(APIView):
             response['X-CSRFToken'] = get_token(request)
             return response
 
+# permetre de se connecter
 class LoginView(APIView):
     permission_classes = []
     def post(self,request):
@@ -34,11 +35,14 @@ class LoginView(APIView):
         response.set_cookie('__isAuth__', 'true', max_age=None)
         return response
 
+
+# permetre de se deconnecter
 class LogoutView(APIView):
     def get(self,request):
         logout(request)
         return Response({'detail': 'Successfully logged out.','uname':request.user.username})
 
+# permetre d'avoir l'utilisateur courant
 class WhoamiView(APIView):
     def get(self,request):
         return Response({'id': request.user.id,'username': request.user.username})
