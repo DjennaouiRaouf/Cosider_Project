@@ -31,7 +31,6 @@ class LoginView(APIView):
 
         login(request, user)
         response=Response({'message': 'Successfully logged in.'},status=status.HTTP_200_OK)
-        response.set_cookie('__isAuth__', 'true', max_age=None)
         return response
 
 class LogoutView(APIView):
