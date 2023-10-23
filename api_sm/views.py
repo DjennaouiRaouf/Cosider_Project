@@ -10,12 +10,6 @@ from .models import *
 
 
 # Create your views here.
-class CSRFView(APIView):
-    def get(self,request):
-            response = Response({'message': 'CSRF cookie set'})
-            response['X-CSRFToken'] = get_token(request)
-            return response
-
 class LoginView(APIView):
     permission_classes = []
     def post(self,request):
@@ -33,7 +27,12 @@ class LoginView(APIView):
         response=Response({'message': 'Successfully logged in.'},status=status.HTTP_200_OK)
         return response
 
+
+
+
+
 class LogoutView(APIView):
+
     def get(self,request):
         logout(request)
         return Response({'detail': 'Successfully logged out.','uname':request.user.username})
@@ -42,12 +41,7 @@ class WhoamiView(APIView):
     def get(self,request):
         return Response({'id': request.user.id,'username': request.user.username})
 
-class SessionView(APIView):
-    def get(self,request):
-        if not request.user.is_authenticated:
-            return Response({'isAuthenticated': False})
 
-        return Response({'isAuthenticated': True})
 class GetICImages(generics.ListAPIView):
     permission_classes = []
     queryset = Interface_de_Connexion.objects.filter(visible=True)
