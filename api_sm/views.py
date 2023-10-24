@@ -25,7 +25,10 @@ class LoginView(APIView):
             return Response({'message': 'Invalid credentials.'}, status=status.HTTP_400_BAD_REQUEST)
 
         login(request, user)
+        session_id = request.session.session_key
         response=Response({'message': 'Successfully logged in.'},status=status.HTTP_200_OK)
+        response.set_cookie("__SID__",session_id)
+
         return response
 
 
@@ -38,19 +41,15 @@ class LogoutView(APIView):
         logout(request)
         response=Response({'detail': 'Successfully logged out.'})
         response.delete_cookie('csrftoken')
+        response.delete_cookie('__SID__')
         return response
 
 
-# endpoint qui récupére le nom d'utilisateur courrant
+# endpoint qui récupére le nom et id d'utilisateur
 class WhoamiView(APIView):
     def get(self,request):
         return Response({'id': request.user.id,'username': request.user.username})
 
-
-class SessionIDView(APIView):
-    def get(self,request):
-        session_id = request.session.session_key
-        return Response({'session_id': session_id})
 
 
 class GetICImages(generics.ListAPIView):
