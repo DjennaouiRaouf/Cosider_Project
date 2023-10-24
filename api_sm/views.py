@@ -25,7 +25,6 @@ class LoginView(APIView):
             return Response({'message': 'Invalid credentials.'}, status=status.HTTP_400_BAD_REQUEST)
 
         login(request, user)
-        session_id = request.session.session_key
         response=Response({'message': 'Successfully logged in.'},status=status.HTTP_200_OK)
         return response
 
