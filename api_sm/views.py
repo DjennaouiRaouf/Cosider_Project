@@ -27,8 +27,6 @@ class LoginView(APIView):
         login(request, user)
         session_id = request.session.session_key
         response=Response({'message': 'Successfully logged in.'},status=status.HTTP_200_OK)
-        response.set_cookie("__SID__",session_id)
-
         return response
 
 
@@ -41,7 +39,6 @@ class LogoutView(APIView):
         logout(request)
         response=Response({'detail': 'Successfully logged out.'})
         response.delete_cookie('csrftoken')
-        response.delete_cookie('__SID__')
         return response
 
 
