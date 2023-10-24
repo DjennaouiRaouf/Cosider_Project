@@ -50,11 +50,6 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 
-
-
-
-
-
 ROOT_URLCONF = 'Cosider_Project.urls'
 
 TEMPLATES = [
