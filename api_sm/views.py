@@ -9,7 +9,8 @@ from .Serializers import *
 from .models import *
 
 
-# Create your views here.
+
+# endpoint qui permet à l'utilisateur de se connecter
 class LoginView(APIView):
     permission_classes = []
     def post(self,request):
@@ -30,16 +31,26 @@ class LoginView(APIView):
 
 
 
-
+# endpoint qui permet à l'utilisateur de se déconnecter
 class LogoutView(APIView):
 
     def get(self,request):
         logout(request)
-        return Response({'detail': 'Successfully logged out.','uname':request.user.username})
+        response=Response({'detail': 'Successfully logged out.'})
+        response.delete_cookie('csrftoken')
+        return response
 
+
+# endpoint qui récupére le nom d'utilisateur courrant
 class WhoamiView(APIView):
     def get(self,request):
         return Response({'id': request.user.id,'username': request.user.username})
+
+
+class SessionIDView(APIView):
+    def get(self,request):
+        session_id = request.session.session_key
+        return Response({'session_id': session_id})
 
 
 class GetICImages(generics.ListAPIView):
