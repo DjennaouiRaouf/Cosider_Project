@@ -18,12 +18,9 @@ class LoginView(APIView):
         password = request.data['password']
         if username is None or password is None:
             return Response({'message': 'Please provide username and password.'}, status=status.HTTP_400_BAD_REQUEST)
-
         user = authenticate(username=username, password=password)
-
         if user is None:
             return Response({'message': 'Invalid credentials.'}, status=status.HTTP_400_BAD_REQUEST)
-
         login(request, user)
         response=Response({'message': 'Successfully logged in.'},status=status.HTTP_200_OK)
         return response
@@ -33,20 +30,16 @@ class LoginView(APIView):
 
 # endpoint qui permet à l'utilisateur de se déconnecter
 class LogoutView(APIView):
-
     def get(self,request):
         logout(request)
         response=Response({'detail': 'Successfully logged out.'})
         response.delete_cookie('csrftoken')
         return response
 
-
 # endpoint qui récupére le nom et id d'utilisateur
 class WhoamiView(APIView):
     def get(self,request):
         return Response({'id': request.user.id,'username': request.user.username})
-
-
 
 class GetICImages(generics.ListAPIView):
     permission_classes = []
