@@ -6,5 +6,5 @@ from .models import *
 class ICSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Interface_de_Connexion
+        model = Images
         fields = '__all__'

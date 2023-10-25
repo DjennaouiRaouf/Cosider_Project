@@ -1,3 +1,19 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+
+
+lp=25
+
+
+class ImagesAdmin(admin.ModelAdmin):
+    list_per_page = lp
+    list_display = ('key','src','caption','text','visible',)
+    list_filter = ('visible',)
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            obj.visible=False
+            obj.save()
+
+admin.site.register(Images, ImagesAdmin)
