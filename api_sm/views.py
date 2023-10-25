@@ -22,8 +22,8 @@ class LoginView(APIView):
         if user is None:
             return Response({'message': 'Informations d’identification non valides.'}, status=status.HTTP_400_BAD_REQUEST)
         login(request, user)
-        response=Response({'message': 'Connexion réussie.',
-                           "__SID__":request.session.session_key},status=status.HTTP_200_OK)
+        response=Response({'message': 'Connexion réussie.'},status=status.HTTP_200_OK)
+        response.set_cookie('isAuth',True)
         return response
 
 
