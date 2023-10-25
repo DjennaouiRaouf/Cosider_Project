@@ -17,12 +17,13 @@ class LoginView(APIView):
         username = request.data['username']
         password = request.data['password']
         if username is None or password is None:
-            return Response({'message': 'Please provide username and password.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Veuillez fournir votre nom d’utilisateur et votre mot de passe.'}, status=status.HTTP_400_BAD_REQUEST)
         user = authenticate(username=username, password=password)
         if user is None:
-            return Response({'message': 'Invalid credentials.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Informations d’identification non valides.'}, status=status.HTTP_400_BAD_REQUEST)
         login(request, user)
-        response=Response({'message': 'Successfully logged in.'},status=status.HTTP_200_OK)
+        response=Response({'message': 'Connexion réussie.',
+                           "__SID__":request.session.session_key},status=status.HTTP_200_OK)
         return response
 
 
