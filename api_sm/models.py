@@ -12,3 +12,7 @@ class Images(models.Model):
     def delete(self, *args, **kwargs):
         self.visible=False
         super(Images, self).save(*args, **kwargs)
+    class Meta:
+        verbose_name = 'Images'
+        verbose_name_plural = 'Images'
+

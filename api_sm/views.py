@@ -35,6 +35,7 @@ class LogoutView(APIView):
         logout(request)
         response=Response({'detail': 'Successfully logged out.'})
         response.delete_cookie('csrftoken')
+        response.delete_cookie('isAuth')
         return response
 
 # endpoint qui récupére le nom et id d'utilisateur
