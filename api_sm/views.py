@@ -43,6 +43,9 @@ class WhoamiView(APIView):
     def get(self,request):
         return Response({'id': request.user.id,'username': request.user.username})
 
+
+
+
 class GetICImages(generics.ListAPIView):
     permission_classes = []
     queryset = Images.objects.filter(visible=True)
