@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'colorfield',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
     'api_sm',
 
@@ -46,10 +47,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
-CORS_ALLOW_CREDENTIALS = True
+
 
 
 ROOT_URLCONF = 'Cosider_Project.urls'
@@ -106,13 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-CSRF_COOKIE_SAMESITE = 'Strict'
-SESSION_COOKIE_SAMESITE = 'Strict'
-CSRF_COOKIE_HTTPONLY = True
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE=True
-CSRF_COOKIE_SECURE=True
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
+
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 
@@ -147,9 +144,6 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend'
      ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+        'rest_framework.authentication.TokenAuthentication',
+    ]
 }
