@@ -17,9 +17,13 @@ def login(request):
 
     if user is not None:
         token, created = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key, 'username': user.username, 'id': user.id})
+        response=Response({'message': 'Invalid credentials'}, status=status.HTTP_200_OK)
+        response.set_cookie('token', token.key)
+        response.set_cookie('username', user.username)
+        response.set_cookie('id', user.id)
+        return response
     else:
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
