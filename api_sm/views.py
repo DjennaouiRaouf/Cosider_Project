@@ -44,15 +44,24 @@ class AddClientView(generics.CreateAPIView):
     def post(self,request):
         code_client=request.data.get('code_client')
         type_client=request.data.get('type_client')
-        est_client_cosider=True
+        est_client_cosider=bool(int(request.data.get('est_client_cosider')))
         libelle_client=request.data.get('libelle_client')
         nif=request.data.get('nif')
         raison_social=request.data.get('raison_social')
         num_registre_commerce=request.data.get('num_registre_commerce')
-        Clients(code_client=code_client,type_client=type_client
-                ,est_client_cosider=est_client_cosider,libelle_client=libelle_client
-                ,nif=nif,raison_social=raison_social,num_registre_commerce=num_registre_commerce).save()
-        return Response({'message':'123' }, status=status.HTTP_200_OK)
+        try:
+            Clients(code_client=code_client, type_client=type_client
+                    , est_client_cosider=est_client_cosider, libelle_client=libelle_client
+                    , nif=nif, raison_social=raison_social, num_registre_commerce=num_registre_commerce
+                    , user_id=User.objects.get(id=request.user.id)).save()
+
+            return Response({'message': 'Client ajouté'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 
 
