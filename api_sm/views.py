@@ -26,6 +26,13 @@ class LoginView(APIView):
             return Response({'message': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+
+        return Response({'whoami':request.user.username}, status=status.HTTP_200_OK)
+
+
 
 class WhoamiView(APIView):
     permission_classes = [IsAuthenticated]
