@@ -32,3 +32,26 @@ class Clients(models.Model):
         verbose_name_plural = 'Clients'
 
 
+
+
+
+class Sites(models.Model):
+
+    code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=10)  # Field name made lowercase.
+    code_filiale = models.CharField(db_column='Code_Filiale', max_length=5)  # Field name made lowercase.
+    code_region = models.CharField(db_column='Code_Region', max_length=1, blank=True, null=True)  # Field name made lowercase.
+    libelle_site = models.CharField(db_column='Libelle_Site', max_length=150, blank=True, null=True)  # Field name made lowercase.
+    code_agence = models.CharField(db_column='Code_Agence', max_length=15, blank=True, null=True)  # Field name made lowercase.
+    type_site = models.SmallIntegerField(db_column='Type_Site', blank=True, null=True)  # Field name made lowercase.
+    code_division = models.CharField(db_column='Code_Division', max_length=15, blank=True, null=True)  # Field name made lowercase.
+    code_commune_site = models.CharField(db_column='Code_Commune_Site', max_length=10, blank=True, null=True)  # Field name made lowercase.
+    jour_cloture_mouv_rh_paie = models.CharField(db_column='Jour_Cloture_Mouv_RH_Paie', max_length=2, blank=True, null=True)  # Field name made lowercase.
+    date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=True)  # Field name made lowercase.
+    date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True)  # Field name made lowercase.
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  # Field name made lowercase.
+    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  # Field name made lowercase.
+    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  # Field name made lowercase.
+    class Meta:
+        verbose_name = 'Sites'
+        verbose_name_plural = 'Sites'
+
