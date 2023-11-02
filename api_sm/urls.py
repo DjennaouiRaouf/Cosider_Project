@@ -7,5 +7,6 @@ urlpatterns = [
     path('whoami/', WhoamiView.as_view()),
     path('ic_images/', GetICImages.as_view()),
     path('addclient/',AddClientView.as_view()),
+    path('getclients/', GetClients.as_view()),
 
 ]
