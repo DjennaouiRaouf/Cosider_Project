@@ -87,7 +87,7 @@ DATABASES = {
         "PASSWORD":"",
         "HOST": "localhost",
         "PORT":"1433",
-        "OPTIONS": {"driver": "SQL Server Native Client 11.0",
+        "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server",
         },
     },
 }
