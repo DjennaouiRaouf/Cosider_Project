@@ -9,6 +9,8 @@ from rest_framework.views import APIView
 
 from .Serializers import *
 from .models import *
+from .tools import *
+
 
 class LoginView(APIView):
     permission_classes = []
@@ -50,10 +52,12 @@ class GetICImages(generics.ListAPIView):
 
 class AddClientView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
+
+
     def post(self,request):
         code_client=request.data.get('code_client')
         type_client=request.data.get('type_client')
-        est_client_cosider=bool(int(request.data.get('est_client_cosider')))
+        est_client_cosider=str_to_bool(request.data.get('est_client_cosider'))
         libelle_client=request.data.get('libelle_client')
         nif=request.data.get('nif')
         raison_social=request.data.get('raison_social')
