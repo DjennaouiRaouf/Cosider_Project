@@ -15,7 +15,6 @@ class Images(models.Model):
         verbose_name_plural = 'Images'
 
 
-
 class Clients(models.Model):
     code_client = models.CharField(db_column='Code_Client', primary_key=True, max_length=500)  # Field name made lowercase.
     type_client = models.SmallIntegerField(db_column='Type_Client', blank=True, null=True)  # Field name made lowercase.
