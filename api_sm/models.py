@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 from colorfield.fields import ColorField
 
@@ -48,9 +49,18 @@ class Sites(models.Model):
     jour_cloture_mouv_rh_paie = models.CharField(db_column='Jour_Cloture_Mouv_RH_Paie', max_length=2, blank=True, null=True)  
     date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=True)  
     date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True)  
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  
-    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  
-    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  
+    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True, default=False)
+    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True,auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if(self.date_cloture_site >= self.date_ouverture_site ):
+            super(Sites, self).save(*args, **kwargs)
+        else:
+                raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
+
+
+
     class Meta:
         verbose_name = 'Sites'
         verbose_name_plural = 'Sites'

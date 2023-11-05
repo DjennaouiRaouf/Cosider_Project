@@ -1,3 +1,5 @@
+from datetime import datetime, date
+
 from django.contrib.auth import authenticate
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
@@ -59,7 +61,7 @@ class AddClientView(generics.CreateAPIView):
         raison_social=request.data.get('raison_social')
         num_registre_commerce=request.data.get('num_registre_commerce')
         try:
-            Clients(code_client=code_client, type_client=type_client
+            Clients.objects.create(code_client=code_client, type_client=type_client
                     , est_client_cosider=est_client_cosider, libelle_client=libelle_client
                     , nif=nif, raison_social=raison_social, num_registre_commerce=num_registre_commerce
                     , user_id=User.objects.get(id=request.user.id)).save()
@@ -89,11 +91,15 @@ class  AddSiteView(APIView):
         jour_cloture_mouv_rh_paie= request.data.get('jour_cloture_mouv_rh_paie')
         date_ouverture_site=request.data.get('date_ouverture_site')
         date_cloture_site=request.data.get('date_cloture_site')
+        print(date_ouverture_site)
+
         try:
-            Sites( code_site=code_site,code_agence=code_agence,type_site=type_site,code_filiale=code_filiale,
-                   code_region=code_region,libelle_site=libelle_site,code_division=code_division,code_commune_site=
-                   code_commune_site,jour_cloture_mouv_rh_paie=jour_cloture_mouv_rh_paie,date_cloture_site=date_cloture_site,
-                   date_ouverture_site=date_ouverture_site).save()
+            Sites.objects.create(code_site=code_site, code_agence=code_agence, type_site=type_site, code_filiale=code_filiale,
+                  code_region=code_region, libelle_site=libelle_site, code_division=code_division,
+                  code_commune_site=code_commune_site, jour_cloture_mouv_rh_paie=jour_cloture_mouv_rh_paie,
+                  date_cloture_site=date_cloture_site,
+                  date_ouverture_site=date_ouverture_site, user_id=User.objects.get(id=request.user.id))
+
             return Response({'message': 'Site ajouté'}, status=status.HTTP_200_OK)
 
         except Exception as e:
