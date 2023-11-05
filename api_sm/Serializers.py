@@ -20,5 +20,7 @@ class ClientsSerializer1(serializers.ModelSerializer):
 
 class SiteSerializer1(serializers.ModelSerializer):
     class Meta:
-        modem = Sites
-        fields =  '__all__'
+        model = Sites
+        fields = ['code_site','code_filiale', 'code_region','libelle_site','code_agence', 'type_site',
+                  'code_division', 'code_commune_site', 'jour_cloture_mouv_rh_paie', 'date_ouverture_site',
+                  'date_cloture_site']

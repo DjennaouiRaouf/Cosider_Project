@@ -29,7 +29,7 @@ class LoginView(APIView):
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-
+        Token.objects.get(user_id=request.user.id).delete()
         response=Response({'message': 'Vous etes déconnecté'}, status=status.HTTP_200_OK)
         response.delete_cookie('token')
         return response
