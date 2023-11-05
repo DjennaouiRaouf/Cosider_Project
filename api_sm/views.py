@@ -106,7 +106,7 @@ class  AddSiteView(APIView):
     
 class GetSitesView(generics.ListAPIView):
     permission_classes = []
-    queryset = Sites.objects.filter(est_bloquer=False)
+    queryset = Sites.objects.all()
     serializer_class = SiteSerializer1
 
 
