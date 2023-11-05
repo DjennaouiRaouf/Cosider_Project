@@ -71,9 +71,9 @@ class AddClientView(generics.CreateAPIView):
 
 
 
-class GetClients(generics.ListAPIView):
+class GetClientsView(generics.ListAPIView):
     queryset = Clients.objects.filter(est_bloquer=False)
-    serializer_class = AddClientsSerializer
+    serializer_class = ClientsSerializer1
 
 
 class  AddSiteView(APIView):
@@ -105,6 +105,9 @@ class  AddSiteView(APIView):
             return Response({'message': "".join(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     
+class GetSitesView(generics.ListAPIView):
+    queryset = Sites.objects.filter(est_bloquer=False)
+    serializer_class = SiteSerializer1
 
 
 
