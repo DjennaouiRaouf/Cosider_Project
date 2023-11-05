@@ -8,6 +8,6 @@ urlpatterns = [
     path('ic_images/', GetICImages.as_view()),
     path('addclient/',AddClientView.as_view()),
     path('getclients/', GetClients.as_view()),
-    path('addSite/',AddSiteView.as_view()),
+    path('addsite/',AddSiteView.as_view()),
 
 ]
