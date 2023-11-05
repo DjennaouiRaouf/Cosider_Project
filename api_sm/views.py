@@ -50,8 +50,6 @@ class GetICImages(generics.ListAPIView):
 
 class AddClientView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
-
-
     def post(self,request):
         code_client=request.data.get('code_client')
         type_client=request.data.get('type_client')
@@ -74,8 +72,35 @@ class AddClientView(generics.CreateAPIView):
 
 
 class GetClients(generics.ListAPIView):
-    queryset = Clients.objects.all()
+    queryset = Clients.objects.filter(est_bloquer=False)
     serializer_class = AddClientsSerializer
+
+
+class  AddSiteView(APIView):
+    def post(self,request):
+        code_site= request.data.get('code_site')
+        code_filiale= request.data.get('code_filiale')
+        code_region= request.data.get('code_region')
+        libelle_site= request.data.get('libelle_site')
+        code_agence= request.data.get('code_agence')
+        type_site=request.data.get('type_site')
+        code_division= request.data.get('code_division')
+        code_commune_site= request.data.get('code_commune_site')
+        jour_cloture_mouv_rh_paie= request.data.get('jour_cloture_mouv_rh_paie')
+        date_ouverture_site=request.data.get('date_ouverture_site')
+        date_cloture_site=request.data.get('date_cloture_site')
+        try:
+            Sites( code_site=code_site,code_agence=code_agence,type_site=type_site,code_filiale=code_filiale,
+                   code_region=code_region,libelle_site=libelle_site,code_division=code_division,code_commune_site=
+                   code_commune_site,jour_cloture_mouv_rh_paie=jour_cloture_mouv_rh_paie,date_cloture_site=date_cloture_site,
+                   date_ouverture_site=date_ouverture_site).save()
+            return Response({'message': 'Site ajouté'}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    
+
 
 
 
