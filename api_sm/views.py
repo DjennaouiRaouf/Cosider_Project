@@ -89,7 +89,6 @@ class  AddSiteView(APIView):
         jour_cloture_mouv_rh_paie= request.data.get('jour_cloture_mouv_rh_paie')
         date_ouverture_site=request.data.get('date_ouverture_site')
         date_cloture_site=request.data.get('date_cloture_site')
-        print(date_ouverture_site)
 
         try:
             Sites.objects.create(code_site=code_site, code_agence=code_agence, type_site=type_site, code_filiale=code_filiale,
@@ -106,6 +105,7 @@ class  AddSiteView(APIView):
 
     
 class GetSitesView(generics.ListAPIView):
+    permission_classes = []
     queryset = Sites.objects.filter(est_bloquer=False)
     serializer_class = SiteSerializer1
 
