@@ -26,11 +26,16 @@ class Clients(models.Model):
     num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True, null=True)  
     est_bloquer = models.BooleanField(default=False,db_column='Est_Bloquer', blank=True, null=True)  
     user_id = models.ForeignKey(User, on_delete=models.CASCADE,db_column='User_ID',  blank=True, null=False)  
-    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True, auto_now=True)  
+    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True, auto_now=True)
 
+    def delete(self, *args, **kwargs):
+        self.est_bloquer=True
+        super(Clients, self).save(*args, **kwargs)
     class Meta:
         verbose_name = 'Clients'
         verbose_name_plural = 'Clients'
+
+
 
 
 
@@ -59,7 +64,9 @@ class Sites(models.Model):
         else:
                 raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
 
-
+    def delete(self, *args, **kwargs):
+        self.est_bloquer=True
+        super(Clients, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Sites'
