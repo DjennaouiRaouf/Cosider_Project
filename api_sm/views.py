@@ -1,5 +1,3 @@
-from datetime import datetime, date
-
 from django.contrib.auth import authenticate
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
