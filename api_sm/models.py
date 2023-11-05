@@ -48,8 +48,8 @@ class Sites(models.Model):
     code_commune_site = models.CharField(db_column='Code_Commune_Site', max_length=10, blank=True, null=True)  
     jour_cloture_mouv_rh_paie = models.CharField(db_column='Jour_Cloture_Mouv_RH_Paie', max_length=2, blank=True, null=True)  
     date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=True)  
-    date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True)  
-    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)
+    date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', blank=True, null=False)
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True, default=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True,auto_now=True)
 
