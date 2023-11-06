@@ -43,7 +43,7 @@ class WhoamiView(APIView):
 
 class GetICImages(generics.ListAPIView):
     permission_classes = []
-    queryset = Images.objects.filter(visible=True)
+    queryset = Images.objects.filter(est_bloquer=False)
     serializer_class = ICSerializer
 
 
