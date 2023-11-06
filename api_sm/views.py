@@ -78,6 +78,7 @@ class GetClientsView(generics.ListAPIView):
 
 
 class  AddSiteView(APIView):
+    permission_classes = [IsAuthenticated, AddSitePermission]
     def post(self,request):
         code_site= request.data.get('code_site')
         code_filiale= request.data.get('code_filiale')
@@ -103,7 +104,7 @@ class  AddSiteView(APIView):
 
     
 class GetSitesView(generics.ListAPIView):
-    permission_classes = []
+    permission_classes = [IsAuthenticated, ViewSitePermission]
     queryset = Sites.objects.filter(est_bloquer=False)
     serializer_class = SiteSerializer1
 
