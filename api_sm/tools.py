@@ -23,7 +23,6 @@ class ViewClientPermission(permissions.BasePermission):
             raise PermissionDenied("Vous n'êtes pas habilité à visualiser la liste des clients")
         return True
 
-
 class AddSitePermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if( not User.objects.get(id=request.user.id).has_perm('api_sm.add_sites')) :
