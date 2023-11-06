@@ -97,11 +97,8 @@ class  AddSiteView(APIView):
                   code_commune_site=code_commune_site, jour_cloture_mouv_rh_paie=jour_cloture_mouv_rh_paie,
                   date_cloture_site=date_cloture_site,
                   date_ouverture_site=date_ouverture_site, user_id=User.objects.get(id=request.user.id))
-
             return Response({'message': 'Site ajouté'}, status=status.HTTP_200_OK)
-
         except Exception as e:
-
             return Response({'message': "".join(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     
