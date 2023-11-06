@@ -49,8 +49,9 @@ class GetICImages(generics.ListAPIView):
 
 
 class AddClientView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,AddClientPermission]
     def post(self,request):
+
         code_client=request.data.get('code_client')
         type_client=request.data.get('type_client')
         est_client_cosider=str_to_bool(request.data.get('est_client_cosider'))
@@ -70,8 +71,8 @@ class AddClientView(generics.CreateAPIView):
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class GetClientsView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated, ViewClientPermission]
     queryset = Clients.objects.filter(est_bloquer=False)
     serializer_class = ClientsSerializer1
 
