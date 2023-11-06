@@ -20,7 +20,7 @@ class LoginView(APIView):
         if user is not None:
             token, created = Token.objects.get_or_create(user=user)
             response=Response({'message': 'Invalid credentials'}, status=status.HTTP_200_OK)
-            response.set_cookie('token', token.key)
+            response.set_cookie('token', token)
             return response
         else:
             return Response({'message': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
