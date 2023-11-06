@@ -138,7 +138,6 @@ class Marche(models.Model):
     marche_initial = models.ForeignKey('self', models.DO_NOTHING, db_column='marche_initial', blank=True, null=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
-
     def __str__(self):
         return self.numero_marche.code_site.code_site+self.numero_marche.nt+str(self.avenant)
     def save(self, *args, **kwargs):
