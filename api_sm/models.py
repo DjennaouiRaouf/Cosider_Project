@@ -24,9 +24,9 @@ class Clients(models.Model):
     nif = models.CharField(db_column='NIF', unique=True, max_length=50, blank=True, null=True)  
     raison_social = models.CharField(db_column='Raison_Social', max_length=50, blank=True, null=True)  
     num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True, null=True)  
-    est_bloquer = models.BooleanField(default=False,db_column='Est_Bloquer', blank=True, null=True)  
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE,db_column='User_ID',  blank=True, null=False)  
-    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True, auto_now=True)
+    est_bloquer = models.BooleanField(default=False,db_column='Est_Bloquer', null=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE,db_column='User_ID', editable=False)
+    date_modification = models.DateTimeField(db_column='Date_Modification', editable=False, auto_now=True)
 
     def delete(self, *args, **kwargs):
         self.est_bloquer=True
@@ -54,9 +54,9 @@ class Sites(models.Model):
     jour_cloture_mouv_rh_paie = models.CharField(db_column='Jour_Cloture_Mouv_RH_Paie', max_length=2, blank=True, null=True)  
     date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=True)  
     date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', blank=True, null=False)
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True, default=False)
-    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True,auto_now=True)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer',null=False, default=False)
+    date_modification = models.DateTimeField(db_column='Date_Modification',null=False,auto_now=True)
 
     def save(self, *args, **kwargs):
         if(self.date_cloture_site >= self.date_ouverture_site ):
