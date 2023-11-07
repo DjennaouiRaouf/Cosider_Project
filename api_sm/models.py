@@ -87,8 +87,7 @@ class Sites(models.Model):
 
 
 class NT(models.Model):
-
-    code_site = models.ForeignKey(Sites, models.DO_NOTHING, db_column='Code_site',null=False )
+    code_site = models.ForeignKey(Sites, models.DO_NOTHING, db_column='Code_site',null=False)
     nt = models.CharField(db_column='NT', max_length=20,null=False)
     code_client = models.ForeignKey(Clients, models.DO_NOTHING, db_column='Code_Client')
     #code_situation_nt = models.ForeignKey('TabSituationNt', models.DO_NOTHING, db_column='Code_Situation_NT', blank=True, null=True)
