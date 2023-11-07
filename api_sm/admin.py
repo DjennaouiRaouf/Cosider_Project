@@ -68,8 +68,8 @@ admin.site.register(Sites, SitesAdmin)
 
 
 class MarcheAdmin(admin.ModelAdmin):
-    list_display = ('numero_marche','avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable' ,'rabais'
-    ,'tva','marche_initial','user_id','date_modification')
+    list_display = ('nt','avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable' ,'rabais'
+    ,'tva','user_id','date_modification')
     def save_model(self, request, obj, form, change):
         obj.user_id = User.objects.get(id=request.user.id)
         obj.date_modification = datetime.now()
@@ -94,3 +94,7 @@ class NTAdmin(admin.ModelAdmin):
             obj.save()
 
 admin.site.register(NT, NTAdmin)
+
+class DQEAdmin(admin.ModelAdmin):
+    list_display = ("marche","designation","prix_u","unite","quantite","prix_q")
+admin.site.register(DQE, DQEAdmin)
