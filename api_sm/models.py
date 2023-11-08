@@ -140,7 +140,18 @@ class Marche(models.Model):
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
     def __str__(self):
-        return self.nt.code_site.code_site + self.nt.nt + str(self.avenant)
+        return "Site: "+self.nt.code_site.code_site +" Nt: "+self.nt.nt+" Av: " + str(self.avenant)
+
+    @property
+    def ht(self):
+        dqe=DQE.objects.filter(marche=self.id)
+        sum=0
+        for i in dqe:
+            sum=sum+i.prix_q
+        return sum
+    @property
+    def ttc(self):
+        return (self.ht+(self.ht*self.tva/100))
 
     def save(self, *args, **kwargs):
         self.date_modification = datetime.now()
