@@ -133,7 +133,7 @@ class Marche(models.Model):
     revisable = models.BooleanField(default=True, null=False)
     rabais = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
                                          null=False)
-    tva = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    tva = models.DecimalField(default=0,  max_digits=10, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     code_contrat = models.CharField(null=False, blank=True, max_length=20)
     date_signature = models.DateTimeField(db_column='Date_Signature', null=False, auto_now=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
@@ -185,3 +185,20 @@ class DQE(models.Model):
     class Meta:
         verbose_name = 'DQE'
         verbose_name_plural = 'DQE'
+
+
+class TypeCaution(models.Model):
+    libelle=models.CharField(max_length=500,null=False)
+    taux=models.DecimalField(default=0,  max_digits=10, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+    date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
+    def save(self, *args, **kwargs):
+        self.date_modification = datetime.now()
+        super(TypeCaution, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        super(TypeCaution, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Type_Caution'
+        verbose_name_plural = 'Type_Caution'
