@@ -185,7 +185,3 @@ class DQE(models.Model):
     class Meta:
         verbose_name = 'DQE'
         verbose_name_plural = 'DQE'
-
-
-
-
