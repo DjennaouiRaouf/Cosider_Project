@@ -205,6 +205,8 @@ class TypeCaution(models.Model):
 
 
 
+
+
 class Banque(models.Model):
     nom=models.CharField(max_length=300,null=False)
     adresse = models.CharField(max_length=300, null=False)
@@ -228,9 +230,41 @@ class Banque(models.Model):
         verbose_name = 'Banque'
         verbose_name_plural = 'Banque'
 
+
+
+class TypeAvance(models.Model):
+    libelle=models.CharField(max_length=500,null=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+    date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
+    def save(self, *args, **kwargs):
+        self.date_modification = datetime.now()
+        super(TypeAvance, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        super(TypeCaution, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Type_Caution'
+        verbose_name_plural = 'Type_Caution'
+
+class Avance(models.Model):
+    marche = models.ForeignKey(Marche, models.DO_NOTHING, null=False, related_name="Avance_Marche")
+    type= models.ForeignKey(TypeAvance,models.DO_NOTHING,null=False)
+    montant = models.DecimalField(max_digits=10, decimal_places=2,validators=[MinValueValidator(0)], default=0)
+    Client=models.ForeignKey(Marche, models.DO_NOTHING, null=False, related_name="Avance_Client")
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+    date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
+    def save(self, *args, **kwargs):
+        self.date_modification = datetime.now()
+        super(Avance, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        super(Avance, self).save(*args, **kwargs)
+
+
 class Cautions(models.Model):
     marche = models.ForeignKey(Marche, models.DO_NOTHING,null=False,related_name="Caution_Marche")
-    type_caution=models.ForeignKey(TypeCaution, models.DO_NOTHING,null=False)
+    type=models.ForeignKey(TypeCaution, models.DO_NOTHING,null=False)
     date_soumission = models.DateField(blank=True, null=False)
     banque=models.ForeignKey(Marche, models.DO_NOTHING,null=False)
     montant=models.DecimalField(
@@ -244,6 +278,9 @@ class Cautions(models.Model):
     def recuperation(self):
         self.est_recupere=True # la caution est récupérée
     def soumission(self):
+        #si c'est une caution sur avance  alors appliquer le pourcentage sur le montant de l'avance
+        #sinon sur le prix du marché
+
         self.est_recupere=False # la caution est déposée
 
     def save(self, *args, **kwargs):
