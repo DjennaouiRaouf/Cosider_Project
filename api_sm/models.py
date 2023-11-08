@@ -34,7 +34,7 @@ class Clients(models.Model):
     date_modification = models.DateTimeField(db_column='Date_Modification', editable=False, auto_now=True)
 
     def __str__(self):
-        return self.code_client + ' ' + self.libelle_client
+        return "Client: "+self.code_client
 
     def delete(self, *args, **kwargs):
         self.est_bloquer = not self.est_bloquer
@@ -64,7 +64,7 @@ class Sites(models.Model):
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
     def __str__(self):
-        return self.code_site
+        return "Site: "+self.code_site
 
     def save(self, *args, **kwargs):
         if (self.date_cloture_site >= self.date_ouverture_site):
@@ -96,7 +96,7 @@ class NT(models.Model):
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
     def __str__(self):
-        return str(self.code_site.code_site) + " " + str(self.nt)
+        return "Site: "+str(self.code_site.code_site) +" Nt: "+ str(self.nt)
 
     def save(self, *args, **kwargs):
         if (self.date_cloture_nt >= self.date_ouverture_nt):
