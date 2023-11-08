@@ -57,7 +57,7 @@ class Sites(models.Model):
     code_commune_site = models.CharField(db_column='Code_Commune_Site', max_length=10, blank=True, null=True)
     jour_cloture_mouv_rh_paie = models.CharField(db_column='Jour_Cloture_Mouv_RH_Paie', max_length=2, blank=True,
                                                  null=True)
-    date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=True)
+    date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=False)
     date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
     est_bloquer = models.BooleanField(db_column='Est_Bloquer', null=False, default=False)
@@ -202,3 +202,62 @@ class TypeCaution(models.Model):
     class Meta:
         verbose_name = 'Type_Caution'
         verbose_name_plural = 'Type_Caution'
+
+
+
+class Banque(models.Model):
+    nom=models.CharField(max_length=300,null=False)
+    adresse = models.CharField(max_length=300, null=False)
+    ville =  models.CharField(max_length=300, null=False)
+    wilaya =  models.CharField(max_length=300, null=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+    date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', null=False, default=False)
+    def save(self, *args, **kwargs):
+        self.date_modification = datetime.now()
+        super(Banque, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.est_bloquer = not self.est_bloquer
+        super(Banque, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.nom+" "+self.ville+'('+self.wilaya+')'
+
+    class Meta:
+        verbose_name = 'Banque'
+        verbose_name_plural = 'Banque'
+
+class Cautions(models.Model):
+    marche = models.ForeignKey(Marche, models.DO_NOTHING,null=False,related_name="Caution_Marche")
+    type_caution=models.ForeignKey(TypeCaution, models.DO_NOTHING,null=False)
+    date_soumission = models.DateField(blank=True, null=False)
+    banque=models.ForeignKey(Marche, models.DO_NOTHING,null=False)
+    montant=models.DecimalField(
+        max_digits=10, decimal_places=2,
+        validators=[MinValueValidator(0)], default=0,
+        editable=False
+    )
+    est_recupere=models.BooleanField(default=True,null=False,editable=False)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+    date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
+    def recuperation(self):
+        self.est_recupere=True # la caution est récupérée
+    def soumission(self):
+        self.est_recupere=False # la caution est déposée
+
+    def save(self, *args, **kwargs):
+        self.soumission()
+        self.date_modification = datetime.now()
+        super(Cautions, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        super(Cautions, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Caution'
+        verbose_name_plural = 'Caution'
+
+
+
+
