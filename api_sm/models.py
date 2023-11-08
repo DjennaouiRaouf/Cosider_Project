@@ -170,15 +170,14 @@ class Marche(models.Model):
 class DQE(models.Model):
     marche = models.ForeignKey(Marche, models.DO_NOTHING,null=False)
     designation = models.CharField(max_length=600, null=False)
+    unite = models.CharField(max_length=5, null=False)
     prix_u = models.DecimalField(
         max_digits=10, decimal_places=2,
         validators=[MinValueValidator(0)], default=0
     )
-    unite = models.CharField(max_length=5, null=False)
     quantite = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], default=0)
     prix_q = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                  editable=False)
-
     def save(self, *args, **kwargs):
         self.prix_q = self.quantite * self.prix_u
         super(DQE, self).save(*args, **kwargs)

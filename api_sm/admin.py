@@ -104,6 +104,6 @@ class NTAdmin(admin.ModelAdmin):
 admin.site.register(NT, NTAdmin)
 
 class DQEAdmin(admin.ModelAdmin):
-    list_display = ("marche","designation","prix_u","unite","quantite","prix_q")
+    list_display = ("marche","designation","unite","prix_u","quantite","prix_q")
 
 admin.site.register(DQE, DQEAdmin)
