@@ -143,7 +143,6 @@ class Marche(models.Model):
         return self.nt.code_site.code_site + self.nt.nt + str(self.avenant)
 
     def save(self, *args, **kwargs):
-        self.ttc = self.ht + (self.ht * self.tva)
         self.date_modification = datetime.now()
         super(Marche, self).save(*args, **kwargs)
 
@@ -154,6 +153,7 @@ class Marche(models.Model):
     class Meta:
         verbose_name = 'Marchés'
         verbose_name_plural = 'Marchés'
+        unique_together = (('avenant', 'nt'),)
 
 
 class DQE(models.Model):
@@ -170,15 +170,6 @@ class DQE(models.Model):
 
     def save(self, *args, **kwargs):
         self.prix_q = self.quantite * self.prix_u
-        dqe=DQE.objects.filter(marche=self.marche)
-        marche=Marche.objects.get(id=self.marche.id)
-        ht=0
-        for d in dqe:
-            ht=ht+d.prix_q
-        marche.ht=ht
-        marche.save()
-
-
         super(DQE, self).save(*args, **kwargs)
 
     class Meta:
