@@ -150,10 +150,12 @@ admin.site.register(Banque,BanqueAdmin)
 
 class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = BanqueResource
-    list_display = ("marche", "libelle", "date_soumission", "montant","user_id","date_modification")
+    list_display = ("marche", "Type_Caution","montant", "date_soumission", "montant","user_id","date_modification")
 
-    def libelle(self,request,obj):
+    def Type_Caution(self,obj):
         return obj.type.libelle
+
+
     def save_model(self, request, obj, form, change):
         obj.date_modification = datetime.now()
         super().save_model(request, obj, form, change)

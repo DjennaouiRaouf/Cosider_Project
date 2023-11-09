@@ -200,6 +200,8 @@ class TypeCaution(models.Model):
     user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
+    def __str__(self):
+        return self.libelle
     def save(self, *args, **kwargs):
         self.date_modification = datetime.now()
         super(TypeCaution, self).save(*args, **kwargs)
@@ -243,6 +245,9 @@ class TypeAvance(models.Model):
     libelle=models.CharField(max_length=500,null=False,unique=True)
     user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
+
+    def __str__(self):
+        return self.libelle
     def save(self, *args, **kwargs):
         self.date_modification = datetime.now()
         super(TypeAvance, self).save(*args, **kwargs)
@@ -274,7 +279,7 @@ class Cautions(models.Model):
     type=models.ForeignKey(TypeCaution, models.DO_NOTHING,null=False)
     avance = models.ForeignKey(Avance, models.DO_NOTHING, null=True,blank=True)
     date_soumission = models.DateField(blank=True, null=False)
-    banque=models.ForeignKey(Marche, models.DO_NOTHING,null=False)
+    banque=models.ForeignKey(Banque, models.DO_NOTHING,null=False)
     montant=models.DecimalField(
         max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0,
