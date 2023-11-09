@@ -180,13 +180,16 @@ class DQE(models.Model):
     quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
     prix_q = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                  editable=False)
-
+    user_id = CurrentUserField(editable=False)
+    date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
     def save(self, *args, **kwargs):
         self.prix_q =self.quantite * self.prix_u
+        self.date_modification = datetime.now()
         super(DQE, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
+        self.date_modification = datetime.now()
         super(DQE, self).save(*args, **kwargs)
     class Meta:
         verbose_name = 'DQE'

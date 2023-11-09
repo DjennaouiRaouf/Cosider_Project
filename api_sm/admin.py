@@ -104,7 +104,7 @@ admin.site.register(NT, NTAdmin)
 
 class DQEAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = DQEResource
-    list_display = ("marche","designation","unite","quantite","prix_u","prix_q")
+    list_display = ("marche","designation","unite","quantite","prix_u","prix_q","user_id","date_modification")
 
 admin.site.register(DQE, DQEAdmin)
 
