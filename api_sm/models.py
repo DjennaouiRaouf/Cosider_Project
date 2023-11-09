@@ -295,7 +295,7 @@ class Cautions(models.Model):
             taux_c=TypeCaution.objects.get(libelle=self.avance.type.libelle).taux
             self.montant=self.avance.montant*taux_c
         if(not self.avance):
-            self.montant = self.marche.ttc * self.type.taux
+            self.montant = (self.marche.ttc * self.type.taux)/100
 
 
         self.est_recupere=False # la caution est déposée
