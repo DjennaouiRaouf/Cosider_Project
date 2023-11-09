@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'colorfield',
+    'djangoql',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
