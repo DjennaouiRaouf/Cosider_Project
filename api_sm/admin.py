@@ -1,6 +1,7 @@
 from datetime import datetime
+
+from admin_adv_search_builder.filters import AdvancedSearchBuilder
 from django.contrib import admin
-from djangoql.admin import DjangoQLSearchMixin
 from import_export.admin import ImportExportModelAdmin
 from django_currentuser.middleware import (
     get_current_user, get_current_authenticated_user)
@@ -128,10 +129,9 @@ admin.site.register(TypeAvance, TypeAvanceAdmin)
 
 
 
-class  TypeCautionAdmin(DjangoQLSearchMixin,ImportExportModelAdmin,admin.ModelAdmin):
+class  TypeCautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeCautionResource
-    search_fields = ('taux', 'libelle')
-    djangoql_completion_enabled_by_default = True
+    list_filter = (AdvancedSearchBuilder,)
     list_display = ("id", "libelle", "taux", "user_id","date_modification")
 
     def save_model(self, request, obj, form, change):

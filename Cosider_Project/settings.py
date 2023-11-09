@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'colorfield',
-    'djangoql',
+    'admin_adv_search_builder',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
@@ -115,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 
-LANGUAGE_CODE = 'fr'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
 

@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from _decimal import Decimal
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -200,7 +199,7 @@ class TypeCaution(models.Model):
     taux=models.DecimalField(default=0,  max_digits=38, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
-   
+
     def save(self, *args, **kwargs):
         self.date_modification = datetime.now()
         super(TypeCaution, self).save(*args, **kwargs)
