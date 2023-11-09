@@ -272,7 +272,7 @@ class Avance(models.Model):
 class Cautions(models.Model):
     marche = models.ForeignKey(Marche, models.DO_NOTHING,null=False,related_name="Caution_Marche")
     type=models.ForeignKey(TypeCaution, models.DO_NOTHING,null=False)
-    avance = models.ForeignKey(Avance, models.DO_NOTHING, null=True)
+    avance = models.ForeignKey(Avance, models.DO_NOTHING, null=True,blank=True)
     date_soumission = models.DateField(blank=True, null=False)
     banque=models.ForeignKey(Marche, models.DO_NOTHING,null=False)
     montant=models.DecimalField(

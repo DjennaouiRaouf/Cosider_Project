@@ -1,10 +1,5 @@
-from datetime import datetime
-
-from admin_adv_search_builder.filters import AdvancedSearchBuilder
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
-from django_currentuser.middleware import (
-    get_current_user, get_current_authenticated_user)
 from api_sm.Resources import *
 from api_sm.models import *
 
@@ -131,7 +126,6 @@ admin.site.register(TypeAvance, TypeAvanceAdmin)
 
 class  TypeCautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeCautionResource
-    list_filter = (AdvancedSearchBuilder,)
     list_display = ("id", "libelle", "taux", "user_id","date_modification")
 
     def save_model(self, request, obj, form, change):
@@ -151,3 +145,20 @@ class BanqueAdmin(ImportExportModelAdmin,admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 admin.site.register(Banque,BanqueAdmin)
+
+
+
+class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    resource_class = BanqueResource
+    list_display = ("marche", "libelle", "date_soumission", "montant","user_id","date_modification")
+
+    def libelle(self,request,obj):
+        return obj.type.libelle
+    def save_model(self, request, obj, form, change):
+        obj.date_modification = datetime.now()
+        super().save_model(request, obj, form, change)
+
+
+
+admin.site.register(Cautions,CautionAdmin)
+
