@@ -153,8 +153,7 @@ class Marche(models.Model):
         return sum
     @property
     def ttc(self):
-        print(self.ht*self.tva/100)
-        return (self.ht+(self.ht*self.tva/100))
+        return round(self.ht+(self.ht*self.tva/100),2)
 
     def save(self, *args, **kwargs):
         self.date_modification = datetime.now()
