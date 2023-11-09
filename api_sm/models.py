@@ -1,9 +1,11 @@
 from datetime import datetime
 
+from _decimal import Decimal
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django_currentuser.db.models import CurrentUserField
 
 
 # Create your models here.
@@ -11,7 +13,6 @@ class Images(models.Model):
     key = models.BigAutoField(primary_key=True)
     src = models.ImageField(upload_to="Images/Login", null=False, blank=True, default='default.png')
     est_bloquer = models.BooleanField(default=False)
-
     def delete(self, *args, **kwargs):
         self.est_bloquer = not self.est_bloquer
         super(Images, self).save(*args, **kwargs)
@@ -29,15 +30,17 @@ class Clients(models.Model):
     nif = models.CharField(db_column='NIF', unique=True, max_length=50, blank=True, null=True)
     raison_social = models.CharField(db_column='Raison_Social', max_length=50, blank=True, null=True)
     num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True, null=True)
-    est_bloquer = models.BooleanField(default=False, db_column='Est_Bloquer', null=False)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+    user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', editable=False, auto_now=True)
 
     def __str__(self):
         return "Client: "+self.code_client
 
+    def save(self, *args, **kwargs):
+        self.date_modification = datetime.now()
+        super(Clients, self).save(*args, **kwargs)
+
     def delete(self, *args, **kwargs):
-        self.est_bloquer = not self.est_bloquer
         self.date_modification = datetime.now()
         super(Clients, self).save(*args, **kwargs)
 
@@ -56,11 +59,11 @@ class Sites(models.Model):
     code_division = models.CharField(db_column='Code_Division', max_length=15, blank=True, null=True)
     code_commune_site = models.CharField(db_column='Code_Commune_Site', max_length=10, blank=True, null=True)
     jour_cloture_mouv_rh_paie = models.CharField(db_column='Jour_Cloture_Mouv_RH_Paie', max_length=2, blank=True,
-                                                 null=True)
+                                          null=True)
     date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=False)
     date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', null=False, default=False)
+    user_id = CurrentUserField(editable=False)
+   
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
     def __str__(self):
@@ -75,7 +78,7 @@ class Sites(models.Model):
             raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
 
     def delete(self, *args, **kwargs):
-        self.est_bloquer = not self.est_bloquer
+        self.date_modification = datetime.now()
         super(Sites, self).save(*args, **kwargs)
 
     class Meta:
@@ -91,8 +94,8 @@ class NT(models.Model):
     libelle_nt = models.TextField(db_column='Libelle_NT', blank=True, null=True)
     date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True)
     date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True)
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', null=False, default=False)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+   
+    user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
     def __str__(self):
@@ -107,7 +110,6 @@ class NT(models.Model):
 
     def delete(self, *args, **kwargs):
         self.date_modification = datetime.now()
-        self.est_bloquer = not self.est_bloquer
         super(NT, self).save(*args, **kwargs)
 
     class Meta:
@@ -123,20 +125,20 @@ class Marche(models.Model):
     ods_depart = models.DateField(null=False, blank=True)
     delais = models.PositiveIntegerField(default=0, null=False)
     ht = models.DecimalField(
-        max_digits=10, decimal_places=2, editable=False,
+        max_digits=38, decimal_places=2, editable=False,
         validators=[MinValueValidator(0)], default=0
     )
     ttc = models.DecimalField(
-        max_digits=10, decimal_places=2, editable=False,
+        max_digits=38, decimal_places=2, editable=False,
         validators=[MinValueValidator(0)], default=0
     )
     revisable = models.BooleanField(default=True, null=False)
     rabais = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
                                          null=False)
-    tva = models.DecimalField(default=0,  max_digits=10, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    tva = models.DecimalField(default=0,  max_digits=38, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     code_contrat = models.CharField(null=False, blank=True, max_length=20)
     date_signature = models.DateTimeField(db_column='Date_Signature', null=False, auto_now=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+    user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
     def __str__(self):
@@ -151,6 +153,7 @@ class Marche(models.Model):
         return sum
     @property
     def ttc(self):
+        print(self.ht*self.tva/100)
         return (self.ht+(self.ht*self.tva/100))
 
     def save(self, *args, **kwargs):
@@ -158,7 +161,6 @@ class Marche(models.Model):
         super(Marche, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        self.est_bloquer = not self.est_bloquer
         super(NT, self).save(*args, **kwargs)
 
     class Meta:
@@ -172,16 +174,20 @@ class DQE(models.Model):
     designation = models.CharField(max_length=600, null=False)
     unite = models.CharField(max_length=5, null=False)
     prix_u = models.DecimalField(
-        max_digits=10, decimal_places=2,
+        max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0
     )
-    quantite = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], default=0)
-    prix_q = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+    quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    prix_q = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                  editable=False)
+
+
     def save(self, *args, **kwargs):
-        self.prix_q = self.quantite * self.prix_u
+        self.prix_q =self.quantite * self.prix_u
         super(DQE, self).save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        super(DQE, self).save(*args, **kwargs)
     class Meta:
         verbose_name = 'DQE'
         verbose_name_plural = 'DQE'
@@ -189,9 +195,10 @@ class DQE(models.Model):
 
 class TypeCaution(models.Model):
     libelle=models.CharField(max_length=500,null=False)
-    taux=models.DecimalField(default=0,  max_digits=10, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+    taux=models.DecimalField(default=0,  max_digits=38, decimal_places=2, validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
+   
     def save(self, *args, **kwargs):
         self.date_modification = datetime.now()
         super(TypeCaution, self).save(*args, **kwargs)
@@ -212,15 +219,14 @@ class Banque(models.Model):
     adresse = models.CharField(max_length=300, null=False)
     ville =  models.CharField(max_length=300, null=False)
     wilaya =  models.CharField(max_length=300, null=False)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+    user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', null=False, default=False)
+   
     def save(self, *args, **kwargs):
         self.date_modification = datetime.now()
         super(Banque, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        self.est_bloquer = not self.est_bloquer
         super(Banque, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -233,8 +239,8 @@ class Banque(models.Model):
 
 
 class TypeAvance(models.Model):
-    libelle=models.CharField(max_length=500,null=False)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+    libelle=models.CharField(max_length=500,null=False,unique=True)
+    user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
     def save(self, *args, **kwargs):
         self.date_modification = datetime.now()
@@ -244,15 +250,15 @@ class TypeAvance(models.Model):
         super(TypeCaution, self).save(*args, **kwargs)
 
     class Meta:
-        verbose_name = 'Type_Caution'
-        verbose_name_plural = 'Type_Caution'
+        verbose_name = 'Type Avance'
+        verbose_name_plural = 'Type Avance'
 
 class Avance(models.Model):
     marche = models.ForeignKey(Marche, models.DO_NOTHING, null=False, related_name="Avance_Marche")
     type= models.ForeignKey(TypeAvance,models.DO_NOTHING,null=False)
-    montant = models.DecimalField(max_digits=10, decimal_places=2,validators=[MinValueValidator(0)], default=0)
+    montant = models.DecimalField(max_digits=38, decimal_places=2,validators=[MinValueValidator(0)], default=0)
     Client=models.ForeignKey(Marche, models.DO_NOTHING, null=False, related_name="Avance_Client")
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+    user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
     def save(self, *args, **kwargs):
         self.date_modification = datetime.now()
@@ -265,21 +271,26 @@ class Avance(models.Model):
 class Cautions(models.Model):
     marche = models.ForeignKey(Marche, models.DO_NOTHING,null=False,related_name="Caution_Marche")
     type=models.ForeignKey(TypeCaution, models.DO_NOTHING,null=False)
+    avance = models.ForeignKey(Avance, models.DO_NOTHING, null=True)
     date_soumission = models.DateField(blank=True, null=False)
     banque=models.ForeignKey(Marche, models.DO_NOTHING,null=False)
     montant=models.DecimalField(
-        max_digits=10, decimal_places=2,
+        max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0,
         editable=False
     )
     est_recupere=models.BooleanField(default=True,null=False,editable=False)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, db_column='User_ID', editable=False)
+    user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
     def recuperation(self):
         self.est_recupere=True # la caution est récupérée
     def soumission(self):
-        #si c'est une caution sur avance  alors appliquer le pourcentage sur le montant de l'avance
-        #sinon sur le prix du marché
+        if(self.avance and self.avance.type.libelle == self.type.libelle):
+            taux_c=TypeCaution.objects.get(libelle=self.avance.type.libelle).taux
+            self.montant=self.avance.montant*taux_c
+        if(not self.avance):
+            self.montant = self.marche.ttc * self.type.taux
+
 
         self.est_recupere=False # la caution est déposée
 

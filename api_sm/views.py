@@ -63,7 +63,7 @@ class AddClientView(generics.CreateAPIView):
             Clients.objects.create(code_client=code_client, type_client=type_client
                     , est_client_cosider=est_client_cosider, libelle_client=libelle_client
                     , nif=nif, raison_social=raison_social, num_registre_commerce=num_registre_commerce
-                    , user_id=User.objects.get(id=request.user.id)).save()
+                   ).save()
 
             return Response({'message': 'Client ajouté'}, status=status.HTTP_200_OK)
 
@@ -73,7 +73,7 @@ class AddClientView(generics.CreateAPIView):
 
 class GetClientsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, ViewClientPermission]
-    queryset = Clients.objects.filter(est_bloquer=False)
+    queryset = Clients.objects.filter()
     serializer_class = ClientsSerializer1
 
 
@@ -97,7 +97,7 @@ class  AddSiteView(APIView):
                   code_region=code_region, libelle_site=libelle_site, code_division=code_division,
                   code_commune_site=code_commune_site, jour_cloture_mouv_rh_paie=jour_cloture_mouv_rh_paie,
                   date_cloture_site=date_cloture_site,
-                  date_ouverture_site=date_ouverture_site, user_id=User.objects.get(id=request.user.id))
+                  date_ouverture_site=date_ouverture_site)
             return Response({'message': 'Site ajouté'}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'message': "".join(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -105,7 +105,7 @@ class  AddSiteView(APIView):
     
 class GetSitesView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, ViewSitePermission]
-    queryset = Sites.objects.filter(est_bloquer=False)
+    queryset = Sites.objects.filter()
     serializer_class = SiteSerializer1
 
 
