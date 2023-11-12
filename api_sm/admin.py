@@ -106,6 +106,19 @@ class NTAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 admin.site.register(NT, NTAdmin)
 
+
+@admin.register(Ordre_De_Service)
+class ODS(ImportExportModelAdmin,admin.ModelAdmin):
+    save_as = True
+    resource_class = ODSResource
+    list_display = ("marche","date_interruption","date_reprise","motif","user_id","date_modification")
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "marche":  # Replace 'parent' with the actual name of your ForeignKey field
+            kwargs["queryset"] = Marche.objects.filter(avenant_du_contrat__isnull=True)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
 @admin.register(DQE)
 class DQEAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True

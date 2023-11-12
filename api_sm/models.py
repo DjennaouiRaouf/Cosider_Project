@@ -201,8 +201,8 @@ class DQE(models.Model):
         verbose_name_plural = 'DQE'
 
 
-class ODS(models.Model):
-    marche=models.ForeignKey(Marche,models.DO_NOTHING,null=True)
+class Ordre_De_Service(models.Model):
+    marche=models.ForeignKey(Marche,models.DO_NOTHING,null=True ,related_name="ods_marche")
     date_interruption=models.DateField(null=False,blank=True)
     date_reprise=models.DateField(null=False,blank=True)
     motif=models.TextField(null=False,blank=True)
@@ -212,10 +212,10 @@ class ODS(models.Model):
     def save(self, *args, **kwargs):
         if (self.date_reprise > self.date_reprise):
             self.date_modification = datetime.now()
-        super(ODS, self).save(*args, **kwargs)
+        super(Ordre_De_Service, self).save(*args, **kwargs)
     class Meta:
-        verbose_name = 'ODS'
-        verbose_name_plural = 'ODS'
+        verbose_name = 'Ordre_De_Service'
+        verbose_name_plural = 'Ordre_De_Service'
 
 
 
