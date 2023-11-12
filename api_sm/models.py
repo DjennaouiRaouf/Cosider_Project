@@ -163,7 +163,6 @@ class Marche(models.Model):
             self.num_avenant=self.avenant_du_contrat.nbr_avenant
             self.nbr_avenant = self.avenant_du_contrat.nbr_avenant
             self.avenant_du_contrat.save()
-
         super(Marche, self).save(*args, **kwargs)
 
 
@@ -171,6 +170,7 @@ class Marche(models.Model):
     class Meta:
         verbose_name = 'Marchés'
         verbose_name_plural = 'Marchés'
+        unique_together=(("nt","num_avenant"))
 
 
 
@@ -199,6 +199,28 @@ class DQE(models.Model):
     class Meta:
         verbose_name = 'DQE'
         verbose_name_plural = 'DQE'
+
+
+class ODS(models.Model):
+    marche=models.ForeignKey(Marche,models.DO_NOTHING,null=True)
+    date_interruption=models.DateField(null=False,blank=True)
+    date_reprise=models.DateField(null=False,blank=True)
+    motif=models.TextField(null=False,blank=True)
+    user_id = CurrentUserField(editable=False)
+    date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if (self.date_reprise > self.date_reprise):
+            self.date_modification = datetime.now()
+        super(ODS, self).save(*args, **kwargs)
+    class Meta:
+        verbose_name = 'ODS'
+        verbose_name_plural = 'ODS'
+
+
+
+
+
 
 
 class TypeCaution(models.Model):

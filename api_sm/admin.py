@@ -1,3 +1,4 @@
+
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from api_sm.Resources import *
@@ -105,11 +106,11 @@ class NTAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 admin.site.register(NT, NTAdmin)
 
+@admin.register(DQE)
 class DQEAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    save_as = True
     resource_class = DQEResource
     list_display = ("marche","designation","unite","quantite","prix_u","prix_q","user_id","date_modification")
-
-admin.site.register(DQE, DQEAdmin)
 
 
 
