@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -93,7 +92,7 @@ class NT(models.Model):
     libelle_nt = models.TextField(db_column='Libelle_NT', blank=True, null=True)
     date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True)
     date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True)
-   
+
     user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
@@ -119,7 +118,8 @@ class NT(models.Model):
 
 class Marche(models.Model):
     nt = models.ForeignKey(NT, models.DO_NOTHING, db_column='numero_marche', null=False)
-    avenant = models.PositiveBigIntegerField(default=0, db_column='avenant', null=False)
+    num_avenant = models.PositiveBigIntegerField(default=0, null=False, editable=False)
+    nbr_avenant = models.PositiveBigIntegerField(default=0, null=False, editable=False)
     libelle = models.CharField(null=False, blank=True, max_length=500)
     ods_depart = models.DateField(null=False, blank=True)
     delais = models.PositiveIntegerField(default=0, null=False)
@@ -139,9 +139,11 @@ class Marche(models.Model):
     date_signature = models.DateTimeField(db_column='Date_Signature', null=False, auto_now=True)
     user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
-
+    avenant_du_contrat=models.ForeignKey('self',models.DO_NOTHING,null=True,blank=True,related_name='avenants')
     def __str__(self):
-        return "Site: "+self.nt.code_site.code_site +" Nt: "+self.nt.nt+" Av: " + str(self.avenant)
+        return "Site: "+self.nt.code_site.code_site +" Nt: "+self.nt.nt+" Av: " + str(self.num_avenant)
+
+
 
     @property
     def ht(self):
@@ -156,15 +158,20 @@ class Marche(models.Model):
 
     def save(self, *args, **kwargs):
         self.date_modification = datetime.now()
+        if not self.id and self.avenant_du_contrat:
+            self.avenant_du_contrat.nbr_avenant += 1
+            self.num_avenant=self.avenant_du_contrat.nbr_avenant
+            self.nbr_avenant = self.avenant_du_contrat.nbr_avenant
+            self.avenant_du_contrat.save()
+
         super(Marche, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        super(NT, self).save(*args, **kwargs)
+
 
     class Meta:
         verbose_name = 'Marchés'
         verbose_name_plural = 'Marchés'
-        unique_together = (('avenant', 'nt'),)
+
 
 
 class DQE(models.Model):

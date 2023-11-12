@@ -50,6 +50,7 @@ admin.site.register(Clients, ClientAdmin)
 
 
 class SitesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    resource_class = SiteResource
     list_per_page = lp
     list_display = ('code_site','code_filiale','code_region','libelle_site','type_site','code_division',
         'code_commune_site','date_ouverture_site', 'date_cloture_site','user_id', 'date_modification')
@@ -70,8 +71,13 @@ admin.site.register(Sites, SitesAdmin)
 
 class MarcheAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = MarcheResource
-    list_display = ('nt','avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable' ,'rabais'
+    list_display = ('nt','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable' ,'rabais'
     ,'tva','user_id','date_modification')
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "avenant_du_contrat":  # Replace 'parent' with the actual name of your ForeignKey field
+            kwargs["queryset"] = Marche.objects.filter(avenant_du_contrat__isnull=True)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
     def save_model(self, request, obj, form, change):
         
         obj.date_modification = datetime.now()
