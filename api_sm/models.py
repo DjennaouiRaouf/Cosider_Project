@@ -111,8 +111,8 @@ class NT(models.Model):
         super(NT, self).save(*args, **kwargs)
 
     class Meta:
-        verbose_name = 'NT'
-        verbose_name_plural = 'NT'
+        verbose_name = 'Numero du travail'
+        verbose_name_plural = 'Numero du travail'
         unique_together = (('code_site', 'nt'),)
 
 
@@ -214,8 +214,8 @@ class Ordre_De_Service(models.Model):
             self.date_modification = datetime.now()
         super(Ordre_De_Service, self).save(*args, **kwargs)
     class Meta:
-        verbose_name = 'Ordre_De_Service'
-        verbose_name_plural = 'Ordre_De_Service'
+        verbose_name = 'Ordre de service'
+        verbose_name_plural = 'Ordre de service'
 
 
 

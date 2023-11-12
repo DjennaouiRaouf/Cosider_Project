@@ -76,7 +76,7 @@ class MarcheAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     ,'tva','user_id','date_modification')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "avenant_du_contrat":  # Replace 'parent' with the actual name of your ForeignKey field
+        if db_field.name == "avenant_du_contrat":  
             kwargs["queryset"] = Marche.objects.filter(avenant_du_contrat__isnull=True)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
     def save_model(self, request, obj, form, change):
@@ -114,7 +114,7 @@ class ODS(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ("marche","date_interruption","date_reprise","motif","user_id","date_modification")
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "marche":  # Replace 'parent' with the actual name of your ForeignKey field
+        if db_field.name == "marche":  
             kwargs["queryset"] = Marche.objects.filter(avenant_du_contrat__isnull=True)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
