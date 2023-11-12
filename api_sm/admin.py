@@ -8,6 +8,8 @@ from api_sm.models import *
 
 lp=25
 
+'''
+
 @admin.register(Images)
 class ImagesAdmin(admin.ModelAdmin):
     list_per_page = lp
@@ -19,6 +21,8 @@ class ImagesAdmin(admin.ModelAdmin):
             obj.est_bloquer = not obj.est_bloquer
             obj.save()
 
+
+'''
 
 
 
@@ -143,7 +147,7 @@ class  TypeAvanceAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 @admin.register(TypeCaution)
 class  TypeCautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeCautionResource
-    list_display = ("id", "libelle", "taux", "user_id","date_modification")
+    list_display = ("id", "libelle", "taux","user_id","date_modification")
 
     def save_model(self, request, obj, form, change):
         obj.date_modification = datetime.now()
