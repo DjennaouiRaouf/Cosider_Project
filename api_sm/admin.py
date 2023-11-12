@@ -8,7 +8,7 @@ from api_sm.models import *
 
 lp=25
 
-
+@admin.register(Images)
 class ImagesAdmin(admin.ModelAdmin):
     list_per_page = lp
     list_display = ('key','src','est_bloquer')
@@ -19,12 +19,11 @@ class ImagesAdmin(admin.ModelAdmin):
             obj.est_bloquer = not obj.est_bloquer
             obj.save()
 
-admin.site.register(Images, ImagesAdmin)
 
 
 
 
-
+@admin.register(Clients)
 class ClientAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_per_page = lp
     resource_class=ClientResource
@@ -46,10 +45,10 @@ class ClientAdmin(ImportExportModelAdmin,admin.ModelAdmin):
             obj.date_modification = datetime.now()
             obj.save()
 
-admin.site.register(Clients, ClientAdmin)
 
 
 
+@admin.register(Sites)
 class SitesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = SiteResource
     list_per_page = lp
@@ -67,9 +66,9 @@ class SitesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
             obj.date_modification = datetime.now()
             obj.save()
 
-admin.site.register(Sites, SitesAdmin)
 
 
+@admin.register(Marche)
 class MarcheAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = MarcheResource
     list_display = ('nt','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable' ,'rabais'
@@ -87,8 +86,8 @@ class MarcheAdmin(ImportExportModelAdmin,admin.ModelAdmin):
         for obj in queryset:
             obj.save()
 
-admin.site.register(Marche, MarcheAdmin)
 
+@admin.register(NT)
 class NTAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
     list_display = (
@@ -104,7 +103,6 @@ class NTAdmin(ImportExportModelAdmin,admin.ModelAdmin):
         for obj in queryset:
             obj.save()
 
-admin.site.register(NT, NTAdmin)
 
 
 @admin.register(Ordre_De_Service)
@@ -126,7 +124,7 @@ class DQEAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ("marche","designation","unite","quantite","prix_u","prix_q","user_id","date_modification")
 
 
-
+@admin.register(TypeAvance)
 class  TypeAvanceAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeAvanceResource
     list_display = ("id", "libelle", "user_id","date_modification")
@@ -140,10 +138,9 @@ class  TypeAvanceAdmin(ImportExportModelAdmin,admin.ModelAdmin):
             obj.save()
 
 
-admin.site.register(TypeAvance, TypeAvanceAdmin)
 
 
-
+@admin.register(TypeCaution)
 class  TypeCautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeCautionResource
     list_display = ("id", "libelle", "taux", "user_id","date_modification")
@@ -153,9 +150,9 @@ class  TypeCautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-admin.site.register(TypeCaution,TypeCautionAdmin)
 
 
+@admin.register(Banque)
 class BanqueAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = BanqueResource
     list_display = ("id", "nom", "adresse", "ville", "wilaya","user_id","date_modification")
@@ -164,10 +161,10 @@ class BanqueAdmin(ImportExportModelAdmin,admin.ModelAdmin):
         obj.date_modification = datetime.now()
         super().save_model(request, obj, form, change)
 
-admin.site.register(Banque,BanqueAdmin)
 
 
 
+@admin.register(Cautions)
 class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = BanqueResource
     list_display = ("marche", "Type_Caution","montant", "date_soumission", "montant","user_id","date_modification")
@@ -175,12 +172,6 @@ class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     def Type_Caution(self,obj):
         return obj.type.libelle
 
-
     def save_model(self, request, obj, form, change):
         obj.date_modification = datetime.now()
         super().save_model(request, obj, form, change)
-
-
-
-admin.site.register(Cautions,CautionAdmin)
-
