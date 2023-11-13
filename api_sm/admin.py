@@ -1,5 +1,4 @@
 from django.contrib import admin
-from djangoql.admin import DjangoQLSearchMixin
 from import_export.admin import ImportExportModelAdmin
 from api_sm.Resources import *
 from api_sm.models import *
@@ -124,9 +123,9 @@ class ODS(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(DQE)
-class DQEAdmin(DjangoQLSearchMixin,admin.ModelAdmin):
+class DQEAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
-    #resource_class = DQEResource
+    resource_class = DQEResource
     list_display = ("marche","designation","unite","quantite","prix_u","prix_q","user_id","date_modification")
 
 
