@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from import_export.admin import ImportExportModelAdmin
 from api_sm.Resources import *
 from api_sm.models import *
@@ -180,3 +181,21 @@ class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.date_modification = datetime.now()
         super().save_model(request, obj, form, change)
+
+@admin.register(Attachements)
+class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    list_display=("marche","designation","qte_realise","avancement","estimation_travaux_avant_r","estimation_travaux_apres_r")
+
+    def avancement(self,obj):
+        return format_html(
+            '''
+            <progress value="{0}" max="100"></progress>
+            <span style="font-weight:bold">{0}%</span>
+            ''',
+            obj.taux
+        )
+    def marche(self,obj):
+        return obj.dqe.marche
+
+    def designation(self, obj):
+        return obj.dqe.designation
