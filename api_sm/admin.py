@@ -82,7 +82,7 @@ class MarcheAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     ,'tva','user_id','date_modification')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "avenant_du_contrat":  
+        if db_field.name == "avenant_du_contrat":
             kwargs["queryset"] = Marche.objects.filter(avenant_du_contrat__isnull=True)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
     def save_model(self, request, obj, form, change):
@@ -176,8 +176,11 @@ class BanqueAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 @admin.register(Cautions)
 class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = BanqueResource
-    list_display = ("marche", "Type_Caution","montant", "date_soumission", "montant","user_id","date_modification")
+    list_display = ("marche", "Type_Caution","montant", "date_soumission", "montant","user_id","date_modification","est_recupere")
+    actions = ['recuperer']
 
+    def recuperer(self, request, queryset):
+        queryset.update(est_recupere=True)
     def Type_Caution(self,obj):
         return obj.type.libelle
 
