@@ -362,6 +362,7 @@ class Attachements(models.Model):
     def save(self, *args, **kwargs):
         self.taux = round(self.qte_realise * 100 / self.dqe.quantite, 2)
         self.estimation_travaux_avant_r = self.dqe.prix_u * self.qte_realise
+
         super(Attachements, self).save(*args, **kwargs)
 
     class Meta:

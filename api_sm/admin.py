@@ -1,12 +1,15 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from import_export.admin import ImportExportModelAdmin
+
 from api_sm.Resources import *
 from api_sm.models import *
 
 
 
 lp=25
+
+
 
 '''
 
@@ -182,9 +185,11 @@ class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
         obj.date_modification = datetime.now()
         super().save_model(request, obj, form, change)
 
+
 @admin.register(Attachements)
-class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class AttachementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display=("marche","designation","qte_realise","avancement","estimation_travaux_avant_r","estimation_travaux_apres_r")
+
 
     def avancement(self,obj):
         return format_html(
