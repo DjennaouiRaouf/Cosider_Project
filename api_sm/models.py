@@ -342,6 +342,12 @@ class Cautions(models.Model):
         verbose_name_plural = 'Caution'
 
 
+class Attachements(models.Model):
+    dqe=models.ForeignKey(DQE,models.DO_NOTHING)
+    qte_realise=models.PositiveBigIntegerField(null=False,blank=True)
+    taux_=models.DecimalField()
+
+
 
 
 '''
