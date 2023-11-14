@@ -111,7 +111,13 @@ class GetSitesView(generics.ListAPIView):
 
 class GetMarcheView(generics.ListAPIView):
 
-    queryset = Marche.objects.filter()
+    queryset = Marche.objects.all()
+    serializer_class = ListMarcheSerializer
+
+
+class GetDQEView(generics.ListAPIView):
+
+    queryset = DQE.objects.all()
     serializer_class = ListMarcheSerializer
 
 

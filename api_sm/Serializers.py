@@ -52,3 +52,8 @@ class ListMarcheSerializer(serializers.ModelSerializer):
     class Meta:
         model=Marche
         fields= '__all__'
+
+class DQESerializer(serializers.ModelSerializer):
+    class Meta:
+        model=DQE
+        fields='__al__'
