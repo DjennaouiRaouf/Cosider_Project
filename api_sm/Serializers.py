@@ -36,3 +36,16 @@ class MarcheSerializer(serializers.ModelSerializer):
     class Meta:
         model=Marche
         fields= '__all__'
+
+
+
+class RecursiveSerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        serializer = self.parent.parent.__class__(instance, context=self.context)
+        return serializer.data
+
+class ListMarcheSerializer(serializers.ModelSerializer):
+    avenants= RecursiveSerializer(many=True, read_only=True)
+    class Meta:
+        model=Marche
+        fields= '__all__'

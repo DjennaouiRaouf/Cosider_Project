@@ -11,6 +11,7 @@ urlpatterns = [
     path('addsite/',AddSiteView.as_view()),
     path('getsites/', GetSitesView.as_view()),
     path('addmarche/',AddMacheView.as_view()),
+    path('getmarche/',GetMarcheView.as_view()),
 
 
 ]

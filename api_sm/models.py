@@ -383,4 +383,19 @@ class Attachements(models.Model):
         verbose_name_plural = 'Attachements'
 
 
+class Factures(models.Model):
+    numero_facture=models.CharField(max_length=500,null=False)
+    date_facture=models.DateField(null=False,blank=True)
+    Attachements=models.ForeignKey(Attachements,models.DO_NOTHING,null=False)
+    
+    montant=models.DecimalField(max_digits=38, decimal_places=2,
+                                                     validators=[MinValueValidator(0)], default=0,
+                                                     editable=False)
+
+    montant_apres_rabais = models.DecimalField(max_digits=38, decimal_places=2,
+                                  validators=[MinValueValidator(0)], default=0,
+                                  editable=False)
+
+
+
 

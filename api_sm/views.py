@@ -109,6 +109,10 @@ class GetSitesView(generics.ListAPIView):
     serializer_class = SiteSerializer
 
 
+class GetMarcheView(generics.ListAPIView):
+
+    queryset = Marche.objects.filter(avenant_du_contrat__isnull=True)
+    serializer_class = ListMarcheSerializer
 
 
 
