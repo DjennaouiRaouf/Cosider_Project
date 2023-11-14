@@ -181,10 +181,7 @@ class DQE(models.Model):
         max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0
     )
-    prix_ur = models.DecimalField(
-        max_digits=38, decimal_places=2,
-        validators=[MinValueValidator(0)], default=0
-    )
+
     quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
     prix_q = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                  editable=False)
@@ -200,8 +197,6 @@ class DQE(models.Model):
     def save(self, *args, **kwargs):
         self.prix_q = self.quantite * self.prix_u
         self.date_modification = datetime.now()
-        if(self.marche.revisable==False or self.prix_ur==0):
-            self.prix_ur=self.prix_u
 
         super(DQE, self).save(*args, **kwargs)
 
@@ -371,13 +366,10 @@ class Attachements(models.Model):
                                                      validators=[MinValueValidator(0)], default=0,
                                                      editable=False)
 
+
     def save(self, *args, **kwargs):
-        if (self.dqe.marche.revisable == False and self.dqe.prix_ur==0):
-            self.taux = round(self.qte_realise * 100 / self.dqe.quantite, 2)
-            self.estimation_travaux_avant_r = self.dqe.prix_u * self.qte_realise
-        if (self.dqe.marche.revisable == True and self.dqe.prix_ur != 0):
-            self.taux = round(self.qte_realise * 100 / self.dqe.quantite, 2)
-            self.estimation_travaux_apres_r = self.dqe.prix_ur * self.qte_realise
+        self.taux = round(self.qte_realise * 100 / self.dqe.quantite, 2)
+        self.estimation_travaux_avant_r = self.dqe.prix_u * self.qte_realise
 
         super(Attachements, self).save(*args, **kwargs)
 
