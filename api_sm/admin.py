@@ -130,7 +130,8 @@ class ODS(ImportExportModelAdmin,admin.ModelAdmin):
 class DQEAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     resource_class = DQEResource
-    list_display = ("marche","designation","unite","quantite","prix_u","prix_q","user_id","date_modification")
+    list_display = ("marche","designation","unite","quantite","prix_u","prix_q","prix_ur","user_id","date_modification")
+    list_editable = ("prix_ur",)
 
 
 @admin.register(TypeAvance)
