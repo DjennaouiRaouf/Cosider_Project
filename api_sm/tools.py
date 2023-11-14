@@ -2,13 +2,14 @@ from django.contrib.auth.models import User
 from rest_framework import permissions
 from rest_framework.exceptions import PermissionDenied
 
+
 def str_to_bool(s):
     if s.lower() == "true":
         return True
     elif s.lower() == "false":
         return False
     else:
-        raise ValueError("Invalid boolean string")
+        raise ValueError("Booleen non valide")
 
 
 

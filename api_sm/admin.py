@@ -77,17 +77,17 @@ class SitesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 @admin.register(Marche)
 class MarcheAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+
     resource_class = MarcheResource
     list_display = ('nt','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable' ,'rabais'
     ,'tva','user_id','date_modification')
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "avenant_du_contrat":
-            kwargs["queryset"] = Marche.objects.filter(avenant_du_contrat__isnull=True)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
     def save_model(self, request, obj, form, change):
         
         obj.date_modification = datetime.now()
+
         super().save_model(request, obj, form, change)
     def delete_queryset(self, request, queryset):
         for obj in queryset:
@@ -118,10 +118,7 @@ class ODS(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = ODSResource
     list_display = ("marche","date_interruption","date_reprise","motif","user_id","date_modification")
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "marche":  
-            kwargs["queryset"] = Marche.objects.filter(avenant_du_contrat__isnull=True)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 
 

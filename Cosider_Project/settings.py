@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -86,7 +87,7 @@ WSGI_APPLICATION = 'Cosider_Project.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "mssql",
-        "NAME": "db",
+        "NAME": "SM",
         "USER":"",
         "PASSWORD":"",
         "HOST": "localhost",

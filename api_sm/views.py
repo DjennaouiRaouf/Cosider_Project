@@ -74,7 +74,7 @@ class AddClientView(generics.CreateAPIView):
 class GetClientsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, ViewClientPermission]
     queryset = Clients.objects.filter()
-    serializer_class = ClientsSerializer1
+    serializer_class = ClientsSerializer
 
 
 class  AddSiteView(APIView):
@@ -106,9 +106,61 @@ class  AddSiteView(APIView):
 class GetSitesView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, ViewSitePermission]
     queryset = Sites.objects.filter()
-    serializer_class = SiteSerializer1
+    serializer_class = SiteSerializer
 
 
+
+
+
+class AddMacheView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        code_site=request.data.get('code_site')
+        num_nt=request.data.get('num_nt')
+        libelle=request.data.get('libelle')
+        ods_depart=request.data.get('ods_depart')
+        date_signature= request.data.get('date_signature')
+        delais=request.data.get('delais')
+        revisable=str_to_bool(request.data.get('revisable'))
+        rabais=request.data.get('rabais')
+        tva=request.data.get('tva')
+        code_contrat=request.data.get('num_contrat')
+        nouveau = str_to_bool(request.data.get('nouveau'))
+        if (nouveau == False):  # ajouter un avenant
+            try:
+                marche = Marche.objects.get(nt__nt=num_nt, nt__code_site__code_site=code_site,
+                                            avenant_du_contrat__isnull=True)
+
+                if (marche.id):
+                    site = Sites.objects.get(code_site=code_site)
+
+                    nt = NT.objects.get(code_site=site, nt=num_nt)
+                    Marche(nt=nt, libelle=libelle, ods_depart=ods_depart, delais=delais, date_signature=date_signature,
+                           revisable=revisable, rabais=rabais, tva=tva, code_contrat=code_contrat,
+                           avenant_du_contrat=marche).save()
+                    return Response({'message': "Vous avez ajouté un avenant"}, status=status.HTTP_200_OK)
+
+                else:
+                    return Response(
+                        {'message': "Ce marche ne paut pas etre un avenant (le marché initial n'existe pas )"},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+            except Exception as e:
+                return Response({'message': "Ce marche ne paut pas etre un avenant (le marché initial n'existe pas )"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            try:
+                site = Sites.objects.get(code_site=code_site)
+                nt = NT.objects.get(code_site=site, nt=num_nt)
+                Marche(nt=nt,
+                       libelle=libelle, ods_depart=ods_depart, delais=delais,
+                       revisable=revisable, rabais=rabais, tva=tva, code_contrat=code_contrat,
+                       avenant_du_contrat=None).save()
+                return Response({'message': "Vous avez créé un nouveau marché"}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'message': "Impossible de créer un nouveau marché"},
+                                status=status.HTTP_400_BAD_REQUEST)
 
 
 

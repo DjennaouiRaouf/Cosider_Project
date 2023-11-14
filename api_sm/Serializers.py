@@ -10,18 +10,29 @@ class ICSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ClientsSerializer1(serializers.ModelSerializer):
+class ClientsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Clients
-        fields = ['code_client','type_client','est_client_cosider','libelle_client','nif',
-                  'raison_social','num_registre_commerce']
+        fields = '__all__'
 
 
-class SiteSerializer1(serializers.ModelSerializer):
+class SiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sites
-        fields = ['code_site','code_filiale', 'code_region','libelle_site','code_agence', 'type_site',
-                  'code_division', 'code_commune_site', 'jour_cloture_mouv_rh_paie', 'date_ouverture_site',
-                  'date_cloture_site']
+        fields = '__all__'
 
+
+
+class NTSerializer(serializers.ModelSerializer):
+    code_site=SiteSerializer()
+    code_client=ClientsSerializer()
+    class Meta:
+        model=NT
+        fields ='__all__'
+
+class MarcheSerializer(serializers.ModelSerializer):
+    nt=NTSerializer()
+    class Meta:
+        model=Marche
+        fields= '__all__'

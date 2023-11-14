@@ -6,6 +6,7 @@ from django.db import models
 from django_currentuser.db.models import CurrentUserField
 
 
+
 # Create your models here.
 class Images(models.Model):
     key = models.BigAutoField(primary_key=True)
@@ -143,6 +144,10 @@ class Marche(models.Model):
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
     avenant_du_contrat = models.ForeignKey('self', models.DO_NOTHING, null=True, blank=True, related_name='avenants')
 
+    def clean(self):
+        super().clean()
+        if self.avenant_du_contrat and self.avenant_du_contrat == self:
+            raise ValidationError('Cannot link row to itself.')
     def __str__(self):
         return "Site: " + self.nt.code_site.code_site + " Nt: " + self.nt.nt + " Av: " + str(self.num_avenant)
 
@@ -159,6 +164,8 @@ class Marche(models.Model):
         return round(self.ht + (self.ht * self.tva / 100), 2)
 
     def save(self, *args, **kwargs):
+        if self.avenant_du_contrat and self.avenant_du_contrat == self:
+            self.avenant_du_contrat=None
         self.date_modification = datetime.now()
         if not self.id and self.avenant_du_contrat:
             self.avenant_du_contrat.nbr_avenant += 1
@@ -185,8 +192,6 @@ class DQE(models.Model):
     quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
     prix_q = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                  editable=False)
-
-
     user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
@@ -197,7 +202,6 @@ class DQE(models.Model):
     def save(self, *args, **kwargs):
         self.prix_q = self.quantite * self.prix_u
         self.date_modification = datetime.now()
-
         super(DQE, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
