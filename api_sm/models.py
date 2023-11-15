@@ -125,14 +125,6 @@ class Marche(models.Model):
     libelle = models.CharField(null=False, blank=True, max_length=500)
     ods_depart = models.DateField(null=False, blank=True)
     delais = models.PositiveIntegerField(default=0, null=False)
-    ht = models.DecimalField(
-        max_digits=38, decimal_places=2, editable=False,
-        validators=[MinValueValidator(0)], default=0
-    )
-    ttc = models.DecimalField(
-        max_digits=38, decimal_places=2, editable=False,
-        validators=[MinValueValidator(0)], default=0
-    )
     revisable = models.BooleanField(default=True, null=False)
     rabais = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
                                          null=False)
@@ -161,7 +153,8 @@ class Marche(models.Model):
 
     @property
     def ttc(self):
-        return round(self.ht + (self.ht * self.tva / 100), 2)
+        ttc=round(self.ht + (self.ht * self.tva / 100), 2)
+        return ttc
 
     def save(self, *args, **kwargs):
         if self.avenant_du_contrat and self.avenant_du_contrat == self:

@@ -27,28 +27,36 @@ class SiteSerializer(serializers.ModelSerializer):
 class NTSerializer(serializers.ModelSerializer):
     code_site=SiteSerializer()
     code_client=ClientsSerializer()
+
+
     class Meta:
         model=NT
         fields ='__all__'
 
 class MarcheSerializer(serializers.ModelSerializer):
     nt=NTSerializer()
+
     class Meta:
         model=Marche
-        fields= '__all__'
+        fields= "__all__"
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        print(instance)
+
+        return representation
 
 
 
-'''
 
 class RecursiveSerializer(serializers.Serializer):
     def to_representation(self, instance):
         serializer = self.parent.parent.__class__(instance, context=self.context)
         return serializer.data
-'''
+
 class ListMarcheSerializer(serializers.ModelSerializer):
     nt = NTSerializer()
-    #avenants= RecursiveSerializer(many=True)
+    avenants= RecursiveSerializer(many=True)
     class Meta:
         model=Marche
         fields= '__all__'
