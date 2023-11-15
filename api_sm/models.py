@@ -130,6 +130,8 @@ class Marche(models.Model):
                                          null=False)
     tva = models.DecimalField(default=0, max_digits=38, decimal_places=2,
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    retenue_de_garantie = models.DecimalField(default=0, max_digits=38, decimal_places=2,
+                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     code_contrat = models.CharField(null=False, blank=True, max_length=20)
     date_signature = models.DateTimeField(db_column='Date_Signature', null=False, auto_now=True)
     user_id = CurrentUserField(editable=False)
@@ -378,10 +380,10 @@ class Attachements(models.Model):
 
 class Factures(models.Model):
     numero_facture=models.CharField(max_length=500,null=False)
-    date_facture=models.DateField(null=False,blank=True)
+    date_facture=models.DateField(auto_now=True,null=False,blank=True)
     Attachements=models.ForeignKey(Attachements,models.DO_NOTHING,null=False)
     
-    montant=models.DecimalField(max_digits=38, decimal_places=2,
+    montant_initial=models.DecimalField(max_digits=38, decimal_places=2,
                                                      validators=[MinValueValidator(0)], default=0,
                                                      editable=False)
 
@@ -389,6 +391,7 @@ class Factures(models.Model):
                                   validators=[MinValueValidator(0)], default=0,
                                   editable=False)
 
+    def save(self, *args, **kwargs):
 
 
 
