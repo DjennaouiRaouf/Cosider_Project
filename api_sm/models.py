@@ -359,15 +359,35 @@ class Attachements(models.Model):
                                                      default=0,
                                                      editable=False)
 
+    montant_rg = models.DecimalField(max_digits=38, decimal_places=2, blank=True,
+                                     validators=[MinValueValidator(0)], default=0,
+                                     editable=False)
+    montant_rb = models.DecimalField(max_digits=38, decimal_places=2, blank=True,
+                                     validators=[MinValueValidator(0)], default=0,
+                                     editable=False)
+    montant_final = models.DecimalField(max_digits=38, decimal_places=2, blank=True,
+                                        validators=[MinValueValidator(0)], default=0,
+                                        editable=False)
 
 
 
+    def __str__(self):
+        return  self.dqe.designation
 
     def save(self, *args, **kwargs):
-        self.taux = round(self.qte_realise * 100 / self.dqe.quantite, 2)
-        self.estimation_travaux_avant_r = self.dqe.prix_u * self.qte_realise
+        if(self.qte_realise <= self.dqe.quantite):
+            self.taux = round(self.qte_realise * 100 / self.dqe.quantite, 2)
+            self.estimation_travaux = self.dqe.prix_u * self.qte_realise
+            rb = self.dqe.marche.rabais
+            rg = self.dqe.marche.retenue_de_garantie
+            self.montant_rb = round(rb * self.estimation_travaux / 100, 2)
+            self.montant_rg = round(rg * self.estimation_travaux / 100, 2)
+            self.montant_final = self.estimation_travaux - self.montant_rg - self.montant_rb
 
-        super(Attachements, self).save(*args, **kwargs)
+
+            super(Attachements, self).save(*args, **kwargs)
+        else:
+            raise ValidationError('Erreur')
 
 
     class Meta:
@@ -376,30 +396,22 @@ class Attachements(models.Model):
 
 
 class Factures(models.Model):
-    numero_facture=models.CharField(max_length=500,null=False)
+    numero_facture=models.CharField(max_length=500,null=False,blank=True)
     date_facture=models.DateField(auto_now=True,null=False,blank=True)
-    Attachements=models.ForeignKey(Attachements,models.DO_NOTHING,null=False)
-
-
-    montant_rg = models.DecimalField(max_digits=38, decimal_places=2,
-                                        validators=[MinValueValidator(0)], default=0,
-                                        editable=False)
-
-    montant_rb = models.DecimalField(max_digits=38, decimal_places=2,
-                                  validators=[MinValueValidator(0)], default=0,
-                                  editable=False)
-    montant_final = models.DecimalField(max_digits=38, decimal_places=2,
-                                        validators=[MinValueValidator(0)], default=0,
-                                        editable=False)
+    attachements=models.ForeignKey(Attachements,models.DO_NOTHING,null=True)
+    annulation=models.BooleanField(default=False,null=False)
 
     def save(self, *args, **kwargs):
-        montant=Attachements.estimation_travaux
-        rb=Attachements.dqe.marche.rabais
-        rg = Attachements.dqe.marche.retenue_de_garantie
-        self.montant_rb=round((rb/100) * montant,2)
-        self.montant_rg =round((rg / 100) * montant,2)
-        self.montant_final=montant-self.montant_rg-self.montant_rb
+
+
         super(Factures, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Factures'
+        verbose_name_plural = 'Factures'
+
+
+
 
 
 

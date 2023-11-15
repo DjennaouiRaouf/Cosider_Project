@@ -189,7 +189,7 @@ class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 @admin.register(Attachements)
 class AttachementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    list_display=("marche","designation","qte_realise","avancement","estimation_travaux")
+    list_display=("marche","designation","qte_realise","avancement","estimation_travaux",'montant_rg','montant_rb','montant_final')
 
 
     def avancement(self,obj):
@@ -205,3 +205,13 @@ class AttachementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
     def designation(self, obj):
         return obj.dqe.designation
+
+
+
+@admin.register(Factures)
+
+
+
+class FacturesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    list_display = ('numero_facture','date_facture',
+                    'annulation')
