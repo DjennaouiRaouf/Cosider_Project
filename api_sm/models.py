@@ -396,22 +396,24 @@ class Attachements(models.Model):
 
 
 class Factures(models.Model):
-    numero_facture=models.CharField(max_length=500,null=False,blank=True)
+    numero_facture=models.CharField(max_length=500,primary_key=True)
     date_facture=models.DateField(auto_now=True,null=False,blank=True)
-    attachements=models.ForeignKey(Attachements,models.DO_NOTHING,null=True)
+    # montants  property field
     annulation=models.BooleanField(default=False,null=False)
-
-    def save(self, *args, **kwargs):
-
-
-        super(Factures, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Factures'
         verbose_name_plural = 'Factures'
 
+class DetailFacture(models.Model):
+    facture=models.ForeignKey(Factures,models.DO_NOTHING,null=False,blank=True)
+    datail=models.ForeignKey(Attachements,models.DO_NOTHING)
 
+    class Meta:
+        verbose_name = 'Datails Facture'
+        verbose_name_plural = 'Details Facture'
 
-
+class Encaissement(models.Model):
+    facture=models.ForeignKey(Factures,models.DO_NOTHING,null=False,blank=True)
 
 

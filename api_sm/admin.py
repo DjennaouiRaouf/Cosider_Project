@@ -82,7 +82,12 @@ class MarcheAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('nt','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','retenue_de_garantie' ,'rabais'
     ,'tva','user_id','date_modification')
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "avenant_du_contrat":
 
+            kwargs["queryset"] = Marche.objects.filter(
+                avenant_du_contrat=None)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def save_model(self, request, obj, form, change):
         
@@ -209,9 +214,8 @@ class AttachementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(Factures)
-
-
-
 class FacturesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('numero_facture','date_facture',
                     'annulation')
+
+
