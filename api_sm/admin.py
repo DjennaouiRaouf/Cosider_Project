@@ -79,7 +79,7 @@ class SitesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class MarcheAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
     resource_class = MarcheResource
-    list_display = ('nt','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable' ,'rabais'
+    list_display = ('nt','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','retenue_de_garantie' ,'rabais'
     ,'tva','user_id','date_modification')
 
 

@@ -128,6 +128,7 @@ class AddMacheView(APIView):
         code_site=request.data.get('code_site')
         num_nt=request.data.get('num_nt')
         libelle=request.data.get('libelle')
+        rg= request.data.get('retenue_garantie')
         ods_depart=request.data.get('ods_depart')
         date_signature= request.data.get('date_signature')
         delais=request.data.get('delais')
@@ -146,7 +147,7 @@ class AddMacheView(APIView):
 
                     nt = NT.objects.get(code_site=site, nt=num_nt)
                     Marche(nt=nt, libelle=libelle, ods_depart=ods_depart, delais=delais, date_signature=date_signature,
-                           revisable=revisable, rabais=rabais, tva=tva, code_contrat=code_contrat,
+                           revisable=revisable, rabais=rabais, tva=tva, code_contrat=code_contrat,retenue_de_garantie=rg,
                            avenant_du_contrat=marche).save()
                     return Response({'message': "Vous avez ajouté un avenant"}, status=status.HTTP_200_OK)
 
@@ -165,7 +166,7 @@ class AddMacheView(APIView):
                 nt = NT.objects.get(code_site=site, nt=num_nt)
                 Marche(nt=nt,
                        libelle=libelle, ods_depart=ods_depart, delais=delais,
-                       revisable=revisable, rabais=rabais, tva=tva, code_contrat=code_contrat,
+                       revisable=revisable, rabais=rabais, tva=tva, code_contrat=code_contrat,retenue_de_garantie=rg,
                        avenant_du_contrat=None).save()
                 return Response({'message': "Vous avez créé un nouveau marché"}, status=status.HTTP_200_OK)
             except Exception as e:

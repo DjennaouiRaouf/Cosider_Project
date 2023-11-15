@@ -391,7 +391,8 @@ class Factures(models.Model):
                                   validators=[MinValueValidator(0)], default=0,
                                   editable=False)
 
-    def save(self, *args, **kwargs):
+
+
 
 
 
