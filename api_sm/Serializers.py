@@ -40,11 +40,7 @@ class MarcheSerializer(serializers.ModelSerializer):
         model=Marche
         fields= "__all__"
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        print(instance)
 
-        return representation
 
 
 
@@ -59,7 +55,13 @@ class ListMarcheSerializer(serializers.ModelSerializer):
     avenants= RecursiveSerializer(many=True)
     class Meta:
         model=Marche
-        fields= '__all__'
+        fields="__all__"
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['ht'] = instance.ttc
+        representation['ttc'] = instance.ttc
+        return representation
+
 
 class DQESerializer(serializers.ModelSerializer):
     class Meta:
