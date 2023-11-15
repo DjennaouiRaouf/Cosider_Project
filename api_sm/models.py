@@ -355,15 +355,12 @@ class Attachements(models.Model):
         validators=[MinValueValidator(0)], default=0,
         editable=False
     )
-    estimation_travaux_avant_r = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)],
+    estimation_travaux = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)],
                                                      default=0,
                                                      editable=False)
 
 
 
-    estimation_travaux_apres_r = models.DecimalField(max_digits=38, decimal_places=2,
-                                                     validators=[MinValueValidator(0)], default=0,
-                                                     editable=False)
 
 
     def save(self, *args, **kwargs):
@@ -382,17 +379,27 @@ class Factures(models.Model):
     numero_facture=models.CharField(max_length=500,null=False)
     date_facture=models.DateField(auto_now=True,null=False,blank=True)
     Attachements=models.ForeignKey(Attachements,models.DO_NOTHING,null=False)
-    
-    montant_initial=models.DecimalField(max_digits=38, decimal_places=2,
-                                                     validators=[MinValueValidator(0)], default=0,
-                                                     editable=False)
 
-    montant_apres_rabais = models.DecimalField(max_digits=38, decimal_places=2,
+
+    montant_rg = models.DecimalField(max_digits=38, decimal_places=2,
+                                        validators=[MinValueValidator(0)], default=0,
+                                        editable=False)
+
+    montant_rb = models.DecimalField(max_digits=38, decimal_places=2,
                                   validators=[MinValueValidator(0)], default=0,
                                   editable=False)
+    montant_final = models.DecimalField(max_digits=38, decimal_places=2,
+                                        validators=[MinValueValidator(0)], default=0,
+                                        editable=False)
 
-
-
+    def save(self, *args, **kwargs):
+        montant=Attachements.estimation_travaux
+        rb=Attachements.dqe.marche.rabais
+        rg = Attachements.dqe.marche.retenue_de_garantie
+        self.montant_rb=round((rb/100) * montant,2)
+        self.montant_rg =round((rg / 100) * montant,2)
+        self.montant_final=montant-self.montant_rg-self.montant_rb
+        super(Factures, self).save(*args, **kwargs)
 
 
 

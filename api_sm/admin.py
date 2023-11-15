@@ -189,7 +189,7 @@ class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 @admin.register(Attachements)
 class AttachementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    list_display=("marche","designation","qte_realise","avancement","estimation_travaux_avant_r","estimation_travaux_apres_r")
+    list_display=("marche","designation","qte_realise","avancement","estimation_travaux")
 
 
     def avancement(self,obj):
