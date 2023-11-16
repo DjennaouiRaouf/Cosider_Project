@@ -167,7 +167,7 @@ class  TypeCautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 @admin.register(Banque)
 class BanqueAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = BanqueResource
-    list_display = ("id", "nom", "adresse", "ville", "wilaya","user_id","date_modification")
+    list_display = ( "nom", "adresse", "ville", "wilaya","user_id","date_modification")
 
     def save_model(self, request, obj, form, change):
         obj.date_modification = datetime.now()

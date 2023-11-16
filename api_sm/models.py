@@ -1,14 +1,15 @@
-import uuid
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models, connection
+from django.db import models
 from django_currentuser.db.models import CurrentUserField
+
 
 
 # Create your models here.
 class Images(models.Model):
+    key = models.BigAutoField(primary_key=True)
     src = models.ImageField(upload_to="Images/Login", null=False, blank=True, default='default.png')
     est_bloquer = models.BooleanField(default=False)
 
@@ -18,7 +19,6 @@ class Images(models.Model):
 
 
 class Clients(models.Model):
-
     code_client = models.CharField(db_column='Code_Client', primary_key=True, max_length=500)
     type_client = models.PositiveSmallIntegerField(db_column='Type_Client', blank=True, null=True)
     est_client_cosider = models.BooleanField(db_column='Est_Client_Cosider', blank=True, null=False)
@@ -44,7 +44,6 @@ class Clients(models.Model):
 
 
 class Sites(models.Model):
-
     code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=10)
     code_filiale = models.CharField(db_column='Code_Filiale', max_length=5)
     code_region = models.CharField(db_column='Code_Region', max_length=1, blank=True, null=True)
@@ -80,7 +79,6 @@ class Sites(models.Model):
 
 
 class NT(models.Model):
-
     code_site = models.ForeignKey(Sites, models.DO_NOTHING, db_column='Code_site', null=False)
     nt = models.CharField(db_column='NT', max_length=20, null=False)
     code_client = models.ForeignKey(Clients, models.DO_NOTHING, db_column='Code_Client')
@@ -111,7 +109,6 @@ class NT(models.Model):
 
 
 class Marche(models.Model):
-
     nt = models.ForeignKey(NT, models.DO_NOTHING, db_column='numero_marche', null=False)
     num_avenant = models.PositiveBigIntegerField(default=0, null=False, editable=False)
     nbr_avenant = models.PositiveBigIntegerField(default=0, null=False, editable=False)
@@ -169,7 +166,6 @@ class Marche(models.Model):
 
 
 class DQE(models.Model):
-
     marche = models.ForeignKey(Marche, models.DO_NOTHING, null=False)
     designation = models.CharField(max_length=600, null=False)
     unite = models.CharField(max_length=5, null=False)
@@ -202,7 +198,6 @@ class DQE(models.Model):
 
 
 class Ordre_De_Service(models.Model):
-
     marche = models.ForeignKey(Marche, models.DO_NOTHING, null=True, related_name="ods_marche")
     date_interruption = models.DateField(null=False, blank=True)
     date_reprise = models.DateField(null=False, blank=True)
@@ -221,7 +216,6 @@ class Ordre_De_Service(models.Model):
 
 
 class TypeCaution(models.Model):
-
     libelle = models.CharField(max_length=500, null=False)
     taux = models.DecimalField(default=0, max_digits=38, decimal_places=2,
                                validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
@@ -243,7 +237,6 @@ class TypeCaution(models.Model):
 
 
 class Banque(models.Model):
-
     nom = models.CharField(max_length=300, null=False)
     adresse = models.CharField(max_length=300, null=False)
     ville = models.CharField(max_length=300, null=False)
@@ -265,7 +258,6 @@ class Banque(models.Model):
 
 
 class TypeAvance(models.Model):
-
     libelle = models.CharField(max_length=500, null=False, unique=True)
     user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
@@ -285,7 +277,6 @@ class TypeAvance(models.Model):
 
 
 class Avance(models.Model):
-
     marche = models.ForeignKey(Marche, models.DO_NOTHING, null=False, related_name="Avance_Marche")
     type = models.ForeignKey(TypeAvance, models.DO_NOTHING, null=False)
     montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
@@ -301,7 +292,6 @@ class Avance(models.Model):
 
 
 class Cautions(models.Model):
-
     marche = models.ForeignKey(Marche, models.DO_NOTHING, null=False, related_name="Caution_Marche")
     type = models.ForeignKey(TypeCaution, models.DO_NOTHING, null=False)
     avance = models.ForeignKey(Avance, models.DO_NOTHING, null=True, blank=True)
@@ -340,7 +330,6 @@ class Cautions(models.Model):
 
 
 class Attachements(models.Model):
-
     dqe = models.ForeignKey(DQE, models.DO_NOTHING)
     qte_realise = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
 
@@ -430,7 +419,13 @@ class Encaissement(models.Model):
     banque=models.ForeignKey(Banque,models.DO_NOTHING,null=False)
     numero_piece = models.CharField(max_length=300,null=False)
 
+
+
     def save(self, *args, **kwargs):
+        super(Encaissement, self).save(*args, **kwargs)
+        sum = Encaissement.objects.filter(facture=self.facture).aggregate(models.Sum('montant_encaisse'))[
+            "montant_encaisse__sum"]
+        self.montant_creance = round(self.facture.montant_global - sum,2)
         super(Encaissement, self).save(*args, **kwargs)
 
     class Meta:
@@ -441,8 +436,4 @@ class Encaissement(models.Model):
 
 
 
-
-def reset_auto_increment():
-    with connection.cursor() as cursor:
-        cursor.execute("TRUNCATE TABLE myapp_mymodel RESTART IDENTITY CASCADE;")
 
