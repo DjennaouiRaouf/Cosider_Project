@@ -9,8 +9,6 @@ from django_currentuser.db.models import CurrentUserField
 
 # Create your models here.
 class Images(models.Model):
-
-    key = models.BigAutoField(primary_key=True)
     src = models.ImageField(upload_to="Images/Login", null=False, blank=True, default='default.png')
     est_bloquer = models.BooleanField(default=False)
 
