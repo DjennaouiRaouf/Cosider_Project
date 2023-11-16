@@ -333,21 +333,6 @@ class Attachements(models.Model):
     dqe = models.ForeignKey(DQE, models.DO_NOTHING)
     qte_realise = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
 
-
-    estimation_travaux = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)],
-                                                     default=0,
-                                                     editable=False)
-
-    montant_rg = models.DecimalField(max_digits=38, decimal_places=2, blank=True,
-                                     validators=[MinValueValidator(0)], default=0,
-                                     editable=False)
-    montant_rb = models.DecimalField(max_digits=38, decimal_places=2, blank=True,
-                                     validators=[MinValueValidator(0)], default=0,
-                                     editable=False)
-    montant_final = models.DecimalField(max_digits=38, decimal_places=2, blank=True,
-                                        validators=[MinValueValidator(0)], default=0,
-                                        editable=False)
-
     @property
     def taux(self):
         taux = round(self.qte_realise * 100 / self.dqe.quantite, 2)
@@ -389,9 +374,23 @@ class Attachements(models.Model):
 
 class Factures(models.Model):
     numero_facture=models.CharField(max_length=500,primary_key=True)
+    date_facture=models.DateField(null=False,auto_now=True)
     date_facture=models.DateField(auto_now=True,null=False,blank=True)
     client=models.ForeignKey(Clients,models.DO_NOTHING,null=False)
     annulation=models.BooleanField(default=False,null=False)
+
+    @property
+    def montant_global(self):  # paiement complet ou incomplet
+
+        return 0
+
+    @property
+    def etat_de_facture(self): #paiement complet ou incomplet
+        dernier_E=Encaissement.objects.latest('date_encaissement')
+        if(dernier_E.montant_creance==0):
+            return True
+        else:
+            return False
 
     class Meta:
         verbose_name = 'Factures'
@@ -407,6 +406,38 @@ class DetailFacture(models.Model):
 
 class Encaissement(models.Model):
     facture=models.ForeignKey(Factures,models.DO_NOTHING,null=False,blank=True)
+    date_encaissement=models.DateField(null=False)
+    mode_paiement=models.CharField(max_length=100,null=False)
+
+    montant_encaisse=models.DecimalField(max_digits=38, decimal_places=2, blank=True,
+                                     validators=[MinValueValidator(0)], default=0)
+    montant_creance=models.DecimalField(max_digits=38, decimal_places=2, blank=True,
+                                     validators=[MinValueValidator(0)], default=0,
+                                     editable=False)
+
+    banque=models.ForeignKey(Banque,models.DO_NOTHING,null=False)
+    numero_piece = models.CharField(max_length=300,null=False)
+
+    def __init__(self, *args, **kwargs):
+        super(Encaissement, self).__init__(*args, **kwargs)
+        dernier_E = Encaissement.objects.latest('date_encaissement')
+        if dernier_E == None:
+            self.montant_creance=self.facture.montant_global
+        else:
+            self.montant_creance=dernier_E.montant_creance-dernier_E.montant_encaisse
+
+
+    def save(self, *args, **kwargs):
+        if (self.montant_encaisse <= self.montant_creance):
+            super(Encaissement, self).save(*args, **kwargs)
+        else:
+            raise ValidationError('Le paiement de la facture est terminé')
+
+    class Meta:
+        verbose_name = 'Encaissement'
+        verbose_name_plural = 'Encaissement'
+
+
 
 
 
