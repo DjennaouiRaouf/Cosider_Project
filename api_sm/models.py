@@ -389,7 +389,7 @@ class Factures(models.Model):
 
     @property
     def etat_de_facture(self): #paiement complet ou incomplet
-
+            e=Encaissement.objects.filter()
             return False
 
 
