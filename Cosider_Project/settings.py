@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'django_extensions',
     'import_export',
     'api_sm',
 
@@ -155,3 +156,7 @@ REST_FRAMEWORK = {
 
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+GRAPH_MODELS ={
+    'applications': ["api_sm"]
+}

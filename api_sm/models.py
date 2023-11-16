@@ -13,10 +13,6 @@ class Images(models.Model):
     src = models.ImageField(upload_to="Images/Login", null=False, blank=True, default='default.png')
     est_bloquer = models.BooleanField(default=False)
 
-    def delete(self, *args, **kwargs):
-        self.est_bloquer = not self.est_bloquer
-        super(Images, self).save(*args, **kwargs)
-
     class Meta:
         verbose_name = 'Images'
         verbose_name_plural = 'Images'
@@ -40,9 +36,7 @@ class Clients(models.Model):
         self.date_modification = datetime.now()
         super(Clients, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        self.date_modification = datetime.now()
-        super(Clients, self).save(*args, **kwargs)
+
 
     class Meta:
         verbose_name = 'Clients'
@@ -77,9 +71,7 @@ class Sites(models.Model):
         else:
             raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
 
-    def delete(self, *args, **kwargs):
-        self.date_modification = datetime.now()
-        super(Sites, self).save(*args, **kwargs)
+
 
     class Meta:
         verbose_name = 'Sites'
@@ -108,9 +100,7 @@ class NT(models.Model):
         else:
             raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
 
-    def delete(self, *args, **kwargs):
-        self.date_modification = datetime.now()
-        super(NT, self).save(*args, **kwargs)
+
 
     class Meta:
         verbose_name = 'Numero du travail'
@@ -185,8 +175,6 @@ class DQE(models.Model):
     )
 
     quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
-    prix_q = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                 editable=False)
     user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
@@ -194,14 +182,15 @@ class DQE(models.Model):
     def __str__(self):
         return (str(self.marche) + " " + self.designation)
 
+    @property
+    def prix_q(self):
+        return self.quantite * self.prix_u
+
     def save(self, *args, **kwargs):
-        self.prix_q = self.quantite * self.prix_u
         self.date_modification = datetime.now()
         super(DQE, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        self.date_modification = datetime.now()
-        super(DQE, self).save(*args, **kwargs)
+   
 
     class Meta:
         verbose_name = 'DQE'
@@ -240,8 +229,7 @@ class TypeCaution(models.Model):
         self.date_modification = datetime.now()
         super(TypeCaution, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        super(TypeCaution, self).save(*args, **kwargs)
+
 
     class Meta:
         verbose_name = 'Type_Caution'
@@ -260,8 +248,6 @@ class Banque(models.Model):
         self.date_modification = datetime.now()
         super(Banque, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        super(Banque, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.nom + " " + self.ville + '(' + self.wilaya + ')'
@@ -283,8 +269,7 @@ class TypeAvance(models.Model):
         self.date_modification = datetime.now()
         super(TypeAvance, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        super(TypeCaution, self).save(*args, **kwargs)
+
 
     class Meta:
         verbose_name = 'Type Avance'
@@ -303,8 +288,7 @@ class Avance(models.Model):
         self.date_modification = datetime.now()
         super(Avance, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        super(Avance, self).save(*args, **kwargs)
+
 
 
 class Cautions(models.Model):
@@ -339,8 +323,6 @@ class Cautions(models.Model):
         self.date_modification = datetime.now()
         super(Cautions, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        super(Cautions, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Caution'
@@ -350,11 +332,8 @@ class Cautions(models.Model):
 class Attachements(models.Model):
     dqe = models.ForeignKey(DQE, models.DO_NOTHING)
     qte_realise = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
-    taux = models.DecimalField(
-        max_digits=38, decimal_places=2,
-        validators=[MinValueValidator(0)], default=0,
-        editable=False
-    )
+
+
     estimation_travaux = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)],
                                                      default=0,
                                                      editable=False)
@@ -369,27 +348,40 @@ class Attachements(models.Model):
                                         validators=[MinValueValidator(0)], default=0,
                                         editable=False)
 
+    @property
+    def taux(self):
+        taux = round(self.qte_realise * 100 / self.dqe.quantite, 2)
+        return taux
+    @property
+    def montant_estime(self):
+        estimation_travaux = self.dqe.prix_u * self.qte_realise
+        return estimation_travaux
 
+    @property
+    def montant_rg(self):
+        rg = self.dqe.marche.retenue_de_garantie
+        montant_rg = round(rg * self.estimation_travaux / 100, 2)
+        return montant_rg
+
+    @property
+    def montant_rb(self):
+        rb = self.dqe.marche.rabais
+        montant_rb = round(rb * self.estimation_travaux / 100, 2)
+        return montant_rb
+
+    @property
+    def montant_final(self):
+        montant_final = self.estimation_travaux - self.montant_rg - self.montant_rb
+        return montant_final
 
     def __str__(self):
         return  self.dqe.designation
 
     def save(self, *args, **kwargs):
         if(self.qte_realise <= self.dqe.quantite):
-            self.taux = round(self.qte_realise * 100 / self.dqe.quantite, 2)
-            self.estimation_travaux = self.dqe.prix_u * self.qte_realise
-            rb = self.dqe.marche.rabais
-            rg = self.dqe.marche.retenue_de_garantie
-            self.montant_rb = round(rb * self.estimation_travaux / 100, 2)
-            self.montant_rg = round(rg * self.estimation_travaux / 100, 2)
-            self.montant_final = self.estimation_travaux - self.montant_rg - self.montant_rb
-
-
             super(Attachements, self).save(*args, **kwargs)
         else:
-            raise ValidationError('Erreur')
-
-
+            raise ValidationError('Qte realisée ne doit pas dépasser le Qte prévue dans le DQE')
     class Meta:
         verbose_name = 'Attachements'
         verbose_name_plural = 'Attachements'
@@ -398,7 +390,7 @@ class Attachements(models.Model):
 class Factures(models.Model):
     numero_facture=models.CharField(max_length=500,primary_key=True)
     date_facture=models.DateField(auto_now=True,null=False,blank=True)
-    # montants  property field
+    client=models.ForeignKey(Clients,models.DO_NOTHING,null=False)
     annulation=models.BooleanField(default=False,null=False)
 
     class Meta:
@@ -415,5 +407,6 @@ class DetailFacture(models.Model):
 
 class Encaissement(models.Model):
     facture=models.ForeignKey(Factures,models.DO_NOTHING,null=False,blank=True)
+
 
 
