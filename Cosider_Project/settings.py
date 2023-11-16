@@ -157,6 +157,3 @@ REST_FRAMEWORK = {
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
-GRAPH_MODELS ={
-    'applications': ["api_sm"]
-}
