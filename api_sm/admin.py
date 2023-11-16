@@ -194,7 +194,7 @@ class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 @admin.register(Attachements)
 class AttachementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    list_display=("marche","designation","qte_realise","avancement","estimation_travaux",'montant_rg','montant_rb','montant_final')
+    list_display=("marche","designation","qte_realise","avancement","montant_estime",'montant_rg','montant_rb','montant_final')
 
 
     def avancement(self,obj):
@@ -215,7 +215,34 @@ class AttachementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 @admin.register(Factures)
 class FacturesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    list_display = ('numero_facture','date_facture',
-                    'annulation')
+    list_display = ('numero_facture','date_facture','montant_global',
+                    'etat')
+
+    def etat(self, obj):
+        return obj.etat_de_facture
 
 
+@admin.register(DetailFacture)
+class DetailFactureAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+    list_display = ("numero_facture","detail_designation","detail_estimation","detail_montant_rg","detail_montant_rb","detail_montant")
+
+    def numero_facture(self, obj):
+        return obj.facture.numero_facture
+    def detail_designation(self,obj):
+        return obj.detail.dqe.designation
+
+    def detail_estimation(self, obj):
+        return obj.detail.montant_estime
+    def detail_montant_rg(self, obj):
+        return obj.detail.montant_rg
+    def detail_montant_rb(self, obj):
+        return obj.detail.montant_rb
+    def detail_montant(self, obj):
+        return obj.detail.montant_final
+
+
+@admin.register(Encaissement)
+class Encaissement(ImportExportModelAdmin,admin.ModelAdmin):
+    list_display = ('numero_facture','date_encaissement','mode_paiement','montant_encaisse','montant_creance')
+    def numero_facture(self, obj):
+        return obj.facture.numero_facture

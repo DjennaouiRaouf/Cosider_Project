@@ -1,14 +1,15 @@
+import uuid
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db import models
+from django.db import models, connection
 from django_currentuser.db.models import CurrentUserField
-
 
 
 # Create your models here.
 class Images(models.Model):
+
     key = models.BigAutoField(primary_key=True)
     src = models.ImageField(upload_to="Images/Login", null=False, blank=True, default='default.png')
     est_bloquer = models.BooleanField(default=False)
@@ -19,6 +20,7 @@ class Images(models.Model):
 
 
 class Clients(models.Model):
+
     code_client = models.CharField(db_column='Code_Client', primary_key=True, max_length=500)
     type_client = models.PositiveSmallIntegerField(db_column='Type_Client', blank=True, null=True)
     est_client_cosider = models.BooleanField(db_column='Est_Client_Cosider', blank=True, null=False)
@@ -44,6 +46,7 @@ class Clients(models.Model):
 
 
 class Sites(models.Model):
+
     code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=10)
     code_filiale = models.CharField(db_column='Code_Filiale', max_length=5)
     code_region = models.CharField(db_column='Code_Region', max_length=1, blank=True, null=True)
@@ -79,6 +82,7 @@ class Sites(models.Model):
 
 
 class NT(models.Model):
+
     code_site = models.ForeignKey(Sites, models.DO_NOTHING, db_column='Code_site', null=False)
     nt = models.CharField(db_column='NT', max_length=20, null=False)
     code_client = models.ForeignKey(Clients, models.DO_NOTHING, db_column='Code_Client')
@@ -109,6 +113,7 @@ class NT(models.Model):
 
 
 class Marche(models.Model):
+
     nt = models.ForeignKey(NT, models.DO_NOTHING, db_column='numero_marche', null=False)
     num_avenant = models.PositiveBigIntegerField(default=0, null=False, editable=False)
     nbr_avenant = models.PositiveBigIntegerField(default=0, null=False, editable=False)
@@ -166,6 +171,7 @@ class Marche(models.Model):
 
 
 class DQE(models.Model):
+
     marche = models.ForeignKey(Marche, models.DO_NOTHING, null=False)
     designation = models.CharField(max_length=600, null=False)
     unite = models.CharField(max_length=5, null=False)
@@ -190,7 +196,7 @@ class DQE(models.Model):
         self.date_modification = datetime.now()
         super(DQE, self).save(*args, **kwargs)
 
-   
+
 
     class Meta:
         verbose_name = 'DQE'
@@ -198,6 +204,7 @@ class DQE(models.Model):
 
 
 class Ordre_De_Service(models.Model):
+
     marche = models.ForeignKey(Marche, models.DO_NOTHING, null=True, related_name="ods_marche")
     date_interruption = models.DateField(null=False, blank=True)
     date_reprise = models.DateField(null=False, blank=True)
@@ -206,7 +213,7 @@ class Ordre_De_Service(models.Model):
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
     def save(self, *args, **kwargs):
-        if (self.date_reprise > self.date_reprise):
+        if (self.date_reprise > self.date_interruption):
             self.date_modification = datetime.now()
         super(Ordre_De_Service, self).save(*args, **kwargs)
 
@@ -216,6 +223,7 @@ class Ordre_De_Service(models.Model):
 
 
 class TypeCaution(models.Model):
+
     libelle = models.CharField(max_length=500, null=False)
     taux = models.DecimalField(default=0, max_digits=38, decimal_places=2,
                                validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
@@ -237,6 +245,7 @@ class TypeCaution(models.Model):
 
 
 class Banque(models.Model):
+
     nom = models.CharField(max_length=300, null=False)
     adresse = models.CharField(max_length=300, null=False)
     ville = models.CharField(max_length=300, null=False)
@@ -258,6 +267,7 @@ class Banque(models.Model):
 
 
 class TypeAvance(models.Model):
+
     libelle = models.CharField(max_length=500, null=False, unique=True)
     user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
@@ -277,6 +287,7 @@ class TypeAvance(models.Model):
 
 
 class Avance(models.Model):
+
     marche = models.ForeignKey(Marche, models.DO_NOTHING, null=False, related_name="Avance_Marche")
     type = models.ForeignKey(TypeAvance, models.DO_NOTHING, null=False)
     montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
@@ -292,6 +303,7 @@ class Avance(models.Model):
 
 
 class Cautions(models.Model):
+
     marche = models.ForeignKey(Marche, models.DO_NOTHING, null=False, related_name="Caution_Marche")
     type = models.ForeignKey(TypeCaution, models.DO_NOTHING, null=False)
     avance = models.ForeignKey(Avance, models.DO_NOTHING, null=True, blank=True)
@@ -330,6 +342,7 @@ class Cautions(models.Model):
 
 
 class Attachements(models.Model):
+
     dqe = models.ForeignKey(DQE, models.DO_NOTHING)
     qte_realise = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
 
@@ -339,24 +352,24 @@ class Attachements(models.Model):
         return taux
     @property
     def montant_estime(self):
-        estimation_travaux = self.dqe.prix_u * self.qte_realise
-        return estimation_travaux
+        montant_e= round(self.dqe.prix_u * self.qte_realise,2)
+        return montant_e
 
     @property
     def montant_rg(self):
         rg = self.dqe.marche.retenue_de_garantie
-        montant_rg = round(rg * self.estimation_travaux / 100, 2)
+        montant_rg = round(rg * self.montant_estime / 100, 2)
         return montant_rg
 
     @property
     def montant_rb(self):
         rb = self.dqe.marche.rabais
-        montant_rb = round(rb * self.estimation_travaux / 100, 2)
+        montant_rb = round(rb * self.montant_estime/ 100, 2)
         return montant_rb
 
     @property
     def montant_final(self):
-        montant_final = self.estimation_travaux - self.montant_rg - self.montant_rb
+        montant_final = round(self.montant_estime- self.montant_rg - self.montant_rb,2)
         return montant_final
 
     def __str__(self):
@@ -375,22 +388,24 @@ class Attachements(models.Model):
 class Factures(models.Model):
     numero_facture=models.CharField(max_length=500,primary_key=True)
     date_facture=models.DateField(null=False,auto_now=True)
-    date_facture=models.DateField(auto_now=True,null=False,blank=True)
     client=models.ForeignKey(Clients,models.DO_NOTHING,null=False)
     annulation=models.BooleanField(default=False,null=False)
 
     @property
     def montant_global(self):  # paiement complet ou incomplet
+        df=DetailFacture.objects.filter(facture=self)
+        mg=0
+        for d in df:
+            mg+=d.detail.montant_final
 
-        return 0
+        return round(mg,2)
 
     @property
     def etat_de_facture(self): #paiement complet ou incomplet
-        dernier_E=Encaissement.objects.latest('date_encaissement')
-        if(dernier_E.montant_creance==0):
-            return True
-        else:
+
             return False
+
+
 
     class Meta:
         verbose_name = 'Factures'
@@ -398,11 +413,12 @@ class Factures(models.Model):
 
 class DetailFacture(models.Model):
     facture=models.ForeignKey(Factures,models.DO_NOTHING,null=False,blank=True)
-    datail=models.ForeignKey(Attachements,models.DO_NOTHING)
+    detail=models.ForeignKey(Attachements,models.DO_NOTHING)
 
     class Meta:
         verbose_name = 'Datails Facture'
         verbose_name_plural = 'Details Facture'
+        unique_together=(("facture","detail"),)
 
 class Encaissement(models.Model):
     facture=models.ForeignKey(Factures,models.DO_NOTHING,null=False,blank=True)
@@ -411,33 +427,24 @@ class Encaissement(models.Model):
 
     montant_encaisse=models.DecimalField(max_digits=38, decimal_places=2, blank=True,
                                      validators=[MinValueValidator(0)], default=0)
-    montant_creance=models.DecimalField(max_digits=38, decimal_places=2, blank=True,
-                                     validators=[MinValueValidator(0)], default=0,
-                                     editable=False)
-
+    montant_creance = models.DecimalField(max_digits=38, decimal_places=2, blank=True,
+                                           validators=[MinValueValidator(0)], default=0,editable=False)
     banque=models.ForeignKey(Banque,models.DO_NOTHING,null=False)
     numero_piece = models.CharField(max_length=300,null=False)
 
-    def __init__(self, *args, **kwargs):
-        super(Encaissement, self).__init__(*args, **kwargs)
-        dernier_E = Encaissement.objects.latest('date_encaissement')
-        if dernier_E == None:
-            self.montant_creance=self.facture.montant_global
-        else:
-            self.montant_creance=dernier_E.montant_creance-dernier_E.montant_encaisse
-
-
     def save(self, *args, **kwargs):
-        if (self.montant_encaisse <= self.montant_creance):
-            super(Encaissement, self).save(*args, **kwargs)
-        else:
-            raise ValidationError('Le paiement de la facture est terminé')
+        super(Encaissement, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Encaissement'
         verbose_name_plural = 'Encaissement'
+        unique_together=(("facture","date_encaissement"),)
 
 
 
 
+
+def reset_auto_increment():
+    with connection.cursor() as cursor:
+        cursor.execute("TRUNCATE TABLE myapp_mymodel RESTART IDENTITY CASCADE;")
 
