@@ -241,8 +241,12 @@ class DetailFactureAdmin(ImportExportModelAdmin,admin.ModelAdmin):
         return obj.detail.montant_final
 
 
-@admin.register(Encaissement)
-class Encaissement(ImportExportModelAdmin,admin.ModelAdmin):
+
+class EncaissementAmin(ImportExportModelAdmin,admin.ModelAdmin):
+
     list_display = ('numero_facture','date_encaissement','mode_paiement','montant_encaisse','montant_creance')
+    save_as = True
     def numero_facture(self, obj):
         return obj.facture.numero_facture
+
+admin.site.register(Encaissement, EncaissementAmin)
