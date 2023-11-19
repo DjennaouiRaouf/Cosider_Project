@@ -13,6 +13,8 @@ urlpatterns = [
     path('getsites/', GetSitesView.as_view()),
     path('addmarche/',AddMacheView.as_view()),
     path('getmarche/',GetMarcheView.as_view()),
+    path('adddqe/',AddDQEView.as_view()),
+    path('getdqe/', GetDQEView.as_view()),
 
 
 ]

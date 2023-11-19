@@ -117,9 +117,37 @@ class GetMarcheView(generics.ListAPIView):
 
 
 class GetDQEView(generics.ListAPIView):
-
+    permission_classes = [IsAuthenticated]
     queryset = DQE.objects.all()
     serializer_class = ListMarcheSerializer
+
+class AddDQEView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        site=request.data.get('site')
+        nt=request.data.get('nt')
+        avenant=request.data.get('avenant')
+        designation=request.data.get('designation')
+        unite=request.data.get('unite')
+        prix_u=request.data.get('prix_u')
+        quantite=request.data.get('quantite')
+
+        marche = Marche.objects.get(nt__nt=nt, nt__code_site__code_site=site,
+                                    num_avenant=avenant)
+        if(marche):
+            try:
+                DQE(marche=marche,designation=designation,unite=unite,prix_u=prix_u,quantite=quantite).save()
+                return Response({'message': "Vous avez ajouté un DQE"}, status=status.HTTP_200_OK)
+
+            except Exception as e:
+                return Response({'message': str(e)},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response({'message': "Ce marché n'existe pas"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 

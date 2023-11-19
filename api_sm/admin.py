@@ -213,10 +213,14 @@ class AttachementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 
+
+
 @admin.register(Factures)
 class FacturesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('numero_facture','date_facture','montant_global',
                     'etat')
+
+
 
     def etat(self, obj):
         if obj.etat_de_facture == True:

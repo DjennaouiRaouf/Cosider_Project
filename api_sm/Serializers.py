@@ -50,6 +50,16 @@ class RecursiveSerializer(serializers.Serializer):
         serializer = self.parent.parent.__class__(instance, context=self.context)
         return serializer.data
 
+
+class DQESerializer(serializers.ModelSerializer):
+    class Meta:
+        model=DQE
+        fields='__al__'
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['prix_q'] = instance.prix_q
+        return representation
+
 class ListMarcheSerializer(serializers.ModelSerializer):
     nt = NTSerializer()
     avenants= RecursiveSerializer(many=True)
@@ -63,7 +73,5 @@ class ListMarcheSerializer(serializers.ModelSerializer):
         return representation
 
 
-class DQESerializer(serializers.ModelSerializer):
-    class Meta:
-        model=DQE
-        fields='__al__'
+
+

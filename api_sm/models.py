@@ -184,7 +184,7 @@ class DQE(models.Model):
 
     @property
     def prix_q(self):
-        return self.quantite * self.prix_u
+        return round(self.quantite * self.prix_u,2)
 
     def save(self, *args, **kwargs):
         self.date_modification = datetime.now()
@@ -372,12 +372,13 @@ class Attachements(models.Model):
         verbose_name_plural = 'Attachements'
 
 
+
+
 class Factures(models.Model):
     numero_facture=models.CharField(max_length=500,primary_key=True)
     date_facture=models.DateField(null=False,auto_now=True)
     client=models.ForeignKey(Clients,models.DO_NOTHING,null=False)
     annulation=models.BooleanField(default=False,null=False)
-
     @property
     def montant_global(self):  # paiement complet ou incomplet
         df=DetailFacture.objects.filter(facture=self)
