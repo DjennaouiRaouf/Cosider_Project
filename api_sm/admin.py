@@ -219,7 +219,18 @@ class FacturesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
                     'etat')
 
     def etat(self, obj):
-        return obj.etat_de_facture
+        if obj.etat_de_facture == True:
+            return format_html(
+                '''
+               <img src="/static/admin/img/icon-yes.svg" alt="True">
+                '''
+            )
+        if obj.etat_de_facture == False:
+            return format_html(
+                '''
+               <img src="/static/admin/img/icon-no.svg" alt="False">
+                '''
+            )
 
 
 @admin.register(DetailFacture)
@@ -244,9 +255,12 @@ class DetailFactureAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 class EncaissementAmin(ImportExportModelAdmin,admin.ModelAdmin):
 
-    list_display = ('numero_facture','date_encaissement','mode_paiement','montant_encaisse','montant_creance')
+    list_display = ('numero_facture','date_encaissement','mode_paiement','montant_facture','montant_encaisse','montant_creance')
     save_as = True
     def numero_facture(self, obj):
         return obj.facture.numero_facture
+    def montant_facture(self,obj):
+
+        return obj.facture.montant_global
 
 admin.site.register(Encaissement, EncaissementAmin)

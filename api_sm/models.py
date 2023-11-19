@@ -389,7 +389,9 @@ class Factures(models.Model):
 
     @property
     def etat_de_facture(self): #paiement complet ou incomplet
-            e=Encaissement.objects.filter()
+            e=Encaissement.objects.filter(facture=self).latest('date_encaissement')
+            if(e.montant_creance == 0):
+                return True
             return False
 
 
@@ -419,15 +421,17 @@ class Encaissement(models.Model):
     banque=models.ForeignKey(Banque,models.DO_NOTHING,null=False)
     numero_piece = models.CharField(max_length=300,null=False)
 
-
-
     def save(self, *args, **kwargs):
-        super(Encaissement, self).save(*args, **kwargs)
         sum = Encaissement.objects.filter(facture=self.facture).aggregate(models.Sum('montant_encaisse'))[
             "montant_encaisse__sum"]
+        if(sum==None):
+            sum=0
+        sum=sum+self.montant_encaisse
         self.montant_creance = round(self.facture.montant_global - sum,2)
-        super(Encaissement, self).save(*args, **kwargs)
-
+        if(self.montant_creance >= 0):
+            super(Encaissement, self).save(*args, **kwargs)
+        else:
+            raise ValidationError('Le paiement de la facture est terminer')
     class Meta:
         verbose_name = 'Encaissement'
         verbose_name_plural = 'Encaissement'
