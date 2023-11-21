@@ -100,7 +100,7 @@ class  AddSiteView(APIView):
                   date_ouverture_site=date_ouverture_site)
             return Response({'message': 'Site ajouté'}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'message': "".join(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': e}, status=status.HTTP_400_BAD_REQUEST)
 
     
 class GetSitesView(generics.ListAPIView):
