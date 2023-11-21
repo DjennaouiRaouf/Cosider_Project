@@ -77,7 +77,6 @@ class GetClientsView(generics.ListAPIView):
     queryset = Clients.objects.filter()
     serializer_class = ClientsSerializer
 
-
 class  AddSiteView(APIView):
     permission_classes = [IsAuthenticated, AddSitePermission]
     def post(self,request):

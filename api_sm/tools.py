@@ -4,9 +4,9 @@ from rest_framework.exceptions import PermissionDenied
 
 
 def str_to_bool(s):
-    if s.lower() == "true":
+    if s.lower() == "1":
         return True
-    elif s.lower() == "false":
+    elif s.lower() == "0":
         return False
     else:
         raise ValueError("Booleen non valide")

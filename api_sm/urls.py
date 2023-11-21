@@ -17,4 +17,5 @@ urlpatterns = [
     path('getdqe/', GetDQEView.as_view()),
 
 
+
 ]

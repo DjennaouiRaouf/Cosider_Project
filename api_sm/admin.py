@@ -128,13 +128,21 @@ class ODS(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 
-@admin.register(DQE)
+
 class DQEAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    save_as = True
+    save_as=True
     resource_class = DQEResource
     list_display = ("marche","designation","unite","quantite","prix_u","prix_q","user_id","date_modification")
-    list_editable = ("prix_u",)
 
+    def get_readonly_fields(self, request, obj=None):
+        # If obj is not None, meaning we are editing an existing object
+        if obj:
+            # Make 'non_editable_field' read-only
+            return ("marche","designation","unite","quantite","prix_u","prix_q","user_id","date_modification") + self.readonly_fields
+
+        # For new objects, all fields are editable
+        return self.readonly_fields
+admin.site.register(DQE, DQEAdmin)
 
 @admin.register(TypeAvance)
 class  TypeAvanceAdmin(ImportExportModelAdmin,admin.ModelAdmin):
