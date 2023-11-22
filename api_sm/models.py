@@ -416,7 +416,7 @@ class Attachements(models.Model):
             sum = 0
         sum = sum + self.qte_realise
         self.qte_restante = round(self.dqe.quantite- sum, 2)
-        if (self.qte_restante >= 0):
+        if (self.qte_restante > 0):
             super(Attachements, self).save(*args, **kwargs)
         else:
             raise ValidationError('Qte realisée ne doit pas dépasser le Qte prévue dans le DQE')
