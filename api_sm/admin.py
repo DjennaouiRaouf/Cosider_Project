@@ -214,9 +214,13 @@ class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 @admin.register(Attachements)
 class AttachementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-    list_display=("marche","designation","qte_realise","avancement","montant_estime",'montant_rg','montant_rb','montant_final')
+    save_as = True
+    list_display=("dqe","qte_realise","qte_rest","avancement","montant_estime",'montant_rg','montant_rb','montant_final'
+                  ,'user_id',"date_modification")
 
 
+    def qte_rest(self,obj):
+        return (str(obj.qte_restante)+"/"+str(obj.dqe.quantite))
     def avancement(self,obj):
         return format_html(
             '''
@@ -225,8 +229,8 @@ class AttachementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
             ''',
             obj.taux
         )
-    def marche(self,obj):
-        return obj.dqe.marche
+    def dqe(self,obj):
+        return obj.dqe
 
     def designation(self, obj):
         return obj.dqe.designation

@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'Cosider_Project.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "mssql",
-        "NAME": "SM",
+        "NAME": "sm",
         "USER":"",
         "PASSWORD":"",
         "HOST": "localhost",

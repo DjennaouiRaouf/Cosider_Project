@@ -217,7 +217,7 @@ class DQE(models.Model): # le prix final
     class Meta:
         verbose_name = 'DQE'
         verbose_name_plural = 'DQE'
-
+        unique_together = (("marche", "designation"))
 
 class Revision_Prix(models.Model):
     dqe=models.ForeignKey(DQE,models.DO_NOTHING, null=False)
@@ -376,10 +376,12 @@ class Cautions(models.Model):
 class Attachements(models.Model):
     dqe = models.ForeignKey(DQE, models.DO_NOTHING)
     qte_realise = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    qte_restante = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0, editable=False)
+    user_id = CurrentUserField(editable=False)
+    date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
     @property
     def taux(self):
-
         taux = round(self.qte_realise * 100 / self.dqe.quantite, 2)
         return taux
     @property
@@ -408,10 +410,28 @@ class Attachements(models.Model):
         return  self.dqe.designation
 
     def save(self, *args, **kwargs):
-        if(self.qte_realise <= self.dqe.quantite):
+        sum=Attachements.objects.filter(dqe__designation=self.dqe.designation).aggregate(models.Sum('qte_realise'))[
+            "qte_realise__sum"]
+        if sum == None:
+            sum = 0
+        sum = sum + self.qte_realise
+        self.qte_restante = round(self.dqe.quantite- sum, 2)
+        if (self.qte_restante >= 0):
             super(Attachements, self).save(*args, **kwargs)
         else:
             raise ValidationError('Qte realisée ne doit pas dépasser le Qte prévue dans le DQE')
+
+
+
+
+
+
+
+
+
+
+
+
     class Meta:
         verbose_name = 'Attachements'
         verbose_name_plural = 'Attachements'
@@ -422,6 +442,7 @@ class Attachements(models.Model):
 class Factures(models.Model):
     numero_facture=models.CharField(max_length=500,primary_key=True)
     date_facture=models.DateField(null=False,auto_now=True)
+    payer = models.BooleanField(default=False, null=False)
     client=models.ForeignKey(Clients,models.DO_NOTHING,null=False)
     annulation=models.BooleanField(default=False,null=False)
     @property
@@ -430,17 +451,7 @@ class Factures(models.Model):
         mg=0
         for d in df:
             mg+=d.detail.montant_final
-
         return round(mg,2)
-
-    @property
-    def etat_de_facture(self): #paiement complet ou incomplet
-            e=Encaissement.objects.filter(facture=self).latest('date_encaissement')
-            if(e.montant_creance == 0):
-                return True
-            return False
-
-
 
     class Meta:
         verbose_name = 'Factures'
