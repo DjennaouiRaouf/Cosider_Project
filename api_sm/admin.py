@@ -128,15 +128,33 @@ class ODS(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 
-
+@admin.register(DQE)
 class DQEAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     save_as=True
     resource_class = DQEResource
     list_display = ("marche","designation","unite","quantite","prix_u","prix_q","user_id","date_modification")
-    def has_change_permission(self, request, obj=None):
-        # Disable editing for all users, change the condition based on your logic
+    list_editable = ("prix_u",)
+
+
+
+@admin.register(Revision_Prix)
+class Revision_PrixAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+
+    resource_class = DQEResource
+    list_display = ("dqe","prix_ur","date_modification")
+    def has_add_permission(self, request):
         return False
-admin.site.register(DQE, DQEAdmin)
+    def has_import_permission(self, request):
+        return False
+
+
+    def has_delete_permission(self, request, obj=None):
+        return  False
+
+    def has_view_permission(self, request, obj=None):
+        return False
+
+
 
 @admin.register(TypeAvance)
 class  TypeAvanceAdmin(ImportExportModelAdmin,admin.ModelAdmin):

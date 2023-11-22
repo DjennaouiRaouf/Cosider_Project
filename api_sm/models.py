@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django_currentuser.db.models import CurrentUserField
 
 
@@ -165,7 +167,7 @@ class Marche(models.Model):
         unique_together = (("nt", "num_avenant"))
 
 
-class DQE(models.Model):
+class DQE(models.Model): # le prix final
     marche = models.ForeignKey(Marche, models.DO_NOTHING, null=False)
     designation = models.CharField(max_length=600, null=False)
     unite = models.CharField(max_length=5, null=False)
@@ -186,17 +188,58 @@ class DQE(models.Model):
     def prix_q(self):
         return round(self.quantite * self.prix_u,2)
 
+
     def save(self, *args, **kwargs):
-        self.date_modification = datetime.now()
-        super(DQE, self).save(*args, **kwargs)
+
+        if self.marche.revisable:
+            try:
+                dqe = DQE.objects.get(pk=self.pk)
+
+                Revision_Prix(dqe=dqe, prix_ur=self.prix_u).save()
+                self.date_modification = datetime.now()
+                super(DQE, self).save(*args, **kwargs)
+
+            except:
+                self.date_modification = datetime.now()
+                super(DQE, self).save(*args, **kwargs)
 
 
+        if not self.marche.revisable:
+            try:
+                dqe = DQE.objects.get(pk=self.pk)
+                print(self.prix_u,dqe.prix_u)
+
+            except:
+                self.date_modification = datetime.now()
+                super(DQE, self).save(*args, **kwargs)
 
 
 
     class Meta:
         verbose_name = 'DQE'
         verbose_name_plural = 'DQE'
+
+
+class Revision_Prix(models.Model):
+    dqe=models.ForeignKey(DQE,models.DO_NOTHING, null=False)
+    prix_ur = models.DecimalField(
+        max_digits=38, decimal_places=2,
+        validators=[MinValueValidator(0)], default=0
+    )
+    user_id = CurrentUserField(editable=False)
+    date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
+
+    class Meta:
+        verbose_name = 'Revision DQE'
+        verbose_name_plural = 'Revision DQE'
+
+
+    def save(self, *args, **kwargs):
+        if(self.dqe.marche.revisable == True):
+            self.prix_ur=self.dqe.prix_u
+            super(Revision_Prix, self).save(*args, **kwargs)
+
+
 
 
 class Ordre_De_Service(models.Model):
@@ -337,6 +380,7 @@ class Attachements(models.Model):
 
     @property
     def taux(self):
+
         taux = round(self.qte_realise * 100 / self.dqe.quantite, 2)
         return taux
     @property
