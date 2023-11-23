@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework import status
@@ -76,6 +77,8 @@ class GetClientsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, ViewClientPermission]
     queryset = Clients.objects.filter()
     serializer_class = ClientsSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['code_client', 'type_client', 'est_client_cosider','est_client_cosider','libelle_client']
 
 class  AddSiteView(APIView):
     permission_classes = [IsAuthenticated, AddSitePermission]

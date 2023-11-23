@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'simple_history',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
     'corsheaders',
     'django_extensions',
     'import_export',
