@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from import_export.admin import ImportExportModelAdmin
+from simple_history.admin import SimpleHistoryAdmin
 
 from api_sm.Resources import *
 from api_sm.models import *
@@ -129,40 +130,12 @@ class ODS(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(DQE)
-class DQEAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class DQEAdmin(SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as=True
     resource_class = DQEResource
-    list_display = ("marche","designation","unite","quantite","prix_u","prix_q","user_id","date_modification")
+    list_display = ("marche","designation","unite","quantite","prix_u","prix_q")
     list_editable = ("prix_u",)
 
-
-
-@admin.register(Revision_Prix)
-class Revision_PrixAdmin(ImportExportModelAdmin,admin.ModelAdmin):
-
-    resource_class = DQEResource
-    list_display = ("dqe","prix_ur","date_modification")
-    readonly_fields = ("dqe","prix_ur","date_modification")
-    def marche(self,obj):
-        return obj.dqe.marche
-
-    def designation(self, obj):
-        return obj.dqe.designation
-
-    def prix_u(self,obj):
-        return obj.dqe.designation
-
-    def has_add_permission(self, request):
-        return False
-    def has_import_permission(self, request):
-        return False
-
-
-    def has_delete_permission(self, request, obj=None):
-        return  False
-
-    def has_view_permission(self, request, obj=None):
-        return False
 
 
 

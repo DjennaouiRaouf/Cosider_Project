@@ -3,9 +3,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-
 from django_currentuser.db.models import CurrentUserField
-
+from simple_history.models import HistoricalRecords
 
 
 # Create your models here.
@@ -176,9 +175,7 @@ class DQE(models.Model): # le prix final
     )
 
     quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
-    user_id = CurrentUserField(editable=False)
-    date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
-
+    history = HistoricalRecords()
 
     def __str__(self):
         return (str(self.marche) + " " + self.designation)
@@ -189,28 +186,9 @@ class DQE(models.Model): # le prix final
 
 
     def save(self, *args, **kwargs):
-
-        if self.marche.revisable:
-            try:
-                dqe = DQE.objects.get(pk=self.pk)
-
-                Revision_Prix(dqe=dqe, prix_ur=self.prix_u).save()
-                self.date_modification = datetime.now()
-                super(DQE, self).save(*args, **kwargs)
-
-            except:
-                self.date_modification = datetime.now()
-                super(DQE, self).save(*args, **kwargs)
-
-
-        if not self.marche.revisable:
-            try:
-                dqe = DQE.objects.get(pk=self.pk)
-                print(self.prix_u,dqe.prix_u)
-
-            except:
-                self.date_modification = datetime.now()
-                super(DQE, self).save(*args, **kwargs)
+            print(self.prix_u)
+            #self.date_modification = datetime.now()
+            super(DQE, self).save(*args, **kwargs)
 
 
 
@@ -218,22 +196,6 @@ class DQE(models.Model): # le prix final
         verbose_name = 'DQE'
         verbose_name_plural = 'DQE'
         unique_together = (("marche", "designation"))
-
-class Revision_Prix(models.Model):
-    dqe=models.ForeignKey(DQE,models.DO_NOTHING, null=False)
-    user_id = CurrentUserField(editable=False)
-    date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
-
-    class Meta:
-        verbose_name = 'Revision DQE'
-        verbose_name_plural = 'Revision DQE'
-        unique_together=(('dqe','user_id','date_modification'))
-
-
-    def save(self, *args, **kwargs):
-        if(self.dqe.marche.revisable == True):
-            self.prix_ur=self.dqe.prix_u
-            super(Revision_Prix, self).save(*args, **kwargs)
 
 
 
