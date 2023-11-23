@@ -141,11 +141,16 @@ class DQEAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class Revision_PrixAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
     resource_class = DQEResource
-    '''
     list_display = ("dqe","prix_ur","date_modification")
     readonly_fields = ("dqe","prix_ur","date_modification")
-    '''
+    def marche(self,obj):
+        return obj.dqe.marche
 
+    def designation(self, obj):
+        return obj.dqe.designation
+
+    def prix_u(self,obj):
+        return obj.dqe.designation
 
     def has_add_permission(self, request):
         return False
