@@ -40,7 +40,7 @@ class ImagesAdmin(admin.ModelAdmin):
 class ClientAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     list_per_page = lp
     resource_class=ClientResource
-    list_display = ('code_client','type_client','est_client_cosider','nif','raison_social','user_id','date_modification')
+    list_display = ('code_client','type_client','est_client_cosider','nif','raison_social','user_id',)
     list_filter = (
         'est_client_cosider',
         'type_client',
@@ -66,7 +66,7 @@ class SitesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = SiteResource
     list_per_page = lp
     list_display = ('code_site','code_filiale','code_region','libelle_site','type_site','code_division',
-        'code_commune_site','date_ouverture_site', 'date_cloture_site','user_id', 'date_modification')
+        'code_commune_site','date_ouverture_site', 'date_cloture_site','user_id', )
     list_editable = ()
 
     def save_model(self, request, obj, form, change):
@@ -86,7 +86,7 @@ class MarcheAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
     resource_class = MarcheResource
     list_display = ('nt','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','retenue_de_garantie' ,'rabais'
-    ,'tva','user_id','date_modification')
+    ,'tva','user_id',)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "avenant_du_contrat":
@@ -110,7 +110,7 @@ class NTAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
     list_display = (
     'code_site','nt','code_client','libelle_nt','date_ouverture_nt','date_cloture_nt','user_id'
-    ,'date_modification')
+    ,)
 
     def save_model(self, request, obj, form, change):
         
@@ -127,7 +127,7 @@ class NTAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class ODS(ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     resource_class = ODSResource
-    list_display = ("marche","date_interruption","date_reprise","motif","user_id","date_modification")
+    list_display = ("marche","date_interruption","date_reprise","motif","user_id")
 
 
 
@@ -140,7 +140,7 @@ class ODS(ImportExportModelAdmin,admin.ModelAdmin):
 class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as=True
     resource_class = DQEResource
-    list_display = (highlight_deleted,"marche","designation","unite","quantite","prix_u","prix_q")
+    list_display = ("marche","designation","unite","quantite","prix_u","prix_q",)
     list_filter = (SafeDeleteAdminFilter,)
     list_editable = ("prix_u",)
 
@@ -152,7 +152,7 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
 @admin.register(TypeAvance)
 class  TypeAvanceAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeAvanceResource
-    list_display = ("id", "libelle", "user_id","date_modification")
+    list_display = ("id", "libelle", "user_id")
 
     def save_model(self, request, obj, form, change):
         
@@ -166,9 +166,23 @@ class  TypeAvanceAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(TypeCaution)
-class  TypeCautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class  TypeCautionAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeCautionResource
-    list_display = ("id", "libelle", "taux","user_id","date_modification")
+    list_display = ("id", "libelle", "taux","user_id","est_bloquer")
+    list_filter = (SafeDeleteAdminFilter,)
+    def est_bloquer(self,obj):
+        if obj.deleted:
+            return format_html(
+                '''
+               <img src="/static/admin/img/icon-yes.svg" alt="True">
+                '''
+            )
+        if not obj.deleted:
+            return format_html(
+                '''
+               <img src="/static/admin/img/icon-no.svg" alt="False">
+                '''
+            )
 
     def save_model(self, request, obj, form, change):
         obj.date_modification = datetime.now()
@@ -180,7 +194,7 @@ class  TypeCautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 @admin.register(Banque)
 class BanqueAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = BanqueResource
-    list_display = ( "nom", "adresse", "ville", "wilaya","user_id","date_modification")
+    list_display = ( "nom", "adresse", "ville", "wilaya","user_id")
 
     def save_model(self, request, obj, form, change):
         obj.date_modification = datetime.now()
@@ -192,7 +206,7 @@ class BanqueAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 @admin.register(Cautions)
 class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = BanqueResource
-    list_display = ("marche", "Type_Caution","montant", "date_soumission", "montant","user_id","date_modification","est_recupere")
+    list_display = ("marche", "Type_Caution","montant", "date_soumission", "montant","user_id","est_recupere")
     actions = ['recuperer']
 
     def recuperer(self, request, queryset):
@@ -209,7 +223,7 @@ class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 class AttachementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     list_display=("dqe","qte_realise","qte_rest","avancement","montant_estime",'montant_rg','montant_rb','montant_final'
-                  ,'user_id',"date_modification")
+                  ,'user_id')
 
 
     def qte_rest(self,obj):
