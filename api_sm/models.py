@@ -221,16 +221,13 @@ class DQE(models.Model): # le prix final
 
 class Revision_Prix(models.Model):
     dqe=models.ForeignKey(DQE,models.DO_NOTHING, null=False)
-    prix_ur = models.DecimalField(
-        max_digits=38, decimal_places=2,
-        validators=[MinValueValidator(0)], default=0
-    )
     user_id = CurrentUserField(editable=False)
     date_modification = models.DateTimeField(db_column='Date_Modification', null=False, auto_now=True)
 
     class Meta:
         verbose_name = 'Revision DQE'
         verbose_name_plural = 'Revision DQE'
+        unique_together=(('dqe','user_id','date_modification'))
 
 
     def save(self, *args, **kwargs):
