@@ -4,7 +4,12 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django_currentuser.db.models import CurrentUserField
+from django_softdelete.models import SoftDeleteModel
+from safedelete import HARD_DELETE_NOCASCADE, SOFT_DELETE_CASCADE, DELETED_VISIBLE_BY_PK
+from safedelete.managers import SafeDeleteManager
+from safedelete.models import SafeDeleteModel
 from simple_history.models import HistoricalRecords
+
 
 
 # Create your models here.
@@ -16,6 +21,8 @@ class Images(models.Model):
     class Meta:
         verbose_name = 'Images'
         verbose_name_plural = 'Images'
+
+
 
 
 class Clients(models.Model):
@@ -165,7 +172,12 @@ class Marche(models.Model):
         unique_together = (("nt", "num_avenant"))
 
 
-class DQE(models.Model): # le prix final
+class MyModelManager(SafeDeleteManager):
+    _safedelete_visibility = DELETED_VISIBLE_BY_PK
+
+
+class DQE(SafeDeleteModel): # le prix final
+    _safedelete_policy = SOFT_DELETE_CASCADE
     marche = models.ForeignKey(Marche, models.DO_NOTHING, null=False)
     designation = models.CharField(max_length=600, null=False)
     unite = models.CharField(max_length=5, null=False)
@@ -176,6 +188,8 @@ class DQE(models.Model): # le prix final
 
     quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
     history = HistoricalRecords()
+    objects = MyModelManager()
+
 
     def __str__(self):
         return (str(self.marche) + " " + self.designation)

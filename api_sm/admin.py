@@ -1,6 +1,11 @@
+
+
 from django.contrib import admin
 from django.utils.html import format_html
 from import_export.admin import ImportExportModelAdmin
+from safedelete import DELETED_VISIBLE_BY_PK
+from safedelete.admin import SafeDeleteAdmin, SafeDeleteAdminFilter, highlight_deleted
+from safedelete.managers import SafeDeleteManager
 from simple_history.admin import SimpleHistoryAdmin
 
 from api_sm.Resources import *
@@ -129,12 +134,17 @@ class ODS(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 
+
+
 @admin.register(DQE)
-class DQEAdmin(SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as=True
     resource_class = DQEResource
-    list_display = ("marche","designation","unite","quantite","prix_u","prix_q")
+    list_display = (highlight_deleted,"marche","designation","unite","quantite","prix_u","prix_q")
+    list_filter = (SafeDeleteAdminFilter,)
     list_editable = ("prix_u",)
+
+
 
 
 
