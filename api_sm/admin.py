@@ -142,6 +142,10 @@ class Revision_PrixAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
     resource_class = DQEResource
     list_display = ("dqe","prix_ur","date_modification")
+    readonly_fields = ("dqe","prix_ur","date_modification")
+
+
+
     def has_add_permission(self, request):
         return False
     def has_import_permission(self, request):
