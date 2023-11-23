@@ -5,12 +5,14 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django_currentuser.db.models import CurrentUserField
 from django_softdelete.models import SoftDeleteModel
-from safedelete import HARD_DELETE_NOCASCADE, SOFT_DELETE_CASCADE, DELETED_VISIBLE_BY_PK
+from safedelete import SOFT_DELETE_CASCADE, DELETED_VISIBLE_BY_PK
 from safedelete.managers import SafeDeleteManager
 from safedelete.models import SafeDeleteModel
 from simple_history.models import HistoricalRecords
 
 
+class DeletedModelManager(SafeDeleteManager):
+    _safedelete_visibility = DELETED_VISIBLE_BY_PK
 
 # Create your models here.
 class Images(models.Model):
@@ -172,8 +174,7 @@ class Marche(models.Model):
         unique_together = (("nt", "num_avenant"))
 
 
-class MyModelManager(SafeDeleteManager):
-    _safedelete_visibility = DELETED_VISIBLE_BY_PK
+
 
 
 class DQE(SafeDeleteModel): # le prix final
@@ -188,7 +189,7 @@ class DQE(SafeDeleteModel): # le prix final
 
     quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
     history = HistoricalRecords()
-    objects = MyModelManager()
+    objects = DeletedModelManager()
 
 
     def __str__(self):
