@@ -20,6 +20,9 @@ class Images(SafeDeleteModel):
     key = models.BigAutoField(primary_key=True)
     src = models.ImageField(upload_to="Images/Login", null=False, blank=True, default='default.png')
     history = HistoricalRecords()
+    objects = DeletedModelManager()
+
+
     class Meta:
         verbose_name = 'Images'
         verbose_name_plural = 'Images'
@@ -37,6 +40,7 @@ class Clients(SafeDeleteModel):
     raison_social = models.CharField(db_column='Raison_Social', max_length=50, blank=True, null=True)
     num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True, null=True)
     history = HistoricalRecords()
+    objects = DeletedModelManager()
     def __str__(self):
         return "Client: " + self.code_client
 
@@ -133,9 +137,9 @@ class Marche(SafeDeleteModel):
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     code_contrat = models.CharField(null=False, blank=True, max_length=20)
     date_signature = models.DateTimeField(db_column='Date_Signature', null=False, auto_now=True)
-    objects = DeletedModelManager()
     avenant_du_contrat = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='avenants')
     history = HistoricalRecords()
+    objects = DeletedModelManager()
     def clean(self):
         super().clean()
         if self.avenant_du_contrat and self.avenant_du_contrat == self:

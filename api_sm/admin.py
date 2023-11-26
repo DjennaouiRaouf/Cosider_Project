@@ -54,14 +54,7 @@ class ClientAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
             del actions['hard_delete_soft_deleted']
         return actions
 
-    def save_model(self, request, obj, form, change):
-        obj.date_modification=datetime.now()
-        super().save_model(request, obj, form, change)
-    def delete_queryset(self, request, queryset):
-        for obj in queryset:
-            
-            obj.date_modification = datetime.now()
-            obj.save()
+
 
 
 
@@ -80,15 +73,6 @@ class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin
         if 'hard_delete_soft_deleted' in actions:
             del actions['hard_delete_soft_deleted']
         return actions
-    def save_model(self, request, obj, form, change):
-        
-        obj.date_modification = datetime.now()
-        super().save_model(request, obj, form, change)
-
-    def delete_queryset(self, request, queryset):
-        for obj in queryset:
-            obj.date_modification = datetime.now()
-            obj.save()
 
 
 
@@ -100,26 +84,17 @@ class MarcheAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
     ,'tva',)
     list_filter = (SafeDeleteAdminFilter,)
 
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "avenant_du_contrat":
 
             kwargs["queryset"] = Marche.objects.filter(
                 avenant_du_contrat=None)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
-    def save_model(self, request, obj, form, change):
-        
-        obj.date_modification = datetime.now()
-
-        super().save_model(request, obj, form, change)
-    def delete_queryset(self, request, queryset):
-        for obj in queryset:
-            obj.save()
 
 
 @admin.register(NT)
@@ -136,14 +111,7 @@ class NTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.Mo
             del actions['hard_delete_soft_deleted']
         return actions
 
-    def save_model(self, request, obj, form, change):
-        
-        obj.date_modification = datetime.now()
-        super().save_model(request, obj, form, change)
-
-    def delete_queryset(self, request, queryset):
-        for obj in queryset:
-            obj.save()
+  
 
 
 
@@ -194,13 +162,6 @@ class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
         if 'hard_delete_soft_deleted' in actions:
             del actions['hard_delete_soft_deleted']
         return actions
-    def save_model(self, request, obj, form, change):
-        
-        obj.date_modification = datetime.now()
-        super().save_model(request, obj, form, change)
-    def delete_queryset(self, request, queryset):
-        for obj in queryset:
-            obj.save()
 
 
 
@@ -218,9 +179,7 @@ class  TypeCautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmi
         return actions
 
 
-    def save_model(self, request, obj, form, change):
-        obj.date_modification = datetime.now()
-        super().save_model(request, obj, form, change)
+
 
 
 
@@ -236,9 +195,6 @@ class BanqueAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
             del actions['hard_delete_soft_deleted']
         return actions
 
-    def save_model(self, request, obj, form, change):
-        obj.date_modification = datetime.now()
-        super().save_model(request, obj, form, change)
 
 
 
