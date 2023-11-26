@@ -22,7 +22,7 @@ lp=25
 @admin.register(Images)
 class ImagesAdmin(admin.ModelAdmin):
     list_per_page = lp
-    list_display = ('key','src','est_bloquer')
+    list_display = ('key','src')
     list_filter = ()
 
     def delete_queryset(self, request, queryset):

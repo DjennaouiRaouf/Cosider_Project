@@ -19,8 +19,7 @@ class Images(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     key = models.BigAutoField(primary_key=True)
     src = models.ImageField(upload_to="Images/Login", null=False, blank=True, default='default.png')
-    est_bloquer = models.BooleanField(default=False)
-
+    history = HistoricalRecords()
     class Meta:
         verbose_name = 'Images'
         verbose_name_plural = 'Images'
@@ -37,9 +36,7 @@ class Clients(SafeDeleteModel):
     nif = models.CharField(db_column='NIF', unique=True, max_length=50, blank=True, null=True)
     raison_social = models.CharField(db_column='Raison_Social', max_length=50, blank=True, null=True)
     num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True, null=True)
-    user_id = CurrentUserField(editable=False)
-    date_modification = models.DateTimeField(db_column='Date_Modification', editable=False, auto_now=True)
-
+    history = HistoricalRecords()
     def __str__(self):
         return "Client: " + self.code_client
 
@@ -68,8 +65,7 @@ class Sites(SafeDeleteModel):
                                                  null=True)
     date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=False)
     date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True)
-    user_id = CurrentUserField(editable=False)
-
+    history = HistoricalRecords()
     objects = DeletedModelManager()
 
     def __str__(self):
@@ -99,8 +95,7 @@ class NT(SafeDeleteModel):
     libelle_nt = models.TextField(db_column='Libelle_NT', blank=True, null=True)
     date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True)
     date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True)
-
-    user_id = CurrentUserField(editable=False)
+    history = HistoricalRecords()
     objects = DeletedModelManager()
 
     def __str__(self):
@@ -138,10 +133,9 @@ class Marche(SafeDeleteModel):
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     code_contrat = models.CharField(null=False, blank=True, max_length=20)
     date_signature = models.DateTimeField(db_column='Date_Signature', null=False, auto_now=True)
-    user_id = CurrentUserField(editable=False)
     objects = DeletedModelManager()
     avenant_du_contrat = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='avenants')
-    
+    history = HistoricalRecords()
     def clean(self):
         super().clean()
         if self.avenant_du_contrat and self.avenant_du_contrat == self:
@@ -226,7 +220,7 @@ class Ordre_De_Service(SafeDeleteModel):
     date_interruption = models.DateField(null=False, blank=True)
     date_reprise = models.DateField(null=False, blank=True)
     motif = models.TextField(null=False, blank=True)
-
+    history = HistoricalRecords()
     objects = DeletedModelManager()
 
     def save(self, *args, **kwargs):
@@ -244,7 +238,7 @@ class TypeCaution(SafeDeleteModel):
     libelle = models.CharField(max_length=500, null=False)
     taux = models.DecimalField(default=0, max_digits=38, decimal_places=2,
                                validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    user_id = CurrentUserField(editable=False)
+    history = HistoricalRecords()
     objects = DeletedModelManager()
 
     def __str__(self):
@@ -267,7 +261,7 @@ class Banque(SafeDeleteModel):
     adresse = models.CharField(max_length=300, null=False)
     ville = models.CharField(max_length=300, null=False)
     wilaya = models.CharField(max_length=300, null=False)
-    user_id = CurrentUserField(editable=False)
+    history = HistoricalRecords()
     objects = DeletedModelManager()
 
     def save(self, *args, **kwargs):
@@ -286,7 +280,7 @@ class Banque(SafeDeleteModel):
 class TypeAvance(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     libelle = models.CharField(max_length=500, null=False, unique=True)
-    user_id = CurrentUserField(editable=False)
+    history = HistoricalRecords()
     objects = DeletedModelManager()
 
     def __str__(self):
@@ -309,7 +303,7 @@ class Avance(SafeDeleteModel):
     type = models.ForeignKey(TypeAvance, on_delete=models.CASCADE, null=False)
     montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
     Client = models.ForeignKey(Marche, on_delete=models.CASCADE, null=False, related_name="Avance_Client")
-    user_id = CurrentUserField(editable=False)
+    history = HistoricalRecords()
     objects = DeletedModelManager()
 
     def save(self, *args, **kwargs):
@@ -332,7 +326,7 @@ class Cautions(SafeDeleteModel):
         editable=False
     )
     est_recupere = models.BooleanField(default=True, null=False, editable=False)
-    user_id = CurrentUserField(editable=False)
+    history = HistoricalRecords()
     objects = DeletedModelManager()
 
     def recuperation(self):
@@ -363,7 +357,7 @@ class Attachements(SafeDeleteModel):
     dqe = models.ForeignKey(DQE, on_delete=models.CASCADE)
     qte_realise = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
     qte_restante = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0, editable=False)
-    user_id = CurrentUserField(editable=False)
+    history = HistoricalRecords()
     objects = DeletedModelManager()
 
     @property
