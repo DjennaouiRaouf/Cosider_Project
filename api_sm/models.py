@@ -226,7 +226,7 @@ class Ordre_De_Service(SafeDeleteModel):
     date_interruption = models.DateField(null=False, blank=True)
     date_reprise = models.DateField(null=False, blank=True)
     motif = models.TextField(null=False, blank=True)
-    user_id = CurrentUserField(editable=False)
+
     objects = DeletedModelManager()
 
     def save(self, *args, **kwargs):

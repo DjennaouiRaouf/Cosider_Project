@@ -37,17 +37,21 @@ class ImagesAdmin(admin.ModelAdmin):
 
 
 @admin.register(Clients)
-class ClientAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class ClientAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_per_page = lp
     resource_class=ClientResource
-    list_display = ('code_client','type_client','est_client_cosider','nif','raison_social','user_id',)
+    list_display = ('code_client','type_client','est_client_cosider','nif','raison_social',)
     list_filter = (
         'est_client_cosider',
         'type_client',
     )
     search_fields = ('code_client','nif')
 
-
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
 
     def save_model(self, request, obj, form, change):
         obj.date_modification=datetime.now()
@@ -62,13 +66,18 @@ class ClientAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(Sites)
-class SitesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = SiteResource
     list_per_page = lp
     list_display = ('code_site','code_filiale','code_region','libelle_site','type_site','code_division',
-        'code_commune_site','date_ouverture_site', 'date_cloture_site','user_id', )
+        'code_commune_site','date_ouverture_site', 'date_cloture_site', )
     list_editable = ()
 
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
     def save_model(self, request, obj, form, change):
         
         obj.date_modification = datetime.now()
@@ -82,11 +91,11 @@ class SitesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(Marche)
-class MarcheAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class MarcheAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
 
     resource_class = MarcheResource
     list_display = ('nt','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','retenue_de_garantie' ,'rabais'
-    ,'tva','user_id',)
+    ,'tva',)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "avenant_du_contrat":
@@ -95,6 +104,11 @@ class MarcheAdmin(ImportExportModelAdmin,admin.ModelAdmin):
                 avenant_du_contrat=None)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
     def save_model(self, request, obj, form, change):
         
         obj.date_modification = datetime.now()
@@ -106,11 +120,17 @@ class MarcheAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(NT)
-class NTAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class NTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
     list_display = (
-    'code_site','nt','code_client','libelle_nt','date_ouverture_nt','date_cloture_nt','user_id'
-    ,)
+    'code_site','nt','code_client','libelle_nt','date_ouverture_nt','date_cloture_nt',
+    )
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
 
     def save_model(self, request, obj, form, change):
         
@@ -124,12 +144,16 @@ class NTAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(Ordre_De_Service)
-class ODS(ImportExportModelAdmin,admin.ModelAdmin):
+class ODS(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     resource_class = ODSResource
-    list_display = ("marche","date_interruption","date_reprise","motif","user_id")
+    list_display = ("marche","date_interruption","date_reprise","motif",)
 
-
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
 
 
 
@@ -144,16 +168,27 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
     list_filter = (SafeDeleteAdminFilter,)
     list_editable = ("prix_u",)
 
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
+
 
 
 
 
 
 @admin.register(TypeAvance)
-class  TypeAvanceAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeAvanceResource
-    list_display = ("id", "libelle", "user_id")
+    list_display = ("id", "libelle", )
 
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
     def save_model(self, request, obj, form, change):
         
         obj.date_modification = datetime.now()
@@ -166,23 +201,17 @@ class  TypeAvanceAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(TypeCaution)
-class  TypeCautionAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class  TypeCautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeCautionResource
-    list_display = ("id", "libelle", "taux","user_id","est_bloquer")
+    list_display = ("id", "libelle", "taux",)
     list_filter = (SafeDeleteAdminFilter,)
-    def est_bloquer(self,obj):
-        if obj.deleted:
-            return format_html(
-                '''
-               <img src="/static/admin/img/icon-yes.svg" alt="True">
-                '''
-            )
-        if not obj.deleted:
-            return format_html(
-                '''
-               <img src="/static/admin/img/icon-no.svg" alt="False">
-                '''
-            )
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
+
 
     def save_model(self, request, obj, form, change):
         obj.date_modification = datetime.now()
@@ -192,9 +221,15 @@ class  TypeCautionAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin)
 
 
 @admin.register(Banque)
-class BanqueAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class BanqueAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = BanqueResource
-    list_display = ( "nom", "adresse", "ville", "wilaya","user_id")
+    list_display = ( "nom", "adresse", "ville", "wilaya",)
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
 
     def save_model(self, request, obj, form, change):
         obj.date_modification = datetime.now()
@@ -204,10 +239,16 @@ class BanqueAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(Cautions)
-class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = BanqueResource
-    list_display = ("marche", "Type_Caution","montant", "date_soumission", "montant","user_id","est_recupere")
+    list_display = ("marche", "Type_Caution","montant", "date_soumission", "montant","est_recupere")
     actions = ['recuperer']
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
 
     def recuperer(self, request, queryset):
         queryset.update(est_recupere=True)
@@ -220,10 +261,16 @@ class CautionAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(Attachements)
-class AttachementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class AttachementAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     list_display=("dqe","qte_realise","qte_rest","avancement","montant_estime",'montant_rg','montant_rb','montant_final'
-                  ,'user_id')
+                  ,)
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
 
 
     def qte_rest(self,obj):
@@ -247,12 +294,15 @@ class AttachementAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(Factures)
-class FacturesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('numero_facture','date_facture','montant_global',
                     'etat')
 
-
-
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
     def etat(self, obj):
         if obj.etat_de_facture == True:
             return format_html(
@@ -269,8 +319,14 @@ class FacturesAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(DetailFacture)
-class DetailFactureAdmin(ImportExportModelAdmin,admin.ModelAdmin):
+class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ("numero_facture","detail_designation","detail_estimation","detail_montant_rg","detail_montant_rb","detail_montant")
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
 
     def numero_facture(self, obj):
         return obj.facture.numero_facture
@@ -288,10 +344,16 @@ class DetailFactureAdmin(ImportExportModelAdmin,admin.ModelAdmin):
 
 
 
-class EncaissementAmin(ImportExportModelAdmin,admin.ModelAdmin):
+class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
 
     list_display = ('numero_facture','date_encaissement','mode_paiement','montant_facture','montant_encaisse','montant_creance')
     save_as = True
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'hard_delete_soft_deleted' in actions:
+            del actions['hard_delete_soft_deleted']
+        return actions
     def numero_facture(self, obj):
         return obj.facture.numero_facture
     def montant_facture(self,obj):
