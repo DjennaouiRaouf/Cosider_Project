@@ -3,8 +3,6 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django_currentuser.db.models import CurrentUserField
-
 from safedelete import SOFT_DELETE_CASCADE, DELETED_VISIBLE_BY_PK
 from safedelete.managers import SafeDeleteManager
 from safedelete.models import SafeDeleteModel
@@ -204,9 +202,8 @@ class DQE(SafeDeleteModel): # le prix final
 
 
     def save(self, *args, **kwargs):
-            print(self.prix_u)
-            #self.date_modification = datetime.now()
-            super(DQE, self).save(*args, **kwargs)
+            if not self.deleted:
+                super(DQE, self).save(*args, **kwargs)
 
 
 

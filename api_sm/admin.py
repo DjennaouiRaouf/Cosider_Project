@@ -52,11 +52,6 @@ class ClientAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
     )
     search_fields = ('code_client','nif')
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
 
 
 
@@ -72,11 +67,6 @@ class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin
     list_editable = ()
     list_filter = (SafeDeleteAdminFilter,)
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
 
 
 
@@ -90,11 +80,6 @@ class MarcheAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
     list_filter = (SafeDeleteAdminFilter,)
 
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "avenant_du_contrat":
 
@@ -111,11 +96,6 @@ class NTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.Mo
     )
     list_filter = (SafeDeleteAdminFilter,)
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
 
   
 
@@ -127,11 +107,6 @@ class ODS(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelA
     resource_class = ODSResource
     list_display = ("marche","date_interruption","date_reprise","motif",)
     list_filter = (SafeDeleteAdminFilter,)
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
 
 
 
@@ -145,17 +120,14 @@ class DQEAdmin(AdminFiltersMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExport
     list_filter = (SafeDeleteAdminFilter,
                    ("marche__nt__code_site__code_site",ValueFilter.factory(lookup_name='exact')),
                    ("marche__nt__nt", ValueFilter.factory(lookup_name='exact')),
-                   ("marche__num_avenant",ValueFilter.factory(lookup_name='lt') ),
+                   ("marche__num_avenant",ValueFilter.factory(lookup_name='exact') ),
                    )
-    list_editable = ("prix_u",)
+
+ 
 
 
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
+
 
 
 
@@ -168,11 +140,6 @@ class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
     list_display = ("id", "libelle", )
     list_filter = (SafeDeleteAdminFilter,)
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
 
 
 
@@ -183,11 +150,6 @@ class  TypeCautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmi
     list_display = ("id", "libelle", "taux",)
     list_filter = (SafeDeleteAdminFilter,)
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
 
 
 
@@ -201,11 +163,6 @@ class BanqueAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
     resource_class = BanqueResource
     list_display = ( "nom", "adresse", "ville", "wilaya",)
     list_filter = (SafeDeleteAdminFilter,)
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
 
 
 
@@ -218,11 +175,6 @@ class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
     actions = ['recuperer']
     list_filter = (SafeDeleteAdminFilter,)
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
 
     def recuperer(self, request, queryset):
         queryset.update(est_recupere=True)
@@ -241,11 +193,6 @@ class AttachementAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
                   ,)
     list_filter = (SafeDeleteAdminFilter,)
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
 
 
     def qte_rest(self,obj):
@@ -274,11 +221,6 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
                     'etat')
     list_filter = (SafeDeleteAdminFilter,)
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
     def etat(self, obj):
         if obj.etat_de_facture == True:
             return format_html(
@@ -298,11 +240,6 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
 class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ("numero_facture","detail_designation","detail_estimation","detail_montant_rg","detail_montant_rb","detail_montant")
     list_filter = (SafeDeleteAdminFilter,)
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
 
     def numero_facture(self, obj):
         return obj.facture.numero_facture
@@ -326,11 +263,6 @@ class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
     save_as = True
     list_filter = (SafeDeleteAdminFilter,)
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        if 'hard_delete_soft_deleted' in actions:
-            del actions['hard_delete_soft_deleted']
-        return actions
     def numero_facture(self, obj):
         return obj.facture.numero_facture
     def montant_facture(self,obj):
