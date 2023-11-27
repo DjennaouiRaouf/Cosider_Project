@@ -142,10 +142,10 @@ class DQEAdmin(AdminFiltersMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExport
     save_as=True
     resource_class = DQEResource
     list_display = ("marche","designation","unite","quantite","prix_u","prix_q",)
-    list_filter = ((SafeDeleteAdminFilter),
+    list_filter = (SafeDeleteAdminFilter,
                    ("marche__nt__code_site__code_site",ValueFilter.factory(lookup_name='exact')),
                    ("marche__nt__nt", ValueFilter.factory(lookup_name='exact')),
-                   ("marche__num_avenant",ValueFilter.factory(lookup_name='exact') ),
+                   ("marche__num_avenant",ValueFilter.factory(lookup_name='lt') ),
                    )
     list_editable = ("prix_u",)
 
@@ -197,6 +197,7 @@ class  TypeCautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmi
 
 @admin.register(Banque)
 class BanqueAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+    save_as = True
     resource_class = BanqueResource
     list_display = ( "nom", "adresse", "ville", "wilaya",)
     list_filter = (SafeDeleteAdminFilter,)

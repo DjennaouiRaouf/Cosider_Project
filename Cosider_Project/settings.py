@@ -122,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'fr-fr'
 
 TIME_ZONE = 'UTC'
 
