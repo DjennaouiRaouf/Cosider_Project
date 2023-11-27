@@ -123,8 +123,8 @@ class NT(SafeDeleteModel):
 class Marche(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     nt = models.ForeignKey(NT, on_delete=models.CASCADE, db_column='numero_marche', null=False)
-    num_avenant = models.PositiveBigIntegerField(default=0, null=False, editable=False)
-    nbr_avenant = models.PositiveBigIntegerField(default=0, null=False, editable=False)
+    num_avenant = models.PositiveIntegerField(default=0, null=False, editable=False)
+    nbr_avenant = models.PositiveIntegerField(default=0, null=False, editable=False)
     libelle = models.CharField(null=False, blank=True, max_length=500)
     ods_depart = models.DateField(null=False, blank=True)
     delais = models.PositiveIntegerField(default=0, null=False)

@@ -1,13 +1,17 @@
-
-
+from adminfilters.autocomplete import AutoCompleteFilter
+from adminfilters.combo import ChoicesFieldComboFilter
+from adminfilters.dj import DjangoLookupFilter
+from adminfilters.mixin import AdminFiltersMixin
+from adminfilters.numbers import NumberFilter
+from adminfilters.querystring import QueryStringFilter
+from adminfilters.radio import RelatedFieldRadioFilter
+from adminfilters.value import ValueFilter
 from django.contrib import admin
+from django.contrib.admin import RelatedFieldListFilter
 from django.utils.html import format_html
 from import_export.admin import ImportExportModelAdmin
-from safedelete import DELETED_VISIBLE_BY_PK
-from safedelete.admin import SafeDeleteAdmin, SafeDeleteAdminFilter, highlight_deleted
-from safedelete.managers import SafeDeleteManager
+from safedelete.admin import SafeDeleteAdmin, SafeDeleteAdminFilter
 from simple_history.admin import SimpleHistoryAdmin
-
 from api_sm.Resources import *
 from api_sm.models import *
 
@@ -78,11 +82,13 @@ class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin
 
 @admin.register(Marche)
 class MarcheAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
-
+    save_as = True
     resource_class = MarcheResource
     list_display = ('nt','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','retenue_de_garantie' ,'rabais'
     ,'tva',)
+
     list_filter = (SafeDeleteAdminFilter,)
+
 
     def get_actions(self, request):
         actions = super().get_actions(request)
@@ -131,14 +137,19 @@ class ODS(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelA
 
 
 
-
 @admin.register(DQE)
-class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class DQEAdmin(AdminFiltersMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as=True
     resource_class = DQEResource
     list_display = ("marche","designation","unite","quantite","prix_u","prix_q",)
-    list_filter = (SafeDeleteAdminFilter,)
+    list_filter = (SafeDeleteAdminFilter,
+                   ("marche__nt__code_site__code_site",ValueFilter.factory(lookup='exact')),
+                   ("marche__nt__nt", ValueFilter.factory(lookup='exact')),
+                   ("marche__num_avenant",NumberFilter ),
+                   )
     list_editable = ("prix_u",)
+
+
 
     def get_actions(self, request):
         actions = super().get_actions(request)

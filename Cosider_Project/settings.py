@@ -21,7 +21,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-
+    'adminfilters',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'import_export',
     'api_sm',
+
 
 
 
@@ -94,9 +95,9 @@ DATABASES = {
         "NAME": "sm",
         "USER":"",
         "PASSWORD":"",
-        "HOST": "localhost",
+        "HOST": "DESKTOP-HQN5RQH",
         "PORT":"1433",
-        "OPTIONS": {"driver": "ODBC Driver 17 for SQL Server",
+        "OPTIONS": {"driver": "SQL Server Native Client 11.0",
         },
     },
 }
