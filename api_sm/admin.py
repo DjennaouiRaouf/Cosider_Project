@@ -163,13 +163,11 @@ class DQEAdmin(AdminFiltersMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExport
     save_as=True
     resource_class = DQEResource
     list_display = ("marche","designation","unite","quantite","prix_u","prix_q",)
-    list_filter = ("designation",
-                   #("marche__nt__code_site__code_site",ValueFilter.factory(lookup_name='exact')),
-                   #("marche__nt__nt", ValueFilter.factory(lookup_name='exact')),
-                   #("marche__num_avenant",ValueFilter.factory(lookup_name='exact') ),
+    list_filter = (SafeDeleteAdminFilter,
+                   ("marche__nt__code_site__code_site",ValueFilter.factory(lookup_name='exact')),
+                   ("marche__nt__nt", ValueFilter.factory(lookup_name='exact')),
+                   ("marche__num_avenant",ValueFilter.factory(lookup_name='exact') ),
                    )
-
-    list_editable = ('prix_u'),
 
 
     def has_change_permission(self, request, obj=None):
