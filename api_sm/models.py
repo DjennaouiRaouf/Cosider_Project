@@ -1,9 +1,8 @@
-from datetime import datetime
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from safedelete import SOFT_DELETE_CASCADE, DELETED_VISIBLE_BY_PK
+from safedelete import SOFT_DELETE_CASCADE, DELETED_VISIBLE_BY_PK, SOFT_DELETE
 from safedelete.managers import SafeDeleteManager
 from safedelete.models import SafeDeleteModel
 from simple_history.models import HistoricalRecords
@@ -20,8 +19,7 @@ class Images(SafeDeleteModel):
     history = HistoricalRecords()
     objects = DeletedModelManager()
 
-    def delete(self, *args, **kwargs):
-       super(Images, self).delete(*args, **kwargs)
+
     class Meta:
         verbose_name = 'Images'
         verbose_name_plural = 'Images'
@@ -31,24 +29,22 @@ class Images(SafeDeleteModel):
 
 class Clients(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    code_client = models.CharField(db_column='Code_Client', primary_key=True, max_length=500)
-    type_client = models.PositiveSmallIntegerField(db_column='Type_Client', blank=True, null=True)
-    est_client_cosider = models.BooleanField(db_column='Est_Client_Cosider', blank=True, null=False)
-    libelle_client = models.CharField(db_column='Libelle_Client', max_length=300, blank=True, null=True)
-    nif = models.CharField(db_column='NIF', unique=True, max_length=50, blank=True, null=True)
-    raison_social = models.CharField(db_column='Raison_Social', max_length=50, blank=True, null=True)
-    num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True, null=True)
+    code_client = models.CharField(db_column='Code_Client', primary_key=True, max_length=500, verbose_name='Code du Client')
+    type_client = models.PositiveSmallIntegerField(db_column='Type_Client', blank=True, null=True ,verbose_name='Type de Client')
+    est_client_cosider = models.BooleanField(db_column='Est_Client_Cosider', blank=True, null=False
+                                             ,verbose_name='Est Client Cosider')
+    libelle_client = models.CharField(db_column='Libelle_Client', max_length=300, blank=True, null=True,
+                                      verbose_name='Libelle')
+    nif = models.CharField(db_column='NIF', unique=True, max_length=50, blank=True, null=True,verbose_name='NIF')
+    raison_social = models.CharField(db_column='Raison_Social', max_length=50, blank=True, null=True,verbose_name='Raison Social')
+    num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True, null=True,
+                                             verbose_name='Numero du registre de commerce')
     history = HistoricalRecords()
     objects = DeletedModelManager()
     def __str__(self):
         return "Client: " + self.code_client
 
-    def save(self, *args, **kwargs):
-        
-        super(Clients, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-       super(Clients, self).delete(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Clients'
@@ -81,8 +77,7 @@ class Sites(SafeDeleteModel):
         else:
             raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
 
-    def delete(self, *args, **kwargs):
-       super(Sites, self).delete(*args, **kwargs)
+
 
 
     class Meta:
@@ -107,13 +102,12 @@ class NT(SafeDeleteModel):
 
     def save(self, *args, **kwargs):
         if (self.date_cloture_nt >= self.date_ouverture_nt):
-            
+
             super(NT, self).save(*args, **kwargs)
         else:
             raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
 
-    def delete(self, *args, **kwargs):
-       super(NT, self).delete(*args, **kwargs)
+
 
     class Meta:
         verbose_name = 'Numero du travail'
@@ -164,7 +158,7 @@ class Marche(SafeDeleteModel):
     def save(self, *args, **kwargs):
         if self.avenant_du_contrat and self.avenant_du_contrat == self:
             self.avenant_du_contrat=None
-        
+
         if not self.id and self.avenant_du_contrat:
             self.avenant_du_contrat.nbr_avenant += 1
             self.num_avenant = self.avenant_du_contrat.nbr_avenant
@@ -172,8 +166,7 @@ class Marche(SafeDeleteModel):
             self.avenant_du_contrat.save()
         super(Marche, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-       super(Marche, self).delete(*args, **kwargs)
+
 
     class Meta:
         verbose_name = 'Marchés'
@@ -210,8 +203,7 @@ class DQE(SafeDeleteModel): # le prix final
     def save(self, *args, **kwargs):
             super(DQE, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-       super(DQE, self).delete(*args, **kwargs)
+
 
 
     class Meta:
@@ -235,8 +227,7 @@ class Ordre_De_Service(SafeDeleteModel):
        if (self.date_reprise > self.date_interruption):
             super(Ordre_De_Service, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-       super(Ordre_De_Service, self).delete(*args, **kwargs)
+
     class Meta:
         verbose_name = 'Ordre de service'
         verbose_name_plural = 'Ordre de service'
@@ -254,11 +245,9 @@ class TypeCaution(SafeDeleteModel):
         return self.libelle
 
     def save(self, *args, **kwargs):
-
         super(TypeCaution, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-       super(TypeCaution, self).delete(*args, **kwargs)
+
 
     class Meta:
         verbose_name = 'Type_Caution'
@@ -266,7 +255,7 @@ class TypeCaution(SafeDeleteModel):
 
 
 class Banque(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
+    _safedelete_policy = SOFT_DELETE
     nom = models.CharField(max_length=300, null=False)
     adresse = models.CharField(max_length=300, null=False)
     ville = models.CharField(max_length=300, null=False)
@@ -277,8 +266,7 @@ class Banque(SafeDeleteModel):
     def save(self, *args, **kwargs):
         super(Banque, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-       super(Banque, self).delete(*args, **kwargs)
+
 
 
     def __str__(self):
@@ -301,8 +289,7 @@ class TypeAvance(SafeDeleteModel):
     def save(self, *args, **kwargs):
         super(TypeAvance, self).save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-       super(TypeAvance, self).delete(*args, **kwargs)
+
 
 
     class Meta:
@@ -318,10 +305,9 @@ class Avance(SafeDeleteModel):
     Client = models.ForeignKey(Marche, on_delete=models.CASCADE, null=False, related_name="Avance_Client")
     history = HistoricalRecords()
     objects = DeletedModelManager()
-    
+
 
     def save(self, *args, **kwargs):
-        
         super(Avance, self).save(*args, **kwargs)
 
 
@@ -357,8 +343,9 @@ class Cautions(SafeDeleteModel):
 
     def save(self, *args, **kwargs):
         self.soumission()
-        
+
         super(Cautions, self).save(*args, **kwargs)
+
 
 
     class Meta:
@@ -415,8 +402,7 @@ class Attachements(SafeDeleteModel):
         else:
             raise ValidationError('Qte realisée ne doit pas dépasser le Qte prévue dans le DQE')
 
-    def delete(self, *args, **kwargs):
-       super(Attachements, self).delete(*args, **kwargs)
+
 
 
     class Meta:
@@ -455,8 +441,7 @@ class DetailFacture(SafeDeleteModel):
     detail=models.ForeignKey(Attachements,on_delete=models.CASCADE)
     history = HistoricalRecords()
     objects = DeletedModelManager()
-    def delete(self, *args, **kwargs):
-       super(DetailFacture, self).delete(*args, **kwargs)
+
 
     class Meta:
         verbose_name = 'Datails Facture'
@@ -489,8 +474,7 @@ class Encaissement(SafeDeleteModel):
         else:
             raise ValidationError('Le paiement de la facture est terminer')
 
-    def delete(self, *args, **kwargs):
-       super(Encaissement, self).delete(*args, **kwargs)
+
 
     class Meta:
         verbose_name = 'Encaissement'

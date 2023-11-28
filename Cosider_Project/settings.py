@@ -21,6 +21,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'safedelete',
     'adminfilters',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -29,7 +30,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'colorfield',
-    'safedelete',
     'simple_history',
     'rest_framework',
     'rest_framework.authtoken',
