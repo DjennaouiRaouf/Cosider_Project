@@ -9,12 +9,21 @@ class ICSerializer(serializers.ModelSerializer):
         model = Images
         fields = '__all__'
 
-
 class ClientsSerializer(serializers.ModelSerializer):
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('deleted', None)
+        fields.pop('deleted_by_cascade', None)
+        return fields
 
     class Meta:
         model = Clients
         fields = '__all__'
+
+
+
+
+
 
 
 class SiteSerializer(serializers.ModelSerializer):

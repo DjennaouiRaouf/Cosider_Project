@@ -50,6 +50,9 @@ class GetICImages(generics.ListAPIView):
 
 
 
+
+
+
 class AddClientView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated,AddClientPermission]
     def post(self,request):
@@ -72,6 +75,18 @@ class AddClientView(generics.CreateAPIView):
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+class ClientFieldsApiView(APIView):
+    def get(self, request, *args, **kwargs):
+        serializer = ClientsSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        for field_name, field_instance in fields.items():
+            field_info.append({
+                'name':field_name,
+                'type': str(field_instance.__class__.__name__),
+                'label': field_instance.label or field_name,
+            })
+        return Response({'fields':field_info},status=status.HTTP_200_OK)
 
 class GetClientsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, ViewClientPermission]

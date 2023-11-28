@@ -3,6 +3,13 @@ from rest_framework import permissions
 from rest_framework.exceptions import PermissionDenied
 
 
+class OrmObjectFields():
+    def __init__(self, name, type,label):
+        self.name = name
+        self.type = type
+        self.label = label
+
+
 def str_to_bool(s):
     if s.lower() == "1":
         return True
