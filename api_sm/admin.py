@@ -51,6 +51,15 @@ class ClientAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
         SafeDeleteAdminFilter
     )
     search_fields = ('code_client','nif')
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
 
 
@@ -66,6 +75,16 @@ class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin
         'code_commune_site','date_ouverture_site', 'date_cloture_site', )
     list_editable = ()
     list_filter = (SafeDeleteAdminFilter,)
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
 
 
 
@@ -78,6 +97,15 @@ class MarcheAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
     ,'tva',)
 
     list_filter = (SafeDeleteAdminFilter,)
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -95,9 +123,18 @@ class NTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.Mo
     'code_site','nt','code_client','libelle_nt','date_ouverture_nt','date_cloture_nt',
     )
     list_filter = (SafeDeleteAdminFilter,)
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
 
-  
+
 
 
 
@@ -108,6 +145,15 @@ class ODS(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelA
     list_display = ("marche","date_interruption","date_reprise","motif",)
     list_filter = (SafeDeleteAdminFilter,)
 
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
 
 
@@ -117,21 +163,24 @@ class DQEAdmin(AdminFiltersMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExport
     save_as=True
     resource_class = DQEResource
     list_display = ("marche","designation","unite","quantite","prix_u","prix_q",)
-    list_filter = (SafeDeleteAdminFilter,
-                   ("marche__nt__code_site__code_site",ValueFilter.factory(lookup_name='exact')),
-                   ("marche__nt__nt", ValueFilter.factory(lookup_name='exact')),
-                   ("marche__num_avenant",ValueFilter.factory(lookup_name='exact') ),
+    list_filter = ("designation",
+                   #("marche__nt__code_site__code_site",ValueFilter.factory(lookup_name='exact')),
+                   #("marche__nt__nt", ValueFilter.factory(lookup_name='exact')),
+                   #("marche__num_avenant",ValueFilter.factory(lookup_name='exact') ),
                    )
 
- 
+    list_editable = ('prix_u'),
 
 
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
-
-
-
-
-
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
 
 @admin.register(TypeAvance)
@@ -139,6 +188,15 @@ class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
     resource_class = TypeAvanceResource
     list_display = ("id", "libelle", )
     list_filter = (SafeDeleteAdminFilter,)
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
 
 
@@ -149,6 +207,15 @@ class  TypeCautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmi
     resource_class = TypeCautionResource
     list_display = ("id", "libelle", "taux",)
     list_filter = (SafeDeleteAdminFilter,)
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
 
 
@@ -164,6 +231,15 @@ class BanqueAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
     list_display = ( "nom", "adresse", "ville", "wilaya",)
     list_filter = (SafeDeleteAdminFilter,)
 
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
 
 
@@ -174,6 +250,15 @@ class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
     list_display = ("marche", "Type_Caution","montant", "date_soumission", "montant","est_recupere")
     actions = ['recuperer']
     list_filter = (SafeDeleteAdminFilter,)
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
 
     def recuperer(self, request, queryset):
@@ -192,6 +277,15 @@ class AttachementAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
     list_display=("dqe","qte_realise","qte_rest","avancement","montant_estime",'montant_rg','montant_rb','montant_final'
                   ,)
     list_filter = (SafeDeleteAdminFilter,)
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
 
 
@@ -220,6 +314,15 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
     list_display = ('numero_facture','date_facture','montant_global',
                     'etat')
     list_filter = (SafeDeleteAdminFilter,)
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
     def etat(self, obj):
         if obj.etat_de_facture == True:
@@ -240,6 +343,15 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
 class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ("numero_facture","detail_designation","detail_estimation","detail_montant_rg","detail_montant_rb","detail_montant")
     list_filter = (SafeDeleteAdminFilter,)
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
     def numero_facture(self, obj):
         return obj.facture.numero_facture
@@ -262,6 +374,15 @@ class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
     list_display = ('numero_facture','date_encaissement','mode_paiement','montant_facture','montant_encaisse','montant_creance')
     save_as = True
     list_filter = (SafeDeleteAdminFilter,)
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
     def numero_facture(self, obj):
         return obj.facture.numero_facture
