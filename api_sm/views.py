@@ -6,8 +6,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework.viewsets import ViewSet
-
 from .Serializers import *
 from .models import *
 from .tools import *
@@ -55,27 +53,6 @@ class GetICImages(generics.ListAPIView):
 
 
 
-class AddClientView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated,AddClientPermission]
-    def post(self,request):
-
-        code_client=request.data.get('code_client')
-        type_client=request.data.get('type_client')
-        est_client_cosider=str_to_bool(request.data.get('est_client_cosider'))
-        libelle_client=request.data.get('libelle_client')
-        nif=request.data.get('nif')
-        raison_social=request.data.get('raison_social')
-        num_registre_commerce=request.data.get('num_registre_commerce')
-        try:
-            Clients.objects.create(code_client=code_client, type_client=type_client
-                    , est_client_cosider=est_client_cosider, libelle_client=libelle_client
-                    , nif=nif, raison_social=raison_social, num_registre_commerce=num_registre_commerce
-                   ).save()
-
-            return Response({'message': 'Client ajouté'}, status=status.HTTP_200_OK)
-
-        except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 class SiteFieldsApiView(APIView):
     def get(self, request):
         flag = request.query_params.get('flag', None)
@@ -90,6 +67,8 @@ class SiteFieldsApiView(APIView):
                         'type': str(field_instance.__class__.__name__),
                         'label': field_instance.label or field_name,
                     })
+
+
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
@@ -104,6 +83,26 @@ class SiteFieldsApiView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class AjoutClientApiView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated, AddClientPermission]
+    queryset = Clients.objects.all()
+    serializer_class = ClientsSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        self.perform_create(serializer)
+        custom_response = {
+            'status': 'success',
+            'message': 'Client ajouté',
+            'data': serializer.data,
+        }
+
+
+        return Response(custom_response, status=status.HTTP_201_CREATED)
 
 
 class ClientFieldsApiView(APIView):
@@ -142,32 +141,33 @@ class GetClientsView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['code_client', 'type_client', 'est_client_cosider','est_client_cosider','libelle_client']
 
-class  AddSiteView(APIView):
-    permission_classes = [IsAuthenticated, AddSitePermission]
-    def post(self,request):
-        code_site= request.data.get('code_site')
-        code_filiale= request.data.get('code_filiale')
-        code_region= request.data.get('code_region')
-        libelle_site= request.data.get('libelle_site')
-        code_agence= request.data.get('code_agence')
-        type_site=request.data.get('type_site')
-        code_division= request.data.get('code_division')
-        code_commune_site= request.data.get('code_commune_site')
-        jour_cloture_mouv_rh_paie= request.data.get('jour_cloture_mouv_rh_paie')
-        date_ouverture_site=request.data.get('date_ouverture_site')
-        date_cloture_site=request.data.get('date_cloture_site')
 
-        try:
-            Sites.objects.create(code_site=code_site, code_agence=code_agence, type_site=type_site, code_filiale=code_filiale,
-                  code_region=code_region, libelle_site=libelle_site, code_division=code_division,
-                  code_commune_site=code_commune_site, jour_cloture_mouv_rh_paie=jour_cloture_mouv_rh_paie,
-                  date_cloture_site=date_cloture_site,
-                  date_ouverture_site=date_ouverture_site)
-            return Response({'message': 'Site ajouté'}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({'message': e}, status=status.HTTP_400_BAD_REQUEST)
 
-    
+
+
+
+class AjoutSiteApiView(generics.CreateAPIView):
+
+    queryset = Sites.objects.all()
+    serializer_class = SiteSerializer
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        self.perform_create(serializer)
+        custom_response = {
+            'status': 'success',
+            'message': 'Site ajouté',
+            'data': serializer.data,
+        }
+        return Response(custom_response, status=status.HTTP_201_CREATED)
+
+
+
+
+
+
+
 class GetSitesView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, ViewSitePermission]
     queryset = Sites.objects.filter()

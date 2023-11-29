@@ -16,6 +16,8 @@ class ClientsSerializer(serializers.ModelSerializer):
         fields.pop('deleted_by_cascade', None)
         return fields
 
+
+
     class Meta:
         model = Clients
         fields = '__all__'

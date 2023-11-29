@@ -65,6 +65,7 @@ class Sites(SafeDeleteModel):
                                                  null=True)
     date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=False)
     date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True)
+    b= models.BooleanField(default=False)
     history = HistoricalRecords()
     objects = DeletedModelManager()
 
@@ -453,7 +454,6 @@ class Encaissement(SafeDeleteModel):
     facture=models.ForeignKey(Factures,on_delete=models.CASCADE,null=False,blank=True)
     date_encaissement=models.DateField(null=False)
     mode_paiement=models.CharField(max_length=100,null=False)
-
     montant_encaisse=models.DecimalField(max_digits=38, decimal_places=2, blank=True,
                                      validators=[MinValueValidator(0)], default=0)
     montant_creance = models.DecimalField(max_digits=38, decimal_places=2, blank=True,
