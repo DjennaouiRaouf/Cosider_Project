@@ -24,6 +24,31 @@ class ClientsSerializer(serializers.ModelSerializer):
 
 
 
+class AMSiteSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model = Sites
+        fields = ["code_site"]
+
+class AMNTSerializer(serializers.ModelSerializer):
+    code_site=AMSiteSerilizer()
+    class Meta:
+        model = NT
+        fields = ["nt","code_site__code_site"]
+
+class AddMarcheSerializer(serializers.ModelSerializer):
+    nt=AMNTSerializer()
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('deleted', None)
+        fields.pop('id', None)
+        fields.pop('deleted_by_cascade', None)
+        return fields
+
+    class Meta:
+        model=Marche
+        fields= "__all__"
+
+
 
 
 
@@ -65,6 +90,9 @@ class RecursiveSerializer(serializers.Serializer):
     def to_representation(self, instance):
         serializer = self.parent.parent.__class__(instance, context=self.context)
         return serializer.data
+
+
+
 
 
 class DQESerializer(serializers.ModelSerializer):

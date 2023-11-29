@@ -65,7 +65,7 @@ class Sites(SafeDeleteModel):
                                                  null=True)
     date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=False)
     date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True)
-    b= models.BooleanField(default=False)
+
     history = HistoricalRecords()
     objects = DeletedModelManager()
 
