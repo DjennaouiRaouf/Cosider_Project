@@ -162,7 +162,7 @@ class AjoutDQEApiView(generics.CreateAPIView):
 
 class GetSitesView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, ViewSitePermission]
-    queryset = Sites.objects.filter()
+    queryset = Sites.objects.all()
     serializer_class = SiteSerializer
 
 
@@ -178,6 +178,10 @@ class GetDQEView(generics.ListAPIView):
     serializer_class = DQESerializer
 
 
+
+class GetNTView(generics.ListAPIView):
+    queryset = NT.objects.all()
+    serializer_class = NTSerializer
 
 
 

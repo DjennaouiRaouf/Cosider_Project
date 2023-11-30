@@ -50,20 +50,13 @@ class SiteSerializer(serializers.ModelSerializer):
 
 
 class NTSerializer(serializers.ModelSerializer):
-    code_site=SiteSerializer()
-    code_client=ClientsSerializer()
+    code_sites=SiteSerializer()
+    code_clients=ClientsSerializer()
 
 
     class Meta:
         model=NT
         fields ='__all__'
-
-
-class ListMarcheSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model=Marche
-        fields= "__all__"
 
 
 
