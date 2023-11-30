@@ -2,24 +2,6 @@ from django.contrib.auth.models import User
 from rest_framework import permissions
 from rest_framework.exceptions import PermissionDenied
 
-
-class OrmObjectFields():
-    def __init__(self, name, type,label):
-        self.name = name
-        self.type = type
-        self.label = label
-
-
-def str_to_bool(s):
-    if s.lower() == "1":
-        return True
-    elif s.lower() == "0":
-        return False
-    else:
-        raise ValueError("Booleen non valide")
-
-
-
 class AddClientPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if( not User.objects.get(id=request.user.id).has_perm('api_sm.add_clients')) :
