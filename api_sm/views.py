@@ -52,39 +52,6 @@ class GetICImages(generics.ListAPIView):
 
 
 
-
-class SiteFieldsApiView(APIView):
-    def get(self, request):
-        flag = request.query_params.get('flag', None)
-        if flag == 'l' or flag == 'f':
-            serializer = SiteSerializer()
-            fields = serializer.get_fields()
-            if (flag == 'f'):  # react form
-                field_info = []
-                for field_name, field_instance in fields.items():
-                    field_info.append({
-                        'name': field_name,
-                        'type': str(field_instance.__class__.__name__),
-                        'label': field_instance.label or field_name,
-                    })
-
-
-            if (flag == 'l'):  # data grid list (react ag-grid)
-                field_info = []
-                for field_name, field_instance in fields.items():
-                    field_info.append({
-                        'field': field_name,
-                        'headerName': field_instance.label or field_name,
-                        'info': str(field_instance.__class__.__name__),
-                    })
-
-            return Response({'fields': field_info}, status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
 class AjoutClientApiView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, AddClientPermission]
     queryset = Clients.objects.all()
@@ -105,45 +72,12 @@ class AjoutClientApiView(generics.CreateAPIView):
         return Response(custom_response, status=status.HTTP_201_CREATED)
 
 
-class ClientFieldsApiView(APIView):
-    def get(self, request):
-        flag = request.query_params.get('flag',None)
-        if flag=='l' or flag =='f':
-            serializer = ClientsSerializer()
-            fields = serializer.get_fields()
-            if(flag=='f'): # react form
-                field_info = []
-                for field_name, field_instance in fields.items():
-                    field_info.append({
-                        'name':field_name,
-                        'type': str(field_instance.__class__.__name__),
-                        'label': field_instance.label or field_name,
-                    })
-            if(flag=='l'): #data grid list (react ag-grid)
-                field_info = []
-                for field_name, field_instance in fields.items():
-                    field_info.append({
-                        'field': field_name,
-                        'headerName': field_instance.label or field_name,
-                        'info': str(field_instance.__class__.__name__),
-                    })
-
-            return Response({'fields':field_info},status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
 class GetClientsView(generics.ListAPIView):
 
     queryset = Clients.objects.filter()
     serializer_class = ClientsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['code_client', 'type_client', 'est_client_cosider','est_client_cosider','libelle_client']
-
-
-
-
 
 
 class AjoutSiteApiView(generics.CreateAPIView):
@@ -163,6 +97,9 @@ class AjoutSiteApiView(generics.CreateAPIView):
         return Response(custom_response, status=status.HTTP_201_CREATED)
 
 
+class AjoutMarcheApiView(generics.CreateAPIView):
+    queryset = Sites.objects.all()
+    serializer_class = MarcheSerializer
 
 
 
@@ -177,13 +114,13 @@ class GetSitesView(generics.ListAPIView):
 
 class GetMarcheView(generics.ListAPIView):
     queryset = Marche.objects.all()
-    serializer_class = ListMarcheSerializer
+    serializer_class = MarcheSerializer
 
 
 class GetDQEView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     queryset = DQE.objects.all()
-    serializer_class = ListMarcheSerializer
+    serializer_class = DQESerializer
 
 class AddDQEView(APIView):
     permission_classes = [IsAuthenticated]
@@ -212,59 +149,6 @@ class AddDQEView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
-class AddMacheView(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request):
-        code_site=request.data.get('code_site')
-        num_nt=request.data.get('num_nt')
-        libelle=request.data.get('libelle')
-        rg= request.data.get('retenue_garantie')
-        ods_depart=request.data.get('ods_depart')
-        date_signature= request.data.get('date_signature')
-        delais=request.data.get('delais')
-        revisable=str_to_bool(request.data.get('revisable'))
-        rabais=request.data.get('rabais')
-        tva=request.data.get('tva')
-        code_contrat=request.data.get('num_contrat')
-        nouveau = str_to_bool(request.data.get('nouveau'))
-        if (nouveau == False):  # ajouter un avenant
-            try:
-                marche = Marche.objects.get(nt__nt=num_nt, nt__code_site__code_site=code_site,
-                                            avenant_du_contrat__isnull=True)
-
-                if (marche.id):
-                    site = Sites.objects.get(code_site=code_site)
-
-                    nt = NT.objects.get(code_site=site, nt=num_nt)
-                    Marche(nt=nt, libelle=libelle, ods_depart=ods_depart, delais=delais, date_signature=date_signature,
-                           revisable=revisable, rabais=rabais, tva=tva, code_contrat=code_contrat,retenue_de_garantie=rg,
-                           avenant_du_contrat=marche).save()
-                    return Response({'message': "Vous avez ajouté un avenant"}, status=status.HTTP_200_OK)
-
-                else:
-                    return Response(
-                        {'message': "Ce marche ne paut pas etre un avenant (le marché initial n'existe pas )"},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-            except Exception as e:
-                return Response({'message': "Ce marche ne paut pas etre un avenant (le marché initial n'existe pas )"},
-                                status=status.HTTP_400_BAD_REQUEST)
-
-        else:
-            try:
-                site = Sites.objects.get(code_site=code_site)
-                nt = NT.objects.get(code_site=site, nt=num_nt)
-                Marche(nt=nt,
-                       libelle=libelle, ods_depart=ods_depart, delais=delais,
-                       revisable=revisable, rabais=rabais, tva=tva, code_contrat=code_contrat,retenue_de_garantie=rg,
-                       avenant_du_contrat=None).save()
-                return Response({'message': "Vous avez créé un nouveau marché"}, status=status.HTTP_200_OK)
-            except Exception as e:
-                return Response({'message': "Impossible de créer un nouveau marché"},
-                                status=status.HTTP_400_BAD_REQUEST)
 
 
 

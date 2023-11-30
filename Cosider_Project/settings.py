@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'import_export',
     'api_sm',
+    'forms',
 
 
 

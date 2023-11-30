@@ -11,6 +11,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('sm/',include('api_sm.urls')),
+    path('forms/',include('forms.urls')),
 
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

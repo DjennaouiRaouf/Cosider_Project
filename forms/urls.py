@@ -1,0 +1,11 @@
+from django.urls import path
+from .views import *
+
+urlpatterns = [
+
+    path('clientfields/', ClientFieldsApiView.as_view()),
+    path('marchefields/', MarcheFieldsApiView.as_view()),
+    path('sitefields/', SiteFieldsApiView.as_view()),
+
+
+]

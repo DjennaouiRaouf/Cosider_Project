@@ -103,7 +103,6 @@ class NT(SafeDeleteModel):
 
     def save(self, *args, **kwargs):
         if (self.date_cloture_nt >= self.date_ouverture_nt):
-
             super(NT, self).save(*args, **kwargs)
         else:
             raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
@@ -131,7 +130,7 @@ class Marche(SafeDeleteModel):
     retenue_de_garantie = models.DecimalField(default=0, max_digits=38, decimal_places=2,
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     code_contrat = models.CharField(null=False, blank=True, max_length=20)
-    date_signature = models.DateTimeField(db_column='Date_Signature', null=False, auto_now=True)
+    date_signature = models.DateField(null=False)
     history = HistoricalRecords()
     objects = DeletedModelManager()
 
@@ -161,7 +160,7 @@ class Marche(SafeDeleteModel):
     class Meta:
         verbose_name = 'Marchés'
         verbose_name_plural = 'Marchés'
-        unique_together = (("nt", "num_avenant"))
+        unique_together=(('nt','num_avenant'),)
 
 
 

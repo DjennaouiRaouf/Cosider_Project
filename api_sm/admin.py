@@ -81,7 +81,7 @@ class MarcheAdmin(AdminFiltersMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExp
     save_as = True
     resource_class = MarcheResource
     list_display = ('nt','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','retenue_de_garantie' ,'rabais'
-    ,'tva',)
+    ,'tva','date_signature')
 
     list_filter = (SafeDeleteAdminFilter,
                    ("nt__code_site__code_site", ValueFilter.factory(lookup_name='exact')),
