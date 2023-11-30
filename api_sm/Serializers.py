@@ -24,30 +24,6 @@ class ClientsSerializer(serializers.ModelSerializer):
 
 
 
-class AMSiteSerilizer(serializers.ModelSerializer):
-    class Meta:
-        model = Sites
-        fields = ["code_site"]
-
-class AMNTSerializer(serializers.ModelSerializer):
-    code_site=AMSiteSerilizer()
-    class Meta:
-        model = NT
-        fields = ["nt","code_site__code_site"]
-
-class AddMarcheSerializer(serializers.ModelSerializer):
-    nt=AMNTSerializer()
-    def get_fields(self, *args, **kwargs):
-        fields = super().get_fields(*args, **kwargs)
-        fields.pop('deleted', None)
-        fields.pop('id', None)
-        fields.pop('deleted_by_cascade', None)
-        return fields
-
-    class Meta:
-        model=Marche
-        fields= "__all__"
-
 
 
 
@@ -65,6 +41,14 @@ class SiteSerializer(serializers.ModelSerializer):
 
 
 
+
+
+
+
+
+
+
+
 class NTSerializer(serializers.ModelSerializer):
     code_site=SiteSerializer()
     code_client=ClientsSerializer()
@@ -74,23 +58,12 @@ class NTSerializer(serializers.ModelSerializer):
         model=NT
         fields ='__all__'
 
-class MarcheSerializer(serializers.ModelSerializer):
-    nt=NTSerializer()
+
+class ListMarcheSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=Marche
         fields= "__all__"
-
-
-
-
-
-
-class RecursiveSerializer(serializers.Serializer):
-    def to_representation(self, instance):
-        serializer = self.parent.parent.__class__(instance, context=self.context)
-        return serializer.data
-
 
 
 
@@ -104,17 +77,26 @@ class DQESerializer(serializers.ModelSerializer):
         representation['prix_q'] = instance.prix_q
         return representation
 
+
+
 class ListMarcheSerializer(serializers.ModelSerializer):
-    nt = NTSerializer()
-    avenants= RecursiveSerializer(many=True)
-    class Meta:
-        model=Marche
-        fields="__all__"
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('deleted', None)
+        fields.pop('deleted_by_cascade', None)
+        return fields
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['ht'] = instance.ttc
         representation['ttc'] = instance.ttc
+        representation['code_site'] = instance.nt.code_site.code_site
+        representation['nt'] = instance.nt.nt
+
         return representation
+    class Meta:
+        model=Marche
+        fields="__all__"
+
 
 
 

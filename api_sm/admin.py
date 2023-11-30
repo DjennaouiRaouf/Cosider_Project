@@ -94,15 +94,6 @@ class MarcheAdmin(AdminFiltersMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExp
             return False
         return super().has_change_permission(request, obj)
 
- 
-
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "avenant_du_contrat":
-
-            kwargs["queryset"] = Marche.objects.filter(
-                avenant_du_contrat=None)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(NT)

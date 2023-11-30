@@ -120,7 +120,6 @@ class Marche(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     nt = models.ForeignKey(NT, on_delete=models.CASCADE, db_column='numero_marche', null=False)
     num_avenant = models.PositiveIntegerField(default=0, null=False, editable=False)
-    nbr_avenant = models.PositiveIntegerField(default=0, null=False, editable=False)
     libelle = models.CharField(null=False, blank=True, max_length=500)
     ods_depart = models.DateField(null=False, blank=True)
     delais = models.PositiveIntegerField(default=0, null=False)
@@ -133,13 +132,9 @@ class Marche(SafeDeleteModel):
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     code_contrat = models.CharField(null=False, blank=True, max_length=20)
     date_signature = models.DateTimeField(db_column='Date_Signature', null=False, auto_now=True)
-    avenant_du_contrat = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='avenants')
     history = HistoricalRecords()
     objects = DeletedModelManager()
-    def clean(self):
-        super().clean()
-        if self.avenant_du_contrat and self.avenant_du_contrat == self:
-            raise ValidationError('Cannot link row to itself.')
+
     def __str__(self):
         return "Site: " + self.nt.code_site.code_site + " Nt: " + self.nt.nt + " Av: " + str(self.num_avenant)
 
@@ -157,14 +152,8 @@ class Marche(SafeDeleteModel):
         return ttc
 
     def save(self, *args, **kwargs):
-        if self.avenant_du_contrat and self.avenant_du_contrat == self:
-            self.avenant_du_contrat=None
-
-        if not self.id and self.avenant_du_contrat:
-            self.avenant_du_contrat.nbr_avenant += 1
-            self.num_avenant = self.avenant_du_contrat.nbr_avenant
-            self.nbr_avenant = self.avenant_du_contrat.nbr_avenant
-            self.avenant_du_contrat.save()
+        count = Marche.objects.filter(nt=self.nt).count()
+        self.num_avenant=count
         super(Marche, self).save(*args, **kwargs)
 
 

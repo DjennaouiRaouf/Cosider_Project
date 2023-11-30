@@ -49,36 +49,7 @@ class GetICImages(generics.ListAPIView):
     serializer_class = ICSerializer
 
 
-class MarcheFieldsApiView(APIView):
-    def get(self, request):
-        flag = request.query_params.get('flag', None)
-        if flag == 'l' or flag == 'f':
-            serializer = AddMarcheSerializer()
-            fields = serializer.get_fields()
-            if (flag == 'f'):  # react form
-                field_info = []
-                for field_name, field_instance in fields.items():
-                    field_info.append({
-                        'name': field_name,
-                        'type': str(field_instance.__class__.__name__),
-                        'label': field_instance.label or field_name,
-                    })
 
-
-            if (flag == 'l'):  # data grid list (react ag-grid)
-                field_info = []
-                for field_name, field_instance in fields.items():
-                    field_info.append({
-                        'field': field_name,
-                        'headerName': field_instance.label or field_name,
-                        'info': str(field_instance.__class__.__name__),
-                    })
-
-            return Response({'fields': field_info}, status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -191,21 +162,6 @@ class AjoutSiteApiView(generics.CreateAPIView):
         }
         return Response(custom_response, status=status.HTTP_201_CREATED)
 
-class AjoutMarcheApiView(generics.CreateAPIView):
-
-    queryset = Marche.objects.all()
-    serializer_class = MarcheSerializer
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        self.perform_create(serializer)
-        custom_response = {
-            'status': 'success',
-            'message': 'Marché ajouté',
-            'data': serializer.data,
-        }
-        return Response(custom_response, status=status.HTTP_201_CREATED)
 
 
 
@@ -220,7 +176,7 @@ class GetSitesView(generics.ListAPIView):
 
 
 class GetMarcheView(generics.ListAPIView):
-    queryset = Marche.objects.filter(avenant_du_contrat__isnull=True)
+    queryset = Marche.objects.all()
     serializer_class = ListMarcheSerializer
 
 
