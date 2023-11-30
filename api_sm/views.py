@@ -183,7 +183,9 @@ class GetNTView(generics.ListAPIView):
     queryset = NT.objects.all()
     serializer_class = NTSerializer
 
-
+class AjoutNTApiView(generics.CreateAPIView):
+    queryset = NT.objects.all()
+    serializer_class = NTSerializer
 
 
 

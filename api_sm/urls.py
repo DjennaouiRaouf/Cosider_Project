@@ -8,10 +8,15 @@ urlpatterns = [
     path('whoami/', WhoamiView.as_view()),
     path('ic_images/', GetICImages.as_view()),
 
+
+
     path('adddqe/',AjoutDQEApiView.as_view()),
     path('addclient/',AjoutClientApiView.as_view()),
     path('addmarche/', AjoutMarcheApiView.as_view()),
     path('addsite/',AjoutSiteApiView.as_view()),
+    path('addnt/',AjoutNTApiView.as_view()),
+
+
 
     path('getclients/', GetClientsView.as_view()),
     path('getsites/', GetSitesView.as_view()),
