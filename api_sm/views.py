@@ -115,9 +115,9 @@ class AjoutMarcheApiView(generics.CreateAPIView):
         return Response(custom_response, status=status.HTTP_201_CREATED)
 
 
-class AjoutDQEApiView(generics.CreateAPIView):
+class AjoutMarcheApiView(generics.CreateAPIView):
     queryset = Sites.objects.all()
-    serializer_class = DQESerializer
+    serializer_class = MarcheSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -126,15 +126,42 @@ class AjoutDQEApiView(generics.CreateAPIView):
         self.perform_create(serializer)
         custom_response = {
             'status': 'success',
-            'message': 'DQE ajouté',
+            'message': 'Marché ajouté',
             'data': serializer.data,
         }
 
         return Response(custom_response, status=status.HTTP_201_CREATED)
 
 
-class GetSitesView(generics.ListAPIView):
+class AjoutDQEApiView(generics.CreateAPIView):
+    queryset = Sites.objects.all()
+    serializer_class = DQESerializer
 
+    def create(self, request, *args, **kwargs):
+        try:
+
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            self.perform_create(serializer)
+            custom_response = {
+                'status': 'success',
+                'message': 'DQE ajouté',
+                'data': serializer.data,
+            }
+
+            return Response(custom_response, status=status.HTTP_201_CREATED)
+        except Exception as e :
+            custom_response = {
+                'status': 'error',
+                'message': str(e),
+                'data': None,
+            }
+
+            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
+
+class GetSitesView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated, ViewSitePermission]
     queryset = Sites.objects.filter()
     serializer_class = SiteSerializer
 
@@ -146,7 +173,7 @@ class GetMarcheView(generics.ListAPIView):
 
 
 class GetDQEView(generics.ListAPIView):
-
+    permission_classes = [IsAuthenticated]
     queryset = DQE.objects.all()
     serializer_class = DQESerializer
 

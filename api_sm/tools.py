@@ -2,6 +2,10 @@ from django.contrib.auth.models import User
 from rest_framework import permissions
 from rest_framework.exceptions import PermissionDenied
 
+
+
+
+
 class AddClientPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if( not User.objects.get(id=request.user.id).has_perm('api_sm.add_clients')) :
