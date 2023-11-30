@@ -6,6 +6,7 @@ urlpatterns = [
     path('clientfields/', ClientFieldsApiView.as_view()),
     path('marchefields/', MarcheFieldsApiView.as_view()),
     path('sitefields/', SiteFieldsApiView.as_view()),
+    path('dqefields/', DQEFieldsApiView.as_view()),
 
 
 ]

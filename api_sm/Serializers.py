@@ -69,12 +69,42 @@ class ListMarcheSerializer(serializers.ModelSerializer):
 
 
 class DQESerializer(serializers.ModelSerializer):
+    code_site = serializers.CharField(source='marche_nt_code_site_code_site', write_only=True)
+    nt = serializers.CharField(source='marche_nt_nt', write_only=True)
+    num_avenant=serializers.CharField(source='marche_num_avenant', write_only=True)
     class Meta:
         model=DQE
-        fields='__al__'
+        fields='__all__'
+
+    def create(self, validated_data):
+        code_site = validated_data.pop('marche_nt_code_site_code_site')
+        nt = validated_data.pop('marche_nt_nt')
+        num_avenant=validated_data.pop('marche_num_avenant')
+
+        marche_obj = Marche.objects.get(
+            nt__nt=nt,
+            nt__code_site__code_site=code_site,
+            num_avenant=num_avenant
+        )
+        dqe = DQE.objects.create(marche=marche_obj, **validated_data)
+        return dqe
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('deleted', None)
+        fields.pop('id', None)
+        fields.pop('marche', None)
+        fields.pop('deleted_by_cascade', None)
+        return fields
+
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['prix_q'] = instance.prix_q
+        representation['code_site'] = instance.marche.nt.code_site.code_site
+        representation['nt'] = instance.marche.nt.nt
+        representation['avenant'] = instance.marche.num_avenant
+
         return representation
 
 
