@@ -1,5 +1,4 @@
-from adminfilters.mixin import AdminFiltersMixin
-from adminfilters.value import ValueFilter
+
 from django.contrib import admin
 from django.utils.html import format_html
 from import_export.admin import ImportExportModelAdmin
@@ -34,7 +33,7 @@ class ImagesAdmin(admin.ModelAdmin):
 
 
 @admin.register(Clients)
-class ClientAdmin(AdminFiltersMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class ClientAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_per_page = lp
     resource_class=ClientResource
     list_display = ('code_client','type_client','est_client_cosider','nif','raison_social',)
@@ -62,6 +61,8 @@ class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin
         'code_commune_site','date_ouverture_site', 'date_cloture_site', )
     list_editable = ()
     list_filter = (SafeDeleteAdminFilter,)
+
+
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
@@ -77,16 +78,14 @@ class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin
 
 
 @admin.register(Marche)
-class MarcheAdmin(AdminFiltersMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class MarcheAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     resource_class = MarcheResource
     list_display = ('nt','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','retenue_de_garantie' ,'rabais'
     ,'tva','date_signature')
 
     list_filter = (SafeDeleteAdminFilter,
-                   ("nt__code_site__code_site", ValueFilter.factory(lookup_name='exact')),
-                   ("nt__nt", ValueFilter.factory(lookup_name='exact')),
-                   ("num_avenant", ValueFilter.factory(lookup_name='exact')),
+
                    )
 
     def has_change_permission(self, request, obj=None):
@@ -133,15 +132,13 @@ class ODS(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelA
 
 
 @admin.register(DQE)
-class DQEAdmin(AdminFiltersMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as=True
     list_per_page = lp
     resource_class = DQEResource
     list_display = ("marche","designation","unite","quantite","prix_u","prix_q",)
     list_filter = (SafeDeleteAdminFilter,
-                   ("marche__nt__code_site__code_site",ValueFilter.factory(lookup_name='exact')),
-                   ("marche__nt__nt", ValueFilter.factory(lookup_name='exact')),
-                   ("marche__num_avenant",ValueFilter.factory(lookup_name='exact') ),
+
                    )
 
 
