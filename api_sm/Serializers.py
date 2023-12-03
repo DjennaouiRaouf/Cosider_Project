@@ -16,7 +16,8 @@ class ClientsSerializer(serializers.ModelSerializer):
         fields.pop('deleted_by_cascade', None)
         return fields
 
-
+    def is_primary_key_field(self, field_name):
+        return field_name == self.Meta.model._meta.pk.name
 
     class Meta:
         model = Clients
