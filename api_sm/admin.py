@@ -1,7 +1,9 @@
 
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 from import_export.admin import ImportExportModelAdmin
+from import_export.formats import base_formats
 from safedelete.admin import SafeDeleteAdmin, SafeDeleteAdminFilter
 from simple_history.admin import SimpleHistoryAdmin
 from api_sm.Resources import *
@@ -11,6 +13,26 @@ from api_sm.models import *
 
 lp=4
 
+class UserAdmin(ImportExportModelAdmin, UserAdmin):
+    resource_class = UserResource
+
+    def get_import_formats(self):
+
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+    pass
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 
 
 '''
@@ -42,6 +64,20 @@ class ClientAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
         'type_client',
         SafeDeleteAdminFilter
     )
+
+    def get_import_formats(self):
+
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
@@ -62,7 +98,19 @@ class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin
     list_editable = ()
     list_filter = (SafeDeleteAdminFilter,)
 
+    def get_import_formats(self):
 
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
@@ -88,6 +136,18 @@ class MarcheAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
 
                    )
 
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
@@ -102,6 +162,18 @@ class NTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.Mo
     'code_site','nt','code_client','libelle_nt','date_ouverture_nt','date_cloture_nt',
     )
     list_filter = (SafeDeleteAdminFilter,)
+
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
@@ -121,12 +193,24 @@ class ODS(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelA
     list_display = ("marche","date_interruption","date_reprise","motif",)
     list_filter = (SafeDeleteAdminFilter,)
 
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
         return super().has_change_permission(request, obj)
 
- 
+
 
 
 
@@ -140,6 +224,20 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
     list_filter = (SafeDeleteAdminFilter,
 
                    )
+
+    def get_import_formats(self):
+
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
 
 
     def has_change_permission(self, request, obj=None):
@@ -158,6 +256,18 @@ class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
     resource_class = TypeAvanceResource
     list_display = ("id", "libelle", )
     list_filter = (SafeDeleteAdminFilter,)
+
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
@@ -174,6 +284,18 @@ class  TypeCautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmi
     resource_class = TypeCautionResource
     list_display = ("id", "libelle", "taux",)
     list_filter = (SafeDeleteAdminFilter,)
+
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
@@ -195,6 +317,18 @@ class BanqueAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
     list_display = ( "nom", "adresse", "ville", "wilaya",)
     list_filter = (SafeDeleteAdminFilter,)
 
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
@@ -213,6 +347,20 @@ class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
     existing_actions = list(SafeDeleteAdmin.actions)
     existing_actions.append('recuperer')
     actions = existing_actions
+
+    def get_import_formats(self):
+
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
@@ -239,6 +387,18 @@ class AttachementAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
     list_display=("dqe","qte_realise","qte_rest","avancement","montant_estime",'montant_rg','montant_rb','montant_final'
                   ,)
     list_filter = (SafeDeleteAdminFilter,)
+
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
@@ -273,6 +433,20 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
     list_display = ('numero_facture','date_facture','montant_global',
                     'etat')
     list_filter = (SafeDeleteAdminFilter,)
+
+    def get_import_formats(self):
+
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
@@ -299,6 +473,18 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
 class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ("numero_facture","detail_designation","detail_estimation","detail_montant_rg","detail_montant_rb","detail_montant")
     list_filter = (SafeDeleteAdminFilter,)
+
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
@@ -327,6 +513,18 @@ class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
     list_display = ('numero_facture','date_encaissement','mode_paiement','montant_facture','montant_encaisse','montant_creance')
     save_as = True
     list_filter = (SafeDeleteAdminFilter,)
+
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False

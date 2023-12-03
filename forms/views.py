@@ -29,6 +29,7 @@ class DQEFieldsApiView(APIView):
                         'field': field_name,
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
+
                     })
 
             return Response({'fields':field_info},status=status.HTTP_200_OK)
