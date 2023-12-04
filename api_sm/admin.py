@@ -11,7 +11,7 @@ from api_sm.models import *
 
 
 
-lp=4
+lp=30
 
 class UserAdmin(ImportExportModelAdmin, UserAdmin):
     resource_class = UserResource
@@ -58,12 +58,13 @@ class ImagesAdmin(admin.ModelAdmin):
 class ClientAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_per_page = lp
     resource_class=ClientResource
-    list_display = ('code_client','type_client','est_client_cosider','nif','raison_social',)
+    list_display = ('code_client','libelle_client','type_client','est_client_cosider','nif','raison_social','adresse')
     list_filter = (
         'est_client_cosider',
         'type_client',
         SafeDeleteAdminFilter
     )
+    search_fields = ('code_client',)
 
     def get_import_formats(self):
 
@@ -93,8 +94,8 @@ class ClientAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
 class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = SiteResource
     list_per_page = lp
-    list_display = ('code_site','code_filiale','code_region','libelle_site','type_site','code_division',
-        'code_commune_site','date_ouverture_site', 'date_cloture_site', )
+    list_display = ('code_site','libelle_site','code_filiale','code_division','code_region',
+        'code_commune_site','date_ouverture_site','date_cloture_site' )
     list_editable = ()
     list_filter = (SafeDeleteAdminFilter,)
 
@@ -154,6 +155,12 @@ class MarcheAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
         return super().has_change_permission(request, obj)
 
 
+@admin.register(SituationNt)
+class SituationNTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+    list_display = (
+        'id', 'libelle'
+    )
+    list_filter = (SafeDeleteAdminFilter,)
 
 @admin.register(NT)
 class NTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):

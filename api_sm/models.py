@@ -35,6 +35,10 @@ class Clients(SafeDeleteModel):
                                              ,verbose_name='Est Client Cosider')
     libelle_client = models.CharField(db_column='Libelle_Client', max_length=300, blank=True, null=True,
                                       verbose_name='Libelle')
+
+    adresse = models.CharField(db_column='adresse', max_length=500, blank=True, null=True,
+                                      verbose_name='Adresse')
+
     nif = models.CharField(db_column='NIF', unique=True, max_length=50, blank=True, null=True,verbose_name='NIF')
     raison_social = models.CharField(db_column='Raison_Social', max_length=50, blank=True, null=True,verbose_name='Raison Social')
     num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True, null=True,
@@ -53,17 +57,18 @@ class Clients(SafeDeleteModel):
 
 class Sites(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=10)
-    code_filiale = models.CharField(db_column='Code_Filiale', max_length=5)
-    code_region = models.CharField(db_column='Code_Region', max_length=1, blank=True, null=True)
-    libelle_site = models.CharField(db_column='Libelle_Site', max_length=150, blank=True, null=True)
-    code_agence = models.CharField(db_column='Code_Agence', max_length=15, blank=True, null=True)
+    code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=500 ,verbose_name='Code du Site')
+    responsable_site = models.CharField(db_column='Responsable', max_length=500, blank=True, null=True)
+    libelle_site = models.CharField(db_column='Libelle_Site', max_length=500, blank=True, null=True)
     type_site = models.PositiveSmallIntegerField(db_column='Type_Site', blank=True, null=True)
-    code_division = models.CharField(db_column='Code_Division', max_length=15, blank=True, null=True)
-    code_commune_site = models.CharField(db_column='Code_Commune_Site', max_length=10, blank=True, null=True)
-    jour_cloture_mouv_rh_paie = models.CharField(db_column='Jour_Cloture_Mouv_RH_Paie', max_length=2, blank=True,
-                                                 null=True)
-    date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=False)
+
+    code_filiale = models.CharField(db_column='Code_Filiale', max_length=50,blank=True, null=True)
+    code_division = models.CharField(db_column='Code_Division', max_length=50, blank=True, null=True)
+
+    code_region = models.CharField(db_column='Code_Region', max_length=20, blank=True, null=True)
+    code_commune_site = models.CharField(db_column='Code_Commune_Site', max_length=50, blank=True, null=True)
+
+    date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=True)
     date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True)
 
     history = HistoricalRecords()
@@ -73,11 +78,15 @@ class Sites(SafeDeleteModel):
         return "Site: " + self.code_site
 
     def save(self, *args, **kwargs):
-        if (self.date_cloture_site >= self.date_ouverture_site):
+        if self.date_cloture_site and self.date_ouverture_site:
+            if (self.date_cloture_site >= self.date_ouverture_site):
+                super(Sites, self).save(*args, **kwargs)
+            else:
+                raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
+        if self.date_ouverture_site == None and self.date_cloture_site == None:
             super(Sites, self).save(*args, **kwargs)
-        else:
-            raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
-
+        if( self.date_ouverture_site and self.date_cloture_site == None ):
+            super(Sites, self).save(*args, **kwargs)
 
 
 
@@ -86,12 +95,30 @@ class Sites(SafeDeleteModel):
         verbose_name_plural = 'Sites'
 
 
+class SituationNt(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+    libelle=models.CharField(max_length=100,null=False,unique=True)
+    history = HistoricalRecords()
+    objects = DeletedModelManager()
+    class Meta:
+        verbose_name = 'SituationNt'
+        verbose_name_plural = 'SituationNt'
+
+    def __str__(self):
+        return  self.libelle
+    def save(self, *args, **kwargs):
+            self.libelle=self.libelle.lower()
+            super(SituationNt, self).save(*args, **kwargs)
+
+
+
+
 class NT(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     code_site = models.ForeignKey(Sites, on_delete=models.CASCADE, db_column='Code_site', null=False)
-    nt = models.CharField(db_column='NT', max_length=20, null=False)
-    code_client = models.ForeignKey(Clients, on_delete=models.CASCADE, db_column='Code_Client',null=False)
-    # code_situation_nt = models.ForeignKey('TabSituationNt', on_delete=models.CASCADE, db_column='Code_Situation_NT', blank=True, null=True)
+    nt = models.CharField(db_column='NT', max_length=20, null=False ,unique=True)
+    code_client = models.ForeignKey(Clients, on_delete=models.CASCADE, db_column='Code_Client',null=True)
+    code_situation_nt = models.ForeignKey(SituationNt, on_delete=models.CASCADE, blank=True, null=True)
     libelle_nt = models.CharField(max_length=900,db_column='Libelle_NT', blank=True, null=True)
     date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True)
     date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True)
@@ -102,12 +129,15 @@ class NT(SafeDeleteModel):
         return "Site: " + str(self.code_site.code_site) + " Nt: " + str(self.nt)
 
     def save(self, *args, **kwargs):
-        if (self.date_cloture_nt >= self.date_ouverture_nt):
+        if self.date_cloture_nt and self.date_ouverture_nt:
+            if (self.date_cloture_nt >= self.date_ouverture_nt):
+                super(NT, self).save(*args, **kwargs)
+            else:
+                raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
+        if self.date_ouverture_nt == None and self.date_cloture_nt == None:
             super(NT, self).save(*args, **kwargs)
-        else:
-            raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
-
-
+        if (self.date_ouverture_nt and self.date_cloture_nt == None):
+            super(NT, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Numero du travail'
