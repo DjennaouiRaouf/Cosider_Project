@@ -16,17 +16,11 @@ class ClientsSerializer(serializers.ModelSerializer):
         fields.pop('deleted_by_cascade', None)
         return fields
 
-    def is_primary_key_field(self, field_name):
-        return field_name == self.Meta.model._meta.pk.name
+
 
     class Meta:
         model = Clients
         fields = '__all__'
-
-
-
-
-
 
 
 
@@ -36,6 +30,8 @@ class SiteSerializer(serializers.ModelSerializer):
         fields.pop('deleted', None)
         fields.pop('deleted_by_cascade', None)
         return fields
+
+
     class Meta:
         model = Sites
         fields = '__all__'

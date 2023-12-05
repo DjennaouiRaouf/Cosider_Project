@@ -189,3 +189,6 @@ class AjoutNTApiView(generics.CreateAPIView):
 
 
 
+
+
+
