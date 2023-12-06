@@ -115,8 +115,9 @@ class SituationNt(SafeDeleteModel):
 
 class NT(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    nt = models.CharField(db_column='NT', max_length=20, primary_key=True)
-    code_site = models.ForeignKey(Sites, on_delete=models.CASCADE, db_column='Code_site', null=False,to_field='code_site')
+    nt = models.CharField(db_column='NT', max_length=20, primary_key=True , verbose_name='Numero du travail')
+    code_site = models.ForeignKey(Sites, on_delete=models.CASCADE, db_column='Code_site', null=False,to_field='code_site'
+                                  , verbose_name='Code du Site')
     code_client = models.ForeignKey(Clients, on_delete=models.CASCADE, db_column='Code_Client',null=True)
     code_situation_nt = models.ForeignKey(SituationNt, on_delete=models.CASCADE, blank=True, null=True)
     libelle_nt = models.CharField(max_length=900,db_column='Libelle_NT', blank=True, null=True)
@@ -150,7 +151,7 @@ class Marche(SafeDeleteModel):
     nt = models.ForeignKey(NT, on_delete=models.CASCADE, db_column='nt', blank=True, null=False
                            , verbose_name='Numero Travail')
     num_avenant = models.PositiveIntegerField(default=0, null=False, editable=False
-                                              , verbose_name='Avenant N° ')
+                                              , verbose_name='Avenant Numero ')
     libelle = models.CharField(null=False, blank=True, max_length=500
                                , verbose_name='Libelle')
     ods_depart = models.DateField(null=False, blank=True
@@ -171,8 +172,9 @@ class Marche(SafeDeleteModel):
 
     tva = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='TVA',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    retenue_de_garantie = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='Retenue de garantie',
-                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    rg = models.DecimalField(default=0, max_digits=38, decimal_places=2,
+                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
+                                              , verbose_name='Retenue de garantie')
     code_contrat = models.CharField(null=False, blank=True, max_length=20, verbose_name='Code du contrat')
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
     history = HistoricalRecords()

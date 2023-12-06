@@ -47,8 +47,8 @@ class SiteSerializer(serializers.ModelSerializer):
 
 
 class NTSerializer(serializers.ModelSerializer):
-    code_site = serializers.CharField(source='code_site_code_site', write_only=True)
-    code_cient = serializers.CharField(source='code_client_code_client', write_only=True)
+    code_site = serializers.CharField(source='code_site_code_site', write_only=True,label='Code du site')
+    code_cient = serializers.CharField(source='code_client_code_client', write_only=True,label='Code du client')
 
     class Meta:
         model=NT
@@ -125,8 +125,8 @@ class DQESerializer(serializers.ModelSerializer):
 
 
 class MarcheSerializer(serializers.ModelSerializer):
-    code_site = serializers.CharField(source='nt_code_site_code_site',write_only=True)
-    nt = serializers.CharField(source='nt_nt',write_only=True)
+    code_site = serializers.CharField(source='nt_code_site_code_site',write_only=True,label='Code du site')
+    nt = serializers.CharField(source='nt_nt',write_only=True,label='Numero du travail')
 
     class Meta:
         model = Marche
