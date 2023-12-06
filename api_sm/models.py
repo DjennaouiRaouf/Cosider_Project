@@ -147,27 +147,34 @@ class NT(SafeDeleteModel):
 
 class Marche(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    nt = models.ForeignKey(NT, on_delete=models.CASCADE, db_column='nt', blank=True, null=False)
-    num_avenant = models.PositiveIntegerField(default=0, null=False, editable=False)
-    libelle = models.CharField(null=False, blank=True, max_length=500)
-    ods_depart = models.DateField(null=False, blank=True)
-    delais = models.PositiveIntegerField(default=0, null=False)
-    revisable = models.BooleanField(default=True, null=False)
+    nt = models.ForeignKey(NT, on_delete=models.CASCADE, db_column='nt', blank=True, null=False
+                           , verbose_name='Numero Travail')
+    num_avenant = models.PositiveIntegerField(default=0, null=False, editable=False
+                                              , verbose_name='Avenant N° ')
+    libelle = models.CharField(null=False, blank=True, max_length=500
+                               , verbose_name='Libelle')
+    ods_depart = models.DateField(null=False, blank=True
+                                  , verbose_name='ODS de départ')
+    delais = models.PositiveIntegerField(default=0, null=False
+                                         , verbose_name='Delai')
+    revisable = models.BooleanField(default=True, null=False
+                                    , verbose_name='Est-il révisable ?')
     delai_paiement_f=models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
-                                         null=True)
+                                         null=True
+                                                 , verbose_name='Delai de paiement')
     rabais = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
-                                         null=False)
-    ht=models.DecimalField(default=0, max_digits=38, decimal_places=2,
+                                         null=False , verbose_name='Taux de rabais')
+    ht=models.DecimalField(default=0, max_digits=38, decimal_places=2,  verbose_name='Prix Hors taxe',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False,editable=False)
-    ttc = models.DecimalField(default=0, max_digits=38, decimal_places=2,
+    ttc = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='Prix avec taxe',
                                   validators=[MinValueValidator(0), MaxValueValidator(100)], null=False, editable=False)
 
-    tva = models.DecimalField(default=0, max_digits=38, decimal_places=2,
+    tva = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='TVA',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    retenue_de_garantie = models.DecimalField(default=0, max_digits=38, decimal_places=2,
+    retenue_de_garantie = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='Retenue de garantie',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    code_contrat = models.CharField(null=False, blank=True, max_length=20)
-    date_signature = models.DateField(null=False)
+    code_contrat = models.CharField(null=False, blank=True, max_length=20, verbose_name='Code du contrat')
+    date_signature = models.DateField(null=False, verbose_name='Date de signature')
     history = HistoricalRecords()
     objects = DeletedModelManager()
 
