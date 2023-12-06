@@ -147,7 +147,6 @@ class MarcheSerializer(serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
-        fields.pop('num_avenant', None)
         fields.pop('id', None)
         fields.pop('deleted_by_cascade', None)
         return fields
