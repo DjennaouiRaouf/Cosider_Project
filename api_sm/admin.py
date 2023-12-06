@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
+from django_admin_relation_links import AdminChangeLinksMixin
 from import_export.admin import ImportExportModelAdmin
 from import_export.formats import base_formats
 from safedelete.admin import SafeDeleteAdmin, SafeDeleteAdminFilter
@@ -163,13 +164,14 @@ class SituationNTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
     list_filter = (SafeDeleteAdminFilter,)
 
 @admin.register(NT)
-class NTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class NTAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
     list_display = (
-    'code_site','nt','code_client','libelle_nt','date_ouverture_nt','date_cloture_nt',
+    'nt','code_site_link','code_client_link','libelle_nt','date_ouverture_nt','date_cloture_nt',
     )
+    change_links = ['code_site','code_client']
     list_filter = (SafeDeleteAdminFilter,)
-
+    search_fields = ('nt','code_site__code_site')
     def get_import_formats(self):
         formats = (
             base_formats.XLSX,
@@ -389,7 +391,7 @@ class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
 
 
 @admin.register(Attachements)
-class AttachementAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     list_display=("dqe","qte_realise","qte_rest","avancement","montant_estime",'montant_rg','montant_rb','montant_final'
                   ,)

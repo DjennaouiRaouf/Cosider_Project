@@ -58,7 +58,7 @@ class MarcheResource(resources.ModelResource):
             return None
     class Meta:
         model = Marche
-        exclude = ('deleted', 'deleted_by_cascade')
+        exclude = ('id','deleted', 'deleted_by_cascade')
 
 
 class ODSResource(resources.ModelResource):

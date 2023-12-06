@@ -46,7 +46,7 @@ class Clients(SafeDeleteModel):
     history = HistoricalRecords()
     objects = DeletedModelManager()
     def __str__(self):
-        return "Client: " + self.code_client
+        return  self.code_client
 
 
 
@@ -75,7 +75,7 @@ class Sites(SafeDeleteModel):
     objects = DeletedModelManager()
 
     def __str__(self):
-        return "Site: " + self.code_site
+        return self.code_site
 
     def save(self, *args, **kwargs):
         if self.date_cloture_site and self.date_ouverture_site:
@@ -115,8 +115,8 @@ class SituationNt(SafeDeleteModel):
 
 class NT(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    code_site = models.ForeignKey(Sites, on_delete=models.CASCADE, db_column='Code_site', null=False)
-    nt = models.CharField(db_column='NT', max_length=20, null=False ,unique=True)
+    nt = models.CharField(db_column='NT', max_length=20, primary_key=True)
+    code_site = models.ForeignKey(Sites, on_delete=models.CASCADE, db_column='Code_site', null=False,to_field='code_site')
     code_client = models.ForeignKey(Clients, on_delete=models.CASCADE, db_column='Code_Client',null=True)
     code_situation_nt = models.ForeignKey(SituationNt, on_delete=models.CASCADE, blank=True, null=True)
     libelle_nt = models.CharField(max_length=900,db_column='Libelle_NT', blank=True, null=True)
@@ -147,14 +147,21 @@ class NT(SafeDeleteModel):
 
 class Marche(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    nt = models.ForeignKey(NT, on_delete=models.CASCADE, db_column='numero_marche', null=False)
+    nt = models.ForeignKey(NT, on_delete=models.CASCADE, db_column='nt', blank=True, null=False)
     num_avenant = models.PositiveIntegerField(default=0, null=False, editable=False)
     libelle = models.CharField(null=False, blank=True, max_length=500)
     ods_depart = models.DateField(null=False, blank=True)
     delais = models.PositiveIntegerField(default=0, null=False)
     revisable = models.BooleanField(default=True, null=False)
+    delai_paiement_f=models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
+                                         null=True)
     rabais = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
                                          null=False)
+    ht=models.DecimalField(default=0, max_digits=38, decimal_places=2,
+                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False,editable=False)
+    ttc = models.DecimalField(default=0, max_digits=38, decimal_places=2,
+                                  validators=[MinValueValidator(0), MaxValueValidator(100)], null=False, editable=False)
+
     tva = models.DecimalField(default=0, max_digits=38, decimal_places=2,
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     retenue_de_garantie = models.DecimalField(default=0, max_digits=38, decimal_places=2,
@@ -167,22 +174,12 @@ class Marche(SafeDeleteModel):
     def __str__(self):
         return "Site: " + self.nt.code_site.code_site + " Nt: " + self.nt.nt + " Av: " + str(self.num_avenant)
 
-    @property
-    def ht(self):
-        dqe = DQE.objects.filter(marche=self.id)
-        sum = 0
-        for i in dqe:
-            sum = sum + i.prix_q
-        return sum
 
-    @property
-    def ttc(self):
-        ttc=round(self.ht + (self.ht * self.tva / 100), 2)
-        return ttc
 
     def save(self, *args, **kwargs):
         count = Marche.objects.filter(nt=self.nt).count()
         self.num_avenant=count
+
         super(Marche, self).save(*args, **kwargs)
 
 
@@ -198,12 +195,16 @@ class Marche(SafeDeleteModel):
 
 class DQE(SafeDeleteModel): # le prix final
     _safedelete_policy = SOFT_DELETE_CASCADE
-    marche = models.ForeignKey(Marche,on_delete=models.CASCADE,  null=False)
+    marche = models.ForeignKey(Marche,on_delete=models.CASCADE,  null=False,related_name="marche_dqe")
     designation = models.CharField(max_length=600, null=False)
     unite = models.CharField(max_length=5, null=False)
     prix_u = models.DecimalField(
         max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0
+    )
+    prix_q = models.DecimalField(
+        max_digits=38, decimal_places=2,
+        validators=[MinValueValidator(0)], default=0,editable=False
     )
 
     quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
@@ -214,13 +215,18 @@ class DQE(SafeDeleteModel): # le prix final
     def __str__(self):
         return (str(self.marche) + " " + self.designation)
 
-    @property
-    def prix_q(self):
-        return round(self.quantite * self.prix_u,2)
 
 
     def save(self, *args, **kwargs):
+            self.prix_q=round(self.quantite * self.prix_u,2)
             super(DQE, self).save(*args, **kwargs)
+            total = DQE.objects.filter(marche=self.marche).aggregate(models.Sum('prix_q'))[
+                "prix_q__sum"]
+            self.marche.ht=round(total,2)
+            self.marche.ttc=round(total + (total * self.marche.tva / 100), 2)
+            self.marche.save()
+
+            super(DQE,self).save(*args, **kwargs)
 
 
 
