@@ -168,7 +168,7 @@ class GetSitesView(generics.ListAPIView):
 
 
 class GetMarcheView(generics.ListAPIView):
-    queryset = Marche.objects.all()
+    queryset = Marche.objects.all().order_by('nt', 'num_avenant')
     serializer_class = MarcheSerializer
 
 
