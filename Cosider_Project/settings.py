@@ -72,7 +72,8 @@ ADMIN_EXTENDED = {
         'user': 'fas fa-user',
         'auth': 'fas fa-users',
     },
-
+    'MODEL_ADMIN_TABBED_INLINE': True,
+    'RAW_ID_FIELDS_AS_DEFAULT': False,
 }
 
 ROOT_URLCONF = 'Cosider_Project.urls'
