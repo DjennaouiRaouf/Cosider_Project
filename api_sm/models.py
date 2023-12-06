@@ -172,7 +172,7 @@ class Marche(SafeDeleteModel):
     objects = DeletedModelManager()
 
     def __str__(self):
-        return "Site: " + self.nt.code_site.code_site + " Nt: " + self.nt.nt + " Av: " + str(self.num_avenant)
+        return self.nt.code_site.code_site + " " + self.nt.nt
 
 
 

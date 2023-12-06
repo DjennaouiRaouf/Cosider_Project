@@ -137,6 +137,7 @@ class MarcheAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
     list_filter = (SafeDeleteAdminFilter,
 
                    )
+    search_fields = ('nt__nt',)
 
     def get_import_formats(self):
         formats = (
@@ -201,6 +202,7 @@ class ODS(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelA
     resource_class = ODSResource
     list_display = ("marche","date_interruption","date_reprise","motif",)
     list_filter = (SafeDeleteAdminFilter,)
+
 
     def get_import_formats(self):
         formats = (
