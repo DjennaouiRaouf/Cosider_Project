@@ -205,18 +205,20 @@ class Marche(SafeDeleteModel):
 class DQE(SafeDeleteModel): # le prix final
     _safedelete_policy = SOFT_DELETE_CASCADE
     marche = models.ForeignKey(Marche,on_delete=models.CASCADE,  null=False,related_name="marche_dqe")
-    designation = models.CharField(max_length=600, null=False)
-    unite = models.CharField(max_length=5, null=False)
+    designation = models.CharField(max_length=600, null=False,verbose_name='Designation')
+    unite = models.CharField(max_length=5, null=False,verbose_name='Unité de mesure')
     prix_u = models.DecimalField(
         max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0
+        ,verbose_name='Prix unitaire'
     )
     prix_q = models.DecimalField(
         max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0,editable=False
+        ,verbose_name='Montant'
     )
 
-    quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantité')
     history = HistoricalRecords()
     objects = DeletedModelManager()
 

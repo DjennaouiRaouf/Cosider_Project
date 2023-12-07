@@ -23,9 +23,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'fontawesomefree',
-    'admin_extended',
-    'safedelete',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -33,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'simple_history',
+    'safedelete',
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
@@ -65,16 +63,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-ADMIN_EXTENDED = {
-    'MENU_APP_ORDER': ['user', 'auth'],
-    'MENU_MODEL_ORDER': ['User', 'Group'],
-    'APP_ICON': {
-        'user': 'fas fa-user',
-        'auth': 'fas fa-users',
-    },
-    'MODEL_ADMIN_TABBED_INLINE': True,
-    'RAW_ID_FIELDS_AS_DEFAULT': False,
-}
+
 
 ROOT_URLCONF = 'Cosider_Project.urls'
 

@@ -82,9 +82,9 @@ class NTSerializer(serializers.ModelSerializer):
 
 
 class DQESerializer(serializers.ModelSerializer):
-    code_site = serializers.CharField(source='marche_nt_code_site_code_site', write_only=True)
-    nt = serializers.CharField(source='marche_nt_nt', write_only=True)
-    num_avenant=serializers.CharField(source='marche_num_avenant', write_only=True)
+    code_site = serializers.CharField(source='marche_nt_code_site_code_site', write_only=True ,label='Code du site')
+    nt = serializers.CharField(source='marche_nt_nt', write_only=True,label='Numero du travail')
+    num_avenant=serializers.CharField(source='marche_num_avenant', write_only=True,label='Numero d\'avenant')
     class Meta:
         model=DQE
         fields='__all__'

@@ -12,7 +12,7 @@ from api_sm.models import *
 
 
 
-lp=30
+lp=20
 
 class UserAdmin(ImportExportModelAdmin, UserAdmin):
     resource_class = UserResource
