@@ -52,7 +52,19 @@ class NTSerializer(serializers.ModelSerializer):
         model=NT
         fields ='__all__'
 
+    def create(self, validated_data):
+        code_site = validated_data.pop('code_site_code_site')
+        code_cient = validated_data.pop('code_client_code_client')
 
+        site_obj = Sites.objects.get(
+            code_site=code_site
+        )
+        client_obj = Clients.objects.get(
+            code_client=code_cient
+        )
+
+        nt = NT.objects.create(code_client=client_obj,code_site=site_obj, **validated_data)
+        return nt
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
@@ -111,6 +123,8 @@ class DQESerializer(serializers.ModelSerializer):
 
 
 class MarcheSerializer(serializers.ModelSerializer):
+    code_site = serializers.CharField(source='nt_code_site_code_site',read_only=True,label='Code du site')
+
 
     class Meta:
         model = Marche
@@ -118,6 +132,7 @@ class MarcheSerializer(serializers.ModelSerializer):
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
+
         fields.pop('deleted', None)
         fields.pop('code_marche', None)
         fields.pop('num_avenant', None)
