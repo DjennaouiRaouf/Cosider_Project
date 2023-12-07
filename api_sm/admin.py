@@ -128,17 +128,18 @@ class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin
 
 
 @admin.register(Marche)
-class MarcheAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class MarcheAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     list_per_page = lp
     resource_class = MarcheResource
-    list_display = ('nt','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','rg' ,'rabais'
+    list_display = ('code_marche','nt_link','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','rg' ,'rabais'
     ,'tva','date_signature')
 
     list_filter = (SafeDeleteAdminFilter,
 
                    )
     search_fields = ('nt__nt',)
+    change_links = ('nt',)
 
     def get_import_formats(self):
         formats = (
@@ -236,6 +237,13 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
     list_filter = (SafeDeleteAdminFilter,
 
                    )
+
+    def code_site(self,obj):
+        return obj.marche.nt.code_site.code_site
+    def numero_t(self,obj):
+        return  obj.marche.nt.nt
+    def avenant (self,obj):
+        return  obj.marche.num_avenant
 
     def get_import_formats(self):
 

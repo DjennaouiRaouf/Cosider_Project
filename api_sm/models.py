@@ -127,7 +127,7 @@ class NT(SafeDeleteModel):
     objects = DeletedModelManager()
 
     def __str__(self):
-        return "Site: " + str(self.code_site.code_site) + " Nt: " + str(self.nt)
+        return str(self.nt)
 
     def save(self, *args, **kwargs):
         if self.date_cloture_nt and self.date_ouverture_nt:
@@ -148,10 +148,12 @@ class NT(SafeDeleteModel):
 
 class Marche(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
+
+    code_marche=models.CharField(max_length=500,primary_key=True,editable=False,verbose_name='Code du marché')
     nt = models.ForeignKey(NT, on_delete=models.CASCADE, db_column='nt', blank=True, null=False
                            , verbose_name='Numero Travail')
     num_avenant = models.PositiveIntegerField(default=0, null=False, editable=False
-                                              , verbose_name='Avenant Numero ')
+                                              , verbose_name='Avenant Numero')
     libelle = models.CharField(null=False, blank=True, max_length=500
                                , verbose_name='Libelle')
     ods_depart = models.DateField(null=False, blank=True
@@ -181,19 +183,17 @@ class Marche(SafeDeleteModel):
     objects = DeletedModelManager()
 
     def __str__(self):
-        return self.nt.code_site.code_site + " " + self.nt.nt
+        return self.code_marche
 
 
 
     def save(self, *args, **kwargs):
-        count = Marche.objects.filter(nt=self.nt).count()
-        self.num_avenant=count
-
+        self.num_avenant = Marche.objects.filter(nt=self.nt).count()
+        self.code_marche = str(self.nt.nt) + "" + str(self.num_avenant)
         super(Marche, self).save(*args, **kwargs)
 
 
-
-    class Meta:
+class Meta:
         verbose_name = 'Marchés'
         verbose_name_plural = 'Marchés'
         unique_together=(('nt','num_avenant'),)

@@ -90,6 +90,8 @@ class MarcheFieldsApiView(APIView):
         if flag=='l' or flag =='f':
             serializer = MarcheSerializer()
             fields = serializer.get_fields()
+            model_class = serializer.Meta.model
+            model_name = model_class.__name__
             if(flag=='f'): # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
@@ -108,7 +110,7 @@ class MarcheFieldsApiView(APIView):
                         'info': str(field_instance.__class__.__name__),
                     })
 
-            return Response({'fields':field_info},status=status.HTTP_200_OK)
+            return Response({'fields':field_info,'models':model_name},status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -144,6 +146,9 @@ class ClientFieldsApiView(APIView):
             if flag == 'l' or flag == 'f':
                 serializer = ClientsSerializer()
                 fields = serializer.get_fields()
+                model_class = serializer.Meta.model
+                model_name = model_class.__name__
+                print(model_name)
                 if (flag == 'f'):  # react form
                     field_info = []
                     for field_name, field_instance in fields.items():
@@ -162,7 +167,7 @@ class ClientFieldsApiView(APIView):
                             'info': str(field_instance.__class__.__name__),
                         })
 
-                return Response({'fields': field_info}, status=status.HTTP_200_OK)
+                return Response({'fields': field_info,'models':model_name}, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 

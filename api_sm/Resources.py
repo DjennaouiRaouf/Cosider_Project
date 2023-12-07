@@ -1,4 +1,4 @@
-from import_export import resources
+from import_export import resources, fields
 from api_sm.models import *
 
 
@@ -58,7 +58,7 @@ class MarcheResource(resources.ModelResource):
             return None
     class Meta:
         model = Marche
-        exclude = ('id','deleted', 'deleted_by_cascade')
+        exclude = ('code_marche','num_avenant','deleted', 'deleted_by_cascade')
 
 
 class ODSResource(resources.ModelResource):
@@ -78,6 +78,8 @@ class ODSResource(resources.ModelResource):
 
 
 class DQEResource(resources.ModelResource):
+
+
     def get_instance(self, instance_loader, row):
         try:
             params = {}
