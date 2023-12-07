@@ -80,31 +80,17 @@ class NTSerializer(serializers.ModelSerializer):
 
 
 class DQESerializer(serializers.ModelSerializer):
-    code_site = serializers.CharField(source='marche_nt_code_site_code_site', write_only=True ,label='Code du site')
-    nt = serializers.CharField(source='marche_nt_nt', write_only=True,label='Numero du travail')
-    num_avenant=serializers.CharField(source='marche_num_avenant', write_only=True,label='Numero d\'avenant')
     class Meta:
         model=DQE
         fields='__all__'
 
-    def create(self, validated_data):
-        code_site = validated_data.pop('marche_nt_code_site_code_site')
-        nt = validated_data.pop('marche_nt_nt')
-        num_avenant=validated_data.pop('marche_num_avenant')
 
-        marche_obj = Marche.objects.get(
-            nt__nt=nt,
-            nt__code_site__code_site=code_site,
-            num_avenant=num_avenant
-        )
-        dqe = DQE.objects.create(marche=marche_obj, **validated_data)
-        return dqe
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
         fields.pop('id', None)
-        fields.pop('marche', None)
+
         fields.pop('deleted_by_cascade', None)
         return fields
 
