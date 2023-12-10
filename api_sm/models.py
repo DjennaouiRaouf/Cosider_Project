@@ -417,6 +417,7 @@ class Attachements(SafeDeleteModel):
     def __str__(self):
         return  self.dqe.designation
 
+
     def save(self, *args, **kwargs):
         sum=Attachements.objects.filter(dqe__designation=self.dqe.designation).aggregate(models.Sum('qte_realise'))[
             "qte_realise__sum"]
@@ -424,7 +425,7 @@ class Attachements(SafeDeleteModel):
             sum = 0
         sum = sum + self.qte_realise
         self.qte_restante = round(self.dqe.quantite- sum, 2)
-        if (self.qte_restante > 0):
+        if (self.qte_restante >= 0):
             super(Attachements, self).save(*args, **kwargs)
         else:
             raise ValidationError('Qte realisée ne doit pas dépasser le Qte prévue dans le DQE')
