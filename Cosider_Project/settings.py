@@ -58,6 +58,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_currentuser.middleware.ThreadLocalUserMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 ]
 
 
@@ -124,13 +125,14 @@ AUTH_PASSWORD_VALIDATORS = [
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 
-LANGUAGE_CODE = 'fr-fr'
+LANGUAGE_CODE = 'fr'
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
 USE_TZ = True
+
 
 
 

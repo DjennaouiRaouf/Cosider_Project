@@ -399,7 +399,7 @@ class Attachements(SafeDeleteModel):
 
     @property
     def montant_rg(self):
-        rg = self.dqe.marche.retenue_de_garantie
+        rg = self.dqe.marche.rg
         montant_rg = round(rg * self.montant_estime / 100, 2)
         return montant_rg
 

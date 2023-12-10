@@ -477,13 +477,13 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
  
 
     def etat(self, obj):
-        if obj.etat_de_facture == True:
+        if obj.paye == True:
             return format_html(
                 '''
                <img src="/static/admin/img/icon-yes.svg" alt="True">
                 '''
             )
-        if obj.etat_de_facture == False:
+        if obj.paye == False:
             return format_html(
                 '''
                <img src="/static/admin/img/icon-no.svg" alt="False">
