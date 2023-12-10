@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
 from django_admin_relation_links import AdminChangeLinksMixin
+from djangoql.admin import DjangoQLSearchMixin
 from import_export.admin import ImportExportModelAdmin
 from import_export.formats import base_formats
 from safedelete.admin import SafeDeleteAdmin, SafeDeleteAdminFilter
@@ -56,16 +57,14 @@ class ImagesAdmin(admin.ModelAdmin):
 
 
 @admin.register(Clients)
-class ClientAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class ClientAdmin(DjangoQLSearchMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_per_page = lp
     resource_class=ClientResource
     list_display = ('code_client','libelle_client','type_client','est_client_cosider','nif','raison_social','adresse')
     list_filter = (
-        'est_client_cosider',
-        'type_client',
-        SafeDeleteAdminFilter
+        SafeDeleteAdminFilter,
     )
-    search_fields = ('code_client',)
+    search_fields = ('code_client','libelle_client','type_client','est_client_cosider','nif','raison_social','adresse')
 
     def get_import_formats(self):
 
@@ -128,7 +127,7 @@ class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin
 
 
 @admin.register(Marche)
-class MarcheAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     list_per_page = lp
     resource_class = MarcheResource
@@ -138,7 +137,7 @@ class MarcheAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,Impor
     list_filter = (SafeDeleteAdminFilter,
 
                    )
-    search_fields = ('nt__nt',)
+    search_fields = ('nt__nt','code_marche','num_avenant')
     change_links = ('nt',)
 
 

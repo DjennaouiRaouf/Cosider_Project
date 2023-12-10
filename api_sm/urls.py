@@ -17,6 +17,9 @@ urlpatterns = [
     path('addnt/',AjoutNTApiView.as_view()),
 
 
+    path('importdqe/',ImportDQEAPIView.as_view()),
+
+
 
     path('getclients/', GetClientsView.as_view()),
     path('getsites/', GetSitesView.as_view()),

@@ -1,15 +1,19 @@
 from django.contrib.auth import authenticate
 from django_filters.rest_framework import DjangoFilterBackend
+from import_export.admin import ImportMixin
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework import status
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from tablib import Dataset
+from .Resources import DQEResource
 from .Serializers import *
 from .models import *
 from .tools import *
-
+import  pandas as p
 
 class LoginView(APIView):
     permission_classes = []
@@ -173,9 +177,30 @@ class GetMarcheView(generics.ListAPIView):
 
 
 class GetDQEView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
+
     queryset = DQE.objects.all()
     serializer_class = DQESerializer
+
+
+class ImportDQEAPIView(ImportMixin,  APIView):
+    parser_classes = (MultiPartParser, FormParser,)
+
+    def post(self, request, *args, **kwargs):
+        resource = DQEResource()
+        dataset = Dataset()
+        dqe = request.FILES['file']
+        marche=request.data.get(Marche._meta.pk.name)
+        imported_data = dataset.load(dqe.read())
+        filtered_rows = [row for row in imported_data.dict if row['marche'] == marche]
+        filtered_dataset = Dataset()
+        filtered_dataset.headers = imported_data.headers
+        filtered_dataset.extend([row.values() for row in filtered_rows])
+        result = resource.import_data(filtered_dataset, dry_run=True)
+        if not result.has_errors():
+            resource.import_data(filtered_dataset, dry_run=False)
+
+        # Check if the import was successful
+        return Response({'message': 'Import successful'}, status=200)
 
 
 

@@ -101,8 +101,8 @@ class SituationNt(SafeDeleteModel):
     history = HistoricalRecords()
     objects = DeletedModelManager()
     class Meta:
-        verbose_name = 'SituationNt'
-        verbose_name_plural = 'SituationNt'
+        verbose_name = 'Situation du Travail'
+        verbose_name_plural = 'Situation du Travail'
 
     def __str__(self):
         return  self.libelle
@@ -223,9 +223,7 @@ class DQE(SafeDeleteModel): # le prix final
         return (str(self.marche) + " " + self.designation)
 
 
-
     def save(self, *args, **kwargs):
-
             super(DQE,self).save(*args, **kwargs)
 
 

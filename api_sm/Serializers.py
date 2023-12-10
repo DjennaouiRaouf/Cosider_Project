@@ -102,6 +102,8 @@ class DQESerializer(serializers.ModelSerializer):
         fields.pop('id', None)
         fields.pop('marche', None)
         fields.pop('deleted_by_cascade', None)
+        fields.pop('prix_q', None)
+
         return fields
 
 
@@ -112,6 +114,7 @@ class DQESerializer(serializers.ModelSerializer):
         representation['nt'] = instance.marche.nt.nt
         representation['code_marche'] = instance.marche.nt.nt
         representation['avenant'] = instance.marche.num_avenant
+
 
         return representation
 
