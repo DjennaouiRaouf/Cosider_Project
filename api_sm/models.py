@@ -185,11 +185,7 @@ class Marche(SafeDeleteModel):
     def __str__(self):
         return self.code_marche
 
-
-
     def save(self, *args, **kwargs):
-        self.num_avenant = Marche.objects.filter(nt=self.nt).count()
-        self.code_marche = str(self.nt.nt) + "" + str(self.num_avenant)
         super(Marche, self).save(*args, **kwargs)
 
 
@@ -229,15 +225,12 @@ class DQE(SafeDeleteModel): # le prix final
 
 
     def save(self, *args, **kwargs):
-            self.prix_q=round(self.quantite * self.prix_u,2)
-            super(DQE, self).save(*args, **kwargs)
-            total = DQE.objects.filter(marche=self.marche).aggregate(models.Sum('prix_q'))[
-                "prix_q__sum"]
-            self.marche.ht=round(total,2)
-            self.marche.ttc=round(total + (total * self.marche.tva / 100), 2)
-            self.marche.save()
 
             super(DQE,self).save(*args, **kwargs)
+
+
+
+
 
 
 
@@ -245,7 +238,7 @@ class DQE(SafeDeleteModel): # le prix final
     class Meta:
         verbose_name = 'DQE'
         verbose_name_plural = 'DQE'
-        unique_together = (("marche", "designation"))
+        unique_together = (("marche", "designation",))
 
 
 

@@ -110,7 +110,7 @@ class MarcheFieldsApiView(APIView):
                         'info': str(field_instance.__class__.__name__),
                     })
 
-            return Response({'fields':field_info,'models':model_name},status=status.HTTP_200_OK)
+            return Response({'fields':field_info,'models':model_name,'pk':Marche._meta.pk.name},status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

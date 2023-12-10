@@ -141,6 +141,7 @@ class MarcheAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,Impor
     search_fields = ('nt__nt',)
     change_links = ('nt',)
 
+
     def get_import_formats(self):
         formats = (
             base_formats.XLSX,

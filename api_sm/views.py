@@ -188,7 +188,3 @@ class AjoutNTApiView(generics.CreateAPIView):
     serializer_class = NTSerializer
 
 
-
-
-
-
