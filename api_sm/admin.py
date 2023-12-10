@@ -567,8 +567,6 @@ class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
             return False
         return super().has_change_permission(request, obj)
 
- 
-
     def numero_facture(self, obj):
         return obj.facture.numero_facture
     def montant_facture(self,obj):
