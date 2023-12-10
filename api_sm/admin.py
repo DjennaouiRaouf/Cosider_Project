@@ -126,39 +126,6 @@ class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin
 
 
 
-@admin.register(Marche)
-class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
-    save_as = True
-    list_per_page = lp
-    resource_class = MarcheResource
-    list_display = ('code_marche','nt_link','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','rg' ,'rabais'
-    ,'tva','date_signature')
-
-    list_filter = (SafeDeleteAdminFilter,
-
-                   )
-    search_fields = ('nt__nt','code_marche','num_avenant')
-    change_links = ('nt',)
-
-
-    def get_import_formats(self):
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_import()]
-
-    def get_export_formats(self):
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_export()]
-
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
-
-
 @admin.register(SituationNt)
 class SituationNTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_display = (
@@ -223,11 +190,6 @@ class ODS(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelA
             return False
         return super().has_change_permission(request, obj)
 
-
-
-
-
-
 @admin.register(DQE)
 class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as=True
@@ -237,6 +199,7 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
     list_filter = (SafeDeleteAdminFilter,
 
                    )
+    search_fields = ('marche__code_marche','marche__num_avenant')
 
     def code_site(self,obj):
         return obj.marche.nt.code_site.code_site
@@ -269,6 +232,45 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
         if obj and obj.deleted:
             return False
         return super().has_delete_permission(request, obj)
+
+
+
+
+
+@admin.register(Marche)
+class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+    save_as = True
+    list_per_page = lp
+    resource_class = MarcheResource
+    list_display = ('code_marche','nt_link','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','rg' ,'rabais'
+    ,'tva','date_signature')
+
+
+    list_filter = (SafeDeleteAdminFilter,
+
+                   )
+    search_fields = ('nt__nt','code_marche','num_avenant')
+    change_links = ('nt',)
+
+
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
+
+
 
 
 @admin.register(TypeAvance)

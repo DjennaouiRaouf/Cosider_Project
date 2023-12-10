@@ -443,7 +443,7 @@ class Factures(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     numero_facture=models.CharField(max_length=500,primary_key=True)
     date_facture=models.DateField(null=False,auto_now=True)
-    payer = models.BooleanField(default=False, null=False)
+    payer = models.BooleanField(default=False, null=False,editable=False)
     client=models.ForeignKey(Clients,on_delete=models.CASCADE,null=False)
     history = HistoricalRecords()
     objects = DeletedModelManager()
