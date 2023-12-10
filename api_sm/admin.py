@@ -149,14 +149,14 @@ class SituationNTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
 
 
 @admin.register(NT)
-class NTAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class NTAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
     list_display = (
     'nt','code_site_link','code_client_link','libelle_nt','date_ouverture_nt','date_cloture_nt',
     )
     change_links = ['code_site','code_client']
     list_filter = (SafeDeleteAdminFilter,)
-    search_fields = ('nt','code_site__code_site')
+    search_fields = ('nt','code_site__code_site','code_client__code_client',)
     def get_import_formats(self):
         formats = (
             base_formats.XLSX,
