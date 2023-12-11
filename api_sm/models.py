@@ -200,7 +200,8 @@ class Meta:
 
 class DQE(SafeDeleteModel): # le prix final
     _safedelete_policy = SOFT_DELETE_CASCADE
-    marche = models.ForeignKey(Marche,on_delete=models.CASCADE,  null=False,related_name="marche_dqe")
+    marche = models.ForeignKey(Marche,on_delete=models.CASCADE,  null=False,related_name="marche_dqe",
+                               to_field="code_marche")
     designation = models.CharField(max_length=600, null=False,verbose_name='Designation')
     unite = models.CharField(max_length=5, null=False,verbose_name='Unité de mesure')
     prix_u = models.DecimalField(
