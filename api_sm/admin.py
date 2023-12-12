@@ -133,30 +133,15 @@ class SituationNTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
     )
     list_filter = (SafeDeleteAdminFilter,)
 
-    def get_import_formats(self):
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_import()]
-
-    def get_export_formats(self):
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_export()]
-
-    pass
-
-
 @admin.register(NT)
-class NTAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class NTAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
     list_display = (
     'nt','code_site_link','code_client_link','libelle_nt','date_ouverture_nt','date_cloture_nt',
     )
     change_links = ['code_site','code_client']
     list_filter = (SafeDeleteAdminFilter,)
-    search_fields = ('nt','code_site__code_site','code_client__code_client',)
+    search_fields = ('nt','code_site__code_site')
     def get_import_formats(self):
         formats = (
             base_formats.XLSX,
@@ -470,7 +455,6 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
     list_display = ('numero_facture','date_facture','montant_global',
                     'etat')
     list_filter = (SafeDeleteAdminFilter,)
-    filter_horizontal=()
 
     def get_import_formats(self):
 
@@ -567,6 +551,8 @@ class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
         if obj and obj.deleted:
             return False
         return super().has_change_permission(request, obj)
+
+ 
 
     def numero_facture(self, obj):
         return obj.facture.numero_facture

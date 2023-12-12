@@ -128,11 +128,16 @@ class NT(SafeDeleteModel):
     nt = models.CharField(db_column='NT', max_length=20, primary_key=True , verbose_name='Numero du travail')
     code_site = models.ForeignKey(Sites, on_delete=models.CASCADE, db_column='Code_site', null=False,to_field='code_site'
                                   , verbose_name='Code du Site')
-    code_client = models.ForeignKey(Clients, on_delete=models.CASCADE, db_column='Code_Client',null=True)
-    code_situation_nt = models.ForeignKey(SituationNt, on_delete=models.CASCADE, blank=True, null=True)
-    libelle_nt = models.CharField(max_length=900,db_column='Libelle_NT', blank=True, null=True)
-    date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True)
-    date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True)
+    code_client = models.ForeignKey(Clients, on_delete=models.CASCADE, db_column='Code_Client',null=True
+                                    , verbose_name='Code du client')
+    code_situation_nt = models.ForeignKey(SituationNt, on_delete=models.CASCADE, blank=True, null=True
+                                          , verbose_name='Situation')
+    libelle_nt = models.CharField(max_length=900,db_column='Libelle_NT', blank=True, null=True
+                                  , verbose_name='Libelle')
+    date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True
+                                         , verbose_name='Ouverture')
+    date_cloture_nt = models.DateField(db_column='Date_Cloture_NT', blank=True, null=True
+                                       , verbose_name='Cloture')
     history = HistoricalRecords()
     objects = DeletedModelManager()
 
