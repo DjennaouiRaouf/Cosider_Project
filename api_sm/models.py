@@ -439,7 +439,6 @@ class Attachements(SafeDeleteModel):
 
 
 
-
 class Factures(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     numero_facture=models.CharField(max_length=500,primary_key=True)
