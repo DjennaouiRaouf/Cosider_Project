@@ -165,7 +165,6 @@ class AjoutDQEApiView(generics.CreateAPIView):
             return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
 
 class GetSitesView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated, ViewSitePermission]
     queryset = Sites.objects.all()
     serializer_class = SiteSerializer
 
