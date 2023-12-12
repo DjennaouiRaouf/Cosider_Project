@@ -36,15 +36,14 @@ def pre_save_marche(sender, instance, **kwargs):
     if not instance.pk:
         instance.num_avenant = Marche.objects.filter(nt=instance.nt).count()
         instance.code_marche = str(instance.nt.nt) + "" + str(instance.num_avenant)
-@receiver(post_save, sender=Marche)
-def post_save_marche(sender, instance, created, **kwargs):
-    if created: # Create
-        instance.num_avenant = Marche.objects.filter(nt=instance.nt).count()
-        instance.code_marche = str(instance.nt.nt) + "" + str(instance.num_avenant)
-    if not created: # update
-        instance.code_marche = str(instance.nt.nt) + "" + str(instance.num_avenant)
 
 
+
+
+@receiver(pre_save, sender=DetailFacture)
+def pre_save_detail(sender, instance, **kwargs):
+    if not instance.facture.marche.nt != instance.detail.dqe.marche.nt :
+        return False
 
 
 

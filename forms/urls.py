@@ -15,7 +15,8 @@ urlpatterns = [
     path('dqefields/', DQEFieldsApiView.as_view()),
     path('dqefieldsstate/',DQEFieldsStateApiView.as_view()),
 
-    path('ntfields/',NTFieldsApiView.as_view())
+    path('ntfields/',NTFieldsApiView.as_view()),
+    path('ntfieldsstate/',NTFieldsApiView.as_view()),
 
 
 ]

@@ -234,6 +234,9 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
         return super().has_delete_permission(request, obj)
 
 
+class DQEInline(admin.TabularInline):
+    model = DQE
+    extra = 1  # Number of empty book forms to display
 
 
 
@@ -251,7 +254,7 @@ class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,Simp
                    )
     search_fields = ('nt__nt','code_marche','num_avenant')
     change_links = ('nt',)
-
+    inlines = [DQEInline]
 
     def get_import_formats(self):
         formats = (
@@ -273,10 +276,11 @@ class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,Simp
 
 
 
+
 @admin.register(TypeAvance)
 class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeAvanceResource
-    list_display = ("id", "libelle", )
+    list_display = ("id", "libelle","taux_reduction_facture" )
     list_filter = (SafeDeleteAdminFilter,)
 
     def get_import_formats(self):
@@ -406,8 +410,7 @@ class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
 @admin.register(Attachements)
 class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
-    list_display=("dqe","qte_realise","qte_rest","avancement","montant_estime",'montant_rg','montant_rb','montant_final'
-                  ,)
+    list_display=("qte_precedente","qte_mois","qte_cumule","montant_precedent",'montant_mois','montant_cumule',)
     list_filter = (SafeDeleteAdminFilter,)
 
     def get_import_formats(self):
@@ -448,14 +451,16 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
 
 
 
-
+class DetailFactureInline(admin.TabularInline):
+    model = DetailFacture
+    extra = 1  # Number of empty book forms to display
 
 @admin.register(Factures)
 class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
-    list_display = ('numero_facture','date_facture','montant_global',
+    list_display = ('numero_facture','du','au','montant_global',
                     'etat')
     list_filter = (SafeDeleteAdminFilter,)
-
+    inlines = [DetailFactureInline]
     def get_import_formats(self):
 
         formats = (

@@ -323,6 +323,8 @@ class Banque(SafeDeleteModel):
 class TypeAvance(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     libelle = models.CharField(max_length=500, null=False, unique=True)
+    taux_reduction_facture=models.DecimalField(default=0, max_digits=38, decimal_places=2,
+                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     history = HistoricalRecords()
     objects = DeletedModelManager()
 
@@ -398,55 +400,20 @@ class Cautions(SafeDeleteModel):
 
 class Attachements(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    dqe = models.ForeignKey(DQE, on_delete=models.CASCADE)
-    qte_realise = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
-    qte_restante = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0, editable=False)
-    history = HistoricalRecords()
+    dqe = models.ForeignKey(DQE, on_delete=models.CASCADE)# item + quantité marche + prix unitaire
+    qte_precedente = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    qte_mois = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    qte_cumule= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    montant_precedent=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    date=models.DateField(null=False)
+
     objects = DeletedModelManager()
 
-    @property
-    def taux(self):
-        taux = round(self.qte_realise * 100 / self.dqe.quantite, 2)
-        return taux
-    @property
-    def montant_estime(self):
-        montant_e= round(self.dqe.prix_u * self.qte_realise,2)
-        return montant_e
-
-    @property
-    def montant_rg(self):
-        rg = self.dqe.marche.rg
-        montant_rg = round(rg * self.montant_estime / 100, 2)
-        return montant_rg
-
-    @property
-    def montant_rb(self):
-        rb = self.dqe.marche.rabais
-        montant_rb = round(rb * self.montant_estime/ 100, 2)
-        return montant_rb
-
-    @property
-    def montant_final(self):
-        montant_final = round(self.montant_estime- self.montant_rg - self.montant_rb,2)
-        return montant_final
 
     def __str__(self):
         return  self.dqe.designation
-
-
-    def save(self, *args, **kwargs):
-        sum=Attachements.objects.filter(dqe__designation=self.dqe.designation).aggregate(models.Sum('qte_realise'))[
-            "qte_realise__sum"]
-        if sum == None:
-            sum = 0
-        sum = sum + self.qte_realise
-        self.qte_restante = round(self.dqe.quantite- sum, 2)
-        if (self.qte_restante >= 0):
-            super(Attachements, self).save(*args, **kwargs)
-        else:
-            raise ValidationError('Qte realisée ne doit pas dépasser le Qte prévue dans le DQE')
-
-
 
 
     class Meta:
@@ -454,14 +421,17 @@ class Attachements(SafeDeleteModel):
         verbose_name_plural = 'Attachements'
 
 
+class FactureRG(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
 
 class Factures(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    numero_facture=models.CharField(max_length=500,primary_key=True)
-    date_facture=models.DateField(null=False,auto_now=True)
+    numero_facture=models.PositiveBigIntegerField(primary_key=True)
+    marche=models.ForeignKey(Marche,on_delete=models.CASCADE,null=True)
+    du = models.DateField()
+    au = models.DateField()
     paye = models.BooleanField(default=False, null=False,editable=False)
-    client=models.ForeignKey(Clients,on_delete=models.CASCADE,null=False)
-    history = HistoricalRecords()
+
     objects = DeletedModelManager()
     @property
     def montant_global(self):  # paiement complet ou incomplet
