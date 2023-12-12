@@ -57,19 +57,29 @@ class Clients(SafeDeleteModel):
 
 class Sites(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=500 ,verbose_name='Code du Site')
-    responsable_site = models.CharField(db_column='Responsable', max_length=500, blank=True, null=True)
-    libelle_site = models.CharField(db_column='Libelle_Site', max_length=500, blank=True, null=True)
-    type_site = models.PositiveSmallIntegerField(db_column='Type_Site', blank=True, null=True)
+    code_site = models.CharField(db_column='Code_site', primary_key=True, max_length=500 ,
+                                 verbose_name='Code du Site')
+    responsable_site = models.CharField(db_column='Responsable', max_length=500, blank=True, null=True,
+                                 verbose_name='Responsable du Site')
+    libelle_site = models.CharField(db_column='Libelle_Site', max_length=500, blank=True, null=True,
+                                 verbose_name='Libelle du Site')
+    type_site = models.PositiveSmallIntegerField(db_column='Type_Site', blank=True, null=True,
+                                 verbose_name='Type du Site')
 
-    code_filiale = models.CharField(db_column='Code_Filiale', max_length=50,blank=True, null=True)
-    code_division = models.CharField(db_column='Code_Division', max_length=50, blank=True, null=True)
+    code_filiale = models.CharField(db_column='Code_Filiale', max_length=50,blank=True, null=True,
+                                 verbose_name='Code Filiale')
+    code_division = models.CharField(db_column='Code_Division', max_length=50, blank=True, null=True,
+                                 verbose_name='Code division')
 
-    code_region = models.CharField(db_column='Code_Region', max_length=20, blank=True, null=True)
-    code_commune_site = models.CharField(db_column='Code_Commune_Site', max_length=50, blank=True, null=True)
+    code_region = models.CharField(db_column='Code_Region', max_length=20, blank=True, null=True,
+                                 verbose_name='Code région')
+    code_commune_site = models.CharField(db_column='Code_Commune_Site', max_length=50, blank=True, null=True,
+                                 verbose_name='Code commune')
 
-    date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=True)
-    date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True)
+    date_ouverture_site = models.DateField(db_column='Date_Ouverture_Site', blank=True, null=True,
+                                 verbose_name='Ouverture')
+    date_cloture_site = models.DateField(db_column='Date_Cloture_Site', blank=True, null=True,
+                                 verbose_name='Cloture')
 
     history = HistoricalRecords()
     objects = DeletedModelManager()
