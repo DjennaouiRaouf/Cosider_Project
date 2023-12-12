@@ -455,6 +455,7 @@ class Factures(SafeDeleteModel):
             mg+=d.detail.montant_final
         return round(mg,2)
 
+
     def delete(self, *args, **kwargs):
        super(Factures, self).delete(*args, **kwargs)
 
