@@ -455,6 +455,7 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
     list_display = ('numero_facture','date_facture','montant_global',
                     'etat')
     list_filter = (SafeDeleteAdminFilter,)
+    filter_horizontal=()
 
     def get_import_formats(self):
 
