@@ -143,7 +143,7 @@ class NT(SafeDeleteModel):
     objects = DeletedModelManager()
 
     def __str__(self):
-        return str(self.id)
+        return str(self.nt)
 
     class Meta:
         verbose_name = 'Numero du travail'
@@ -157,6 +157,7 @@ class Marche(SafeDeleteModel):
     id=models.CharField(max_length=500,primary_key=True,editable=False,verbose_name='id')
     nt = models.ForeignKey(NT, on_delete=models.CASCADE, db_column='nt', null=False
                            , verbose_name='Numero Travail',to_field="id")
+
     num_avenant = models.PositiveIntegerField(default=0, null=False, editable=False
                                               , verbose_name='Avenant Numero')
     libelle = models.CharField(null=False, blank=True, max_length=500

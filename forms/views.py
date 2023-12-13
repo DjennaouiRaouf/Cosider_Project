@@ -69,8 +69,12 @@ class MarcheFieldsStateApiView(APIView):
         field_info = []
         for field_name, field_instance in fields.items():
             default_value = ''
+
+            if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
+                default_value= ''
             if str(field_instance.__class__.__name__) == 'BooleanField':
                 default_value= True
+
             if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
                                                           'IntegerField',]:
                 default_value = 0
@@ -96,17 +100,16 @@ class MarcheFieldsApiView(APIView):
             if(flag=='f'): # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    field_info.append({
+                    obj={
                         'name':field_name,
                         'type': str(field_instance.__class__.__name__),
                         'label': field_instance.label or field_name,
+                    }
+                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                        obj['queryset']=anySerilizer(field_instance.queryset, many=True).data
 
-
-
-                    })
-                    if(str(field_instance.__class__.__name__)=="PrimaryKeyRelatedField"):
-                        anySerilizer=create_dynamic_serializer(field_instance.queryset.model)
-                        print(anySerilizer(field_instance.queryset,many=True).data)
+                    field_info.append(obj)
 
             if(flag=='l'): #data grid list (react ag-grid)
                 field_info = []
