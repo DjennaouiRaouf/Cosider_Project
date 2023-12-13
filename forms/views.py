@@ -100,7 +100,14 @@ class MarcheFieldsApiView(APIView):
                         'name':field_name,
                         'type': str(field_instance.__class__.__name__),
                         'label': field_instance.label or field_name,
+
+
+
                     })
+                    if(str(field_instance.__class__.__name__)=="PrimaryKeyRelatedField"):
+                        anySerilizer=create_dynamic_serializer(field_instance.queryset.model)
+                        print(anySerilizer(field_instance.queryset,many=True).data)
+
             if(flag=='l'): #data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():

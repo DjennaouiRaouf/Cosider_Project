@@ -1,8 +1,13 @@
 from rest_framework import serializers
 from api_sm.models import *
 
+def create_dynamic_serializer(model_class):
+    class DynamicModelSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = model_class
+            fields = '__all__'
 
-
+    return DynamicModelSerializer
 class ICSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -59,7 +64,7 @@ class NTSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-
+        representation['id'] = instance.id
         return representation
 
 
@@ -108,7 +113,6 @@ class DQESerializer(serializers.ModelSerializer):
 
 
 class MarcheSerializer(serializers.ModelSerializer):
-    code_site = serializers.CharField(source='nt_code_site_code_site',read_only=True,label='Code du site')
 
 
     class Meta:
@@ -118,6 +122,8 @@ class MarcheSerializer(serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
+        fields.pop('num_avenant', None)
+        fields.pop('id', None)
         fields.pop('deleted_by_cascade', None)
         return fields
     def to_representation(self, instance):

@@ -137,7 +137,7 @@ class SituationNTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
 class NTAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
     list_display = (
-    'nt','code_site_link','code_client_link','libelle_nt','date_ouverture_nt','date_cloture_nt',
+    'id','nt','code_site_link','code_client_link','libelle_nt','date_ouverture_nt','date_cloture_nt',
     )
     change_links = ['code_site','code_client']
     list_filter = (SafeDeleteAdminFilter,)
@@ -199,7 +199,7 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
     list_filter = (SafeDeleteAdminFilter,
 
                    )
-    search_fields = ('marche__code_marche','marche__num_avenant')
+    search_fields = ('marche__id','marche__num_avenant')
 
     def code_site(self,obj):
         return obj.marche.nt.code_site.code_site
@@ -245,14 +245,14 @@ class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,Simp
     save_as = True
     list_per_page = lp
     resource_class = MarcheResource
-    list_display = ('code_marche','nt_link','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','rg' ,'rabais'
+    list_display = ('id','nt_link','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','rg' ,'rabais'
     ,'tva','date_signature')
 
 
     list_filter = (SafeDeleteAdminFilter,
 
                    )
-    search_fields = ('nt__nt','code_marche','num_avenant')
+    search_fields = ('nt__nt','id','num_avenant')
     change_links = ('nt',)
     inlines = [DQEInline]
 
