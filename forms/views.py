@@ -7,6 +7,47 @@ from api_sm.Serializers import *
 
 # Create your views here.
 
+
+class UserFieldsApiView(APIView):
+    def get(self, request):
+
+        serializer = UserSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        for field_name, field_instance in fields.items():
+            obj = {
+                    'name': field_name,
+                        'type': str(field_instance.__class__.__name__),
+                        'label': field_instance.label or field_name,
+                }
+            field_info.append(obj)
+            if (field_name == "password"):
+                field_info.append({
+                    'name': 'confirme' + field_name,
+                    'type': str(field_instance.__class__.__name__),
+                    'label': 'Confirmer le mot de passe',
+                })
+        return Response({'fields': field_info},
+                        status=status.HTTP_200_OK)
+
+class UserFieldsStateApiView(APIView):
+    def get(self, request):
+        serializer = UserSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        for field_name, field_instance in fields.items():
+            default_value = ''
+            field_info.append({
+                field_name:default_value ,
+
+            })
+            state = {}
+
+            for d in field_info:
+                state.update(d)
+        return Response({'state': state}, status=status.HTTP_200_OK)
+
+
 class DQEFieldsStateApiView(APIView):
     def get(self, request):
         serializer = DQESerializer()
@@ -250,11 +291,16 @@ class NTFieldsApiView(APIView):
             if (flag == 'f'):  # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    field_info.append({
+                    obj = {
                         'name': field_name,
                         'type': str(field_instance.__class__.__name__),
                         'label': field_instance.label or field_name,
-                    })
+                    }
+                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                        obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+
+                    field_info.append(obj)
 
 
             if (flag == 'l'):  # data grid list (react ag-grid)

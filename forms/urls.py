@@ -3,6 +3,9 @@ from .views import *
 
 urlpatterns = [
 
+    path('userfields/', UserFieldsApiView.as_view()),
+    path('userfieldsstate/', UserFieldsStateApiView.as_view()),
+
     path('clientfields/', ClientFieldsApiView.as_view()),
     path('clientfieldsstate/', ClientFieldsStateApiView.as_view()),
 

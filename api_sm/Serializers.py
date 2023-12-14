@@ -8,6 +8,32 @@ def create_dynamic_serializer(model_class):
             fields = '__all__'
 
     return DynamicModelSerializer
+
+
+
+class UserSerializer(serializers.ModelSerializer):
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('id', None)
+        return fields
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name','password']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password'],
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', ''),
+            is_active=False
+
+        )
+        return user
+
+
 class ICSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -113,7 +139,7 @@ class DQESerializer(serializers.ModelSerializer):
 
 
 class MarcheSerializer(serializers.ModelSerializer):
-    code_site = serializers.CharField(source='nt_code_site_code_site', write_only=True, label='Code du Site')
+    code_site = serializers.CharField(source='nt_code_site_id', write_only=True, label='Code du Site')
     num_t = serializers.CharField(source='nt_nt', write_only=True, label='Numero du Travail')
 
     class Meta:
@@ -121,7 +147,7 @@ class MarcheSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        code_site = validated_data.pop('nt_code_site_code_site')
+        code_site = validated_data.pop('nt_code_site_id')
         num_t = validated_data.pop('nt_nt')
 
         nt_obj = NT.objects.get(

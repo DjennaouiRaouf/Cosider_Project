@@ -54,17 +54,33 @@ class ImagesAdmin(admin.ModelAdmin):
 '''
 
 
+@admin.register(TabUniteDeMesure)
+class TabUniteDeMesure(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+    list_per_page = lp
+    resource_class = TabUniteDeMesureResource
+    list_display = ('code_unite_mesure','symbole_unite','libelle_unite',)
 
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
 
 @admin.register(Clients)
 class ClientAdmin(DjangoQLSearchMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_per_page = lp
     resource_class=ClientResource
-    list_display = ('code_client','libelle_client','type_client','est_client_cosider','nif','raison_social','adresse')
+    list_display = ('id','libelle','type_client','est_client_cosider','nif','raison_social','adresse')
     list_filter = (
         SafeDeleteAdminFilter,
     )
-    search_fields = ('code_client','libelle_client','type_client','est_client_cosider','nif','raison_social','adresse')
+    search_fields = ('id','libelle','type_client','est_client_cosider','nif','raison_social','adresse')
 
     def get_import_formats(self):
 
@@ -94,7 +110,7 @@ class ClientAdmin(DjangoQLSearchMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportE
 class SitesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = SiteResource
     list_per_page = lp
-    list_display = ('code_site','libelle_site','code_filiale','code_division','code_region',
+    list_display = ('id','libelle','code_filiale','code_division','code_region',
         'code_commune_site','date_ouverture_site','date_cloture_site' )
     list_editable = ()
     list_filter = (SafeDeleteAdminFilter,)
@@ -137,11 +153,11 @@ class SituationNTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
 class NTAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
     list_display = (
-    'id','nt','code_site_link','code_client_link','libelle_nt','date_ouverture_nt','date_cloture_nt',
+    'nt','code_client_link','code_site_link','libelle_nt','date_ouverture_nt','date_cloture_nt',
     )
-    change_links = ['code_site','code_client']
+    change_links = ['code_client','code_site']
     list_filter = (SafeDeleteAdminFilter,)
-    search_fields = ('nt','code_site__code_site')
+    search_fields = ('nt','code_client__id')
     def get_import_formats(self):
         formats = (
             base_formats.XLSX,
@@ -195,14 +211,17 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
     save_as=True
     list_per_page = lp
     resource_class = DQEResource
-    list_display = ("marche","designation","unite","quantite","prix_u","prix_q",)
+    list_display = ("marche","code_tache","libelle_tache","unite","quantite","prix_u","prix_q",)
     list_filter = (SafeDeleteAdminFilter,
 
                    )
     search_fields = ('marche__id','marche__num_avenant')
 
-    def code_site(self,obj):
-        return obj.marche.nt.code_site.code_site
+    def unite(self,obj):
+        return obj.unite.libelle_unite
+
+    def id(self,obj):
+        return obj.marche.nt.id.id
     def numero_t(self,obj):
         return  obj.marche.nt.nt
     def avenant (self,obj):

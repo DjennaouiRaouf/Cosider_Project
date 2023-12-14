@@ -9,11 +9,15 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from tablib import Dataset
+from .Filters import *
 from .Resources import DQEResource
 from .Serializers import *
 from .models import *
 from .tools import *
 import  pandas as p
+class CreateUserView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 class LoginView(APIView):
     permission_classes = []
@@ -25,8 +29,8 @@ class LoginView(APIView):
         if user is not None:
             Token.objects.filter(user=user).delete()
             token, created = Token.objects.get_or_create(user=user)
-            response=Response({'message': 'Invalid credentials'}, status=status.HTTP_200_OK)
-            response.set_cookie('token', token.key)
+            response = Response(status=status.HTTP_200_OK)
+            response.set_cookie('token',token.key )
             return response
         else:
             return Response({'message': 'Informations d’identification non valides'}, status=status.HTTP_400_BAD_REQUEST)
@@ -80,8 +84,6 @@ class GetClientsView(generics.ListAPIView):
 
     queryset = Clients.objects.filter()
     serializer_class = ClientsSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['code_client', 'type_client', 'est_client_cosider','est_client_cosider','libelle_client']
 
 
 class AjoutSiteApiView(generics.CreateAPIView):
@@ -206,6 +208,7 @@ class ImportDQEAPIView(ImportMixin,  APIView):
 class GetNTView(generics.ListAPIView):
     queryset = NT.objects.all()
     serializer_class = NTSerializer
+
 
 class AjoutNTApiView(generics.CreateAPIView):
     queryset = NT.objects.all()
