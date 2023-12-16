@@ -421,6 +421,7 @@ class Cautions(SafeDeleteModel):
 
 class Attachements(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
+    dqe=models.CharField(max_length=500,null=True,blank=True)
     qte_precedente = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,editable=False)
     qte_mois = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
     qte_cumule= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,editable=False)
