@@ -8,7 +8,7 @@ from .models import *
 @receiver(pre_save, sender=NT)
 def pre_save_nt(sender, instance, **kwargs):
     if not instance.pk:
-        instance.id = instance.code_site.id+"-"+instance.nt
+        instance.id = instance.code_site.code_site+"-"+instance.nt
 
     if (instance.date_cloture_nt <= instance.date_ouverture_nt):
         raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
@@ -17,7 +17,7 @@ def pre_save_nt(sender, instance, **kwargs):
 @receiver(post_save, sender=NT)
 def post_save_nt(sender, instance, created, **kwargs):
     if created:
-        instance.id = instance.code_site.id+"-" + instance.nt
+        instance.id = instance.code_site.code_site+"-" + instance.nt
 
         if (instance.date_cloture_nt <= instance.date_ouverture_nt):
             raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
@@ -56,6 +56,12 @@ def post_save_dqe(sender, instance, created, **kwargs):
 
 
 #marche
+@receiver(pre_save, sender=Marche)
+def pre_save_marche(sender, instance, **kwargs):
+    if not instance.pk:
+        instance.num_avenant = Marche.objects.filter(nt=instance.nt).count()
+        instance.id = str(instance.nt.id) + "-" + str(instance.num_avenant)
+
 
 
 @receiver(pre_save, sender=Attachements)

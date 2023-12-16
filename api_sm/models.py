@@ -150,7 +150,7 @@ class NT(SafeDeleteModel):
     id=models.CharField(db_column='id',max_length=500,primary_key=True,verbose_name="id",editable=False)
     nt = models.CharField(db_column='NT', max_length=20, verbose_name='Numero du travail')
     code_site = models.ForeignKey(Sites, on_delete=models.DO_NOTHING, db_column='Code_site', null=False
-                                  , verbose_name='Code du Site',to_field='id')
+                                  , verbose_name='Code du Site')
     code_client = models.ForeignKey(Clients, on_delete=models.DO_NOTHING, db_column='Code_Client',null=True
                                     , verbose_name='Code du client')
     code_situation_nt = models.ForeignKey(SituationNt, on_delete=models.DO_NOTHING, blank=True, null=True
@@ -207,17 +207,13 @@ class Marche(SafeDeleteModel):
                                               , verbose_name='Retenue de garantie')
     code_contrat = models.CharField(null=False, blank=True, max_length=20, verbose_name='Code du contrat')
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
-    avenant_du_marche=models.ForeignKey('self',null=True,blank=True,to_field='id',on_delete=models.DO_NOTHING,
-                                        verbose_name='Avenant du marche',
-                                        related_name='avenant')
+
     objects = DeletedModelManager()
 
     def __str__(self):
         return self.id
 
     def save(self, *args, **kwargs):
-        self.num_avenant = self.avenant.count()
-
         super(Marche, self).save(*args, **kwargs)
 
 
