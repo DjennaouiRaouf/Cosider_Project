@@ -253,9 +253,6 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
         return super().has_delete_permission(request, obj)
 
 
-class DQEInline(admin.TabularInline):
-    model = DQE
-    extra = 1  # Number of empty book forms to display
 
 
 
@@ -273,7 +270,7 @@ class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,Simp
                    )
     search_fields = ('nt__nt','id','num_avenant')
     change_links = ('nt',)
-    inlines = [DQEInline]
+
 
     def get_import_formats(self):
         formats = (
@@ -470,16 +467,13 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
 
 
 
-class DetailFactureInline(admin.TabularInline):
-    model = DetailFacture
-    extra = 1  # Number of empty book forms to display
 
 @admin.register(Factures)
 class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('numero_facture','du','au','montant_global',
                     'etat')
     list_filter = (SafeDeleteAdminFilter,)
-    inlines = [DetailFactureInline]
+
     def get_import_formats(self):
 
         formats = (
