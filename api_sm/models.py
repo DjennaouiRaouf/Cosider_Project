@@ -419,7 +419,7 @@ class Cautions(SafeDeleteModel):
         verbose_name_plural = 'Caution'
 
 
-class Attachements(SafeDeleteModel):
+class Attachements(SafeDeleteModel): # decompte
     _safedelete_policy = SOFT_DELETE_CASCADE
     dqe=models.CharField(max_length=500,null=True,blank=True)
     qte_precedente = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,editable=False)
@@ -441,8 +441,7 @@ class Attachements(SafeDeleteModel):
         verbose_name_plural = 'Attachements'
 
 
-class FactureRG(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
+
 
 class Factures(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
@@ -468,6 +467,14 @@ class Factures(SafeDeleteModel):
     class Meta:
         verbose_name = 'Factures'
         verbose_name_plural = 'Factures'
+
+
+class FactureRG(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True)
+    montant_rg=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0
+                                         ,editable=False)
+
 
 class DetailFacture(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
