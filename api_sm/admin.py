@@ -153,7 +153,7 @@ class SituationNTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
 class NTAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
     list_display = (
-    'nt','code_client_link','code_site_link','libelle_nt','date_ouverture_nt','date_cloture_nt',
+    'nt','code_client_link','code_site_link','libelle','date_ouverture_nt','date_cloture_nt',
     )
     change_links = ['code_client','code_site']
     list_filter = (SafeDeleteAdminFilter,)
@@ -211,7 +211,7 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
     save_as=True
     list_per_page = lp
     resource_class = DQEResource
-    list_display = ("marche","code_tache","libelle_tache","unite","quantite","prix_u","prix_q",)
+    list_display = ("marche","code_tache","libelle","unite","quantite","prix_u","prix_q",)
     list_filter = (SafeDeleteAdminFilter,
 
                    )

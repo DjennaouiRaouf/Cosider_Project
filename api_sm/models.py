@@ -155,7 +155,7 @@ class NT(SafeDeleteModel):
                                     , verbose_name='Code du client')
     code_situation_nt = models.ForeignKey(SituationNt, on_delete=models.DO_NOTHING, blank=True, null=True
                                           , verbose_name='Situation')
-    libelle_nt = models.CharField(max_length=900,db_column='Libelle_NT', blank=True, null=True
+    libelle = models.CharField(max_length=900,db_column='Libelle_NT', blank=True, null=True
                                   , verbose_name='Libelle')
     date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True
                                          , verbose_name='Ouverture')
@@ -231,7 +231,7 @@ class DQE(SafeDeleteModel): # le prix final
     marche = models.ForeignKey(Marche,on_delete=models.DO_NOTHING,  null=False,related_name="marche_dqe",
                                to_field="id")
     code_tache = models.CharField(db_column='Code_Tache', max_length=30)
-    libelle_tache = models.TextField(db_column='Libelle_Tache')
+    libelle = models.TextField(db_column='Libelle_Tache')
 
     unite =models.ForeignKey(TabUniteDeMesure,on_delete=models.DO_NOTHING,  null=False, verbose_name='Unité de mesure')
 
