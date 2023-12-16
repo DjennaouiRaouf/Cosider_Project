@@ -208,13 +208,16 @@ class Marche(SafeDeleteModel):
     code_contrat = models.CharField(null=False, blank=True, max_length=20, verbose_name='Code du contrat')
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
     avenant_du_marche=models.ForeignKey('self',null=True,blank=True,to_field='id',on_delete=models.DO_NOTHING,
-                                        verbose_name='Avenant du marche')
+                                        verbose_name='Avenant du marche',
+                                        related_name='avenant')
     objects = DeletedModelManager()
 
     def __str__(self):
         return self.id
 
     def save(self, *args, **kwargs):
+        self.num_avenant = self.avenant.count()
+
         super(Marche, self).save(*args, **kwargs)
 
 

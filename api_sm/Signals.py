@@ -56,12 +56,6 @@ def post_save_dqe(sender, instance, created, **kwargs):
 
 
 #marche
-@receiver(pre_save, sender=Marche)
-def pre_save_marche(sender, instance, **kwargs):
-    if not instance.pk:
-        instance.num_avenant = Marche.objects.filter(nt=instance.nt).count()
-        instance.id = str(instance.nt.id) + "-" + str(instance.num_avenant)
-
 
 
 @receiver(pre_save, sender=Attachements)
