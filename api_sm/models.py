@@ -475,7 +475,6 @@ class FactureRG(SafeDeleteModel):
     montant_rg=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0
                                          ,editable=False)
 
-
 class DetailFacture(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=False,blank=True)
