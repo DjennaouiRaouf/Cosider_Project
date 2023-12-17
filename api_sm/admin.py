@@ -58,7 +58,7 @@ class ImagesAdmin(admin.ModelAdmin):
 class TabUniteDeMesure(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_per_page = lp
     resource_class = TabUniteDeMesureResource
-    list_display = ('code_unite_mesure','symbole_unite','libelle_unite',)
+    list_display = ('id','libelle','description')
 
     def get_import_formats(self):
         formats = (
@@ -211,14 +211,14 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
     save_as=True
     list_per_page = lp
     resource_class = DQEResource
-    list_display = ("marche","code_tache","libelle_tache","unite","quantite","prix_u","prix_q",)
+    list_display = ("marche","code_tache","libelle","unite","quantite","prix_u","prix_q",)
     list_filter = (SafeDeleteAdminFilter,
 
                    )
     search_fields = ('marche__id','marche__num_avenant')
 
     def unite(self,obj):
-        return obj.unite.libelle_unite
+        return obj.unite.libelle
 
     def id(self,obj):
         return obj.marche.nt.id.id
@@ -253,9 +253,7 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
         return super().has_delete_permission(request, obj)
 
 
-class DQEInline(admin.TabularInline):
-    model = DQE
-    extra = 1  # Number of empty book forms to display
+
 
 
 
@@ -273,7 +271,7 @@ class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,Simp
                    )
     search_fields = ('nt__nt','id','num_avenant')
     change_links = ('nt',)
-    inlines = [DQEInline]
+
 
     def get_import_formats(self):
         formats = (
@@ -470,16 +468,14 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
 
 
 
-class DetailFactureInline(admin.TabularInline):
-    model = DetailFacture
-    extra = 1  # Number of empty book forms to display
+
 
 @admin.register(Factures)
 class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_display = ('numero_facture','du','au','montant_global',
                     'etat')
     list_filter = (SafeDeleteAdminFilter,)
-    inlines = [DetailFactureInline]
+
     def get_import_formats(self):
 
         formats = (
@@ -541,7 +537,7 @@ class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdm
     def numero_facture(self, obj):
         return obj.facture.numero_facture
     def detail_designation(self,obj):
-        return obj.detail.dqe.designation
+        return obj.detail.dqe.libelle
 
     def detail_estimation(self, obj):
         return obj.detail.montant_estime
