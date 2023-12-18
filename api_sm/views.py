@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
 from django_filters.rest_framework import DjangoFilterBackend
 from import_export.admin import ImportMixin
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from rest_framework.generics import RetrieveAPIView, ListAPIView
@@ -82,11 +82,10 @@ class AjoutClientApiView(generics.CreateAPIView):
 
 
 class GetClientsView(generics.ListAPIView):
-
-    queryset = Clients.objects.filter()
+    queryset = Clients.objects.all()
     serializer_class = ClientsSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['id', 'type_client', ]
+    filterset_class = ClientsFilter
 
 
 class AjoutSiteApiView(generics.CreateAPIView):
@@ -157,6 +156,9 @@ class AjoutDQEApiView(generics.CreateAPIView):
 class GetSitesView(generics.ListAPIView):
     queryset = Sites.objects.all()
     serializer_class = SiteSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = SitesFilter
+
 
 
 
@@ -198,7 +200,8 @@ class ImportDQEAPIView(ImportMixin,  APIView):
 class GetNTView(generics.ListAPIView):
     queryset = NT.objects.all()
     serializer_class = NTSerializer
-
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = NTFilter
 
 class AjoutNTApiView(generics.CreateAPIView):
     queryset = NT.objects.all()

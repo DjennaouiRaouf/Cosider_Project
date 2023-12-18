@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from api_sm.Filters import *
 from api_sm.Serializers import *
 
 
@@ -177,6 +178,23 @@ class MarcheFieldsApiView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+class ClientFieldsFilterApiView(APIView):
+    def get(self,request):
+        filter_fields = list(ClientsFilter.base_filters.keys())
+        serializer = ClientsSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        for field_name, field_instance in fields.items():
+            if field_name in filter_fields:
+                field_info.append({
+                    'name': field_name,
+                    'type': str(field_instance.__class__.__name__),
+                    'label': field_instance.label or field_name,
+                })
+
+        return Response({'fields': field_info},status=status.HTTP_200_OK)
+
+
 class ClientFieldsStateApiView(APIView):
     def get(self, request):
         serializer = ClientsSerializer()
@@ -258,6 +276,23 @@ class SiteFieldsStateApiView(APIView):
                 state.update(d)
         return Response({'state': state}, status=status.HTTP_200_OK)
 
+
+
+class SiteFieldsFilterApiView(APIView):
+    def get(self,request):
+        filter_fields = list(SitesFilter.base_filters.keys())
+        serializer = SiteSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        for field_name, field_instance in fields.items():
+            if field_name in filter_fields:
+                field_info.append({
+                    'name': field_name,
+                    'type': str(field_instance.__class__.__name__),
+                    'label': field_instance.label or field_name,
+                })
+
+        return Response({'fields': field_info},status=status.HTTP_200_OK)
 class SiteFieldsApiView(APIView):
     def get(self, request):
         flag = request.query_params.get('flag', None)
@@ -289,6 +324,22 @@ class SiteFieldsApiView(APIView):
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+class NTFieldsFilterApiView(APIView):
+    def get(self,request):
+        filter_fields = list(NTFilter.base_filters.keys())
+        serializer = NTSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        for field_name, field_instance in fields.items():
+            if field_name in filter_fields:
+                field_info.append({
+                    'name': field_name,
+                    'type': str(field_instance.__class__.__name__),
+                    'label': field_instance.label or field_name,
+                })
+
+        return Response({'fields': field_info},status=status.HTTP_200_OK)
 
 class NTFieldsApiView(APIView):
     def get(self, request):
