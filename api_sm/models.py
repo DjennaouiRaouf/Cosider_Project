@@ -129,7 +129,7 @@ class Sites(SafeDeleteModel):
 
 class SituationNt(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    libelle=models.CharField(max_length=100,null=False,unique=True)
+    libelle=models.CharField(max_length=100,null=False,unique=True,verbose_name='Libelle')
     objects = DeletedModelManager()
     class Meta:
         verbose_name = 'Situation du Travail'
@@ -152,7 +152,7 @@ class NT(SafeDeleteModel):
                                   , verbose_name='Code du Site')
     code_client = models.ForeignKey(Clients, on_delete=models.DO_NOTHING, db_column='Code_Client',null=True
                                     , verbose_name='Code du client')
-    code_situation_nt = models.ForeignKey(SituationNt, on_delete=models.DO_NOTHING, blank=True, null=True
+    situation = models.ForeignKey(SituationNt, on_delete=models.DO_NOTHING, blank=True, null=True
                                           , verbose_name='Situation')
     libelle_nt = models.CharField(max_length=900,db_column='Libelle_NT', blank=True, null=True
                                   , verbose_name='Libelle')

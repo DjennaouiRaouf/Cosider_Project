@@ -18,4 +18,4 @@ class SitesFilter(django_filters.FilterSet):
 class NTFilter(django_filters.FilterSet):
     class Meta:
         model = NT
-        fields=['nt','code_site','code_client']
+        fields=['nt','code_site','code_client','situation']

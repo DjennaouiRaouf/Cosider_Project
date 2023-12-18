@@ -68,6 +68,17 @@ class SiteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class SituationNtSerializer(serializers.ModelSerializer):
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('deleted', None)
+        fields.pop('deleted_by_cascade', None)
+        return fields
+
+
+    class Meta:
+        model = SituationNt
+        fields = '__all__'
 
 
 
@@ -78,6 +89,7 @@ class SiteSerializer(serializers.ModelSerializer):
 
 
 class NTSerializer(serializers.ModelSerializer):
+
     class Meta:
         model=NT
         fields ='__all__'
@@ -91,6 +103,8 @@ class NTSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['id'] = instance.id
+
+
         return representation
 
 
@@ -105,12 +119,14 @@ class DQESerializer(serializers.ModelSerializer):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
         fields.pop('deleted_by_cascade', None)
+
         return fields
 
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['unite']=instance.unite.libelle
+
 
         return representation
 
