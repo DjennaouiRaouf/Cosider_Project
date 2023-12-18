@@ -53,7 +53,6 @@ class ImagesAdmin(admin.ModelAdmin):
 
 '''
 
-
 @admin.register(TabUniteDeMesure)
 class TabUniteDeMesure(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_per_page = lp
