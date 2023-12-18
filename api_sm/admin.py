@@ -58,7 +58,7 @@ class ImagesAdmin(admin.ModelAdmin):
 class TabUniteDeMesure(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_per_page = lp
     resource_class = TabUniteDeMesureResource
-    list_display = ('code_unite_mesure','symbole_unite','libelle_unite',)
+    list_display = ('id','libelle','description')
 
     def get_import_formats(self):
         formats = (
@@ -153,7 +153,7 @@ class SituationNTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
 class NTAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
     list_display = (
-    'nt','code_client_link','code_site_link','libelle','date_ouverture_nt','date_cloture_nt',
+    'nt','code_client_link','code_site_link','libelle_nt','date_ouverture_nt','date_cloture_nt',
     )
     change_links = ['code_client','code_site']
     list_filter = (SafeDeleteAdminFilter,)
@@ -218,7 +218,7 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
     search_fields = ('marche__id','marche__num_avenant')
 
     def unite(self,obj):
-        return obj.unite.libelle_unite
+        return obj.unite.libelle
 
     def id(self,obj):
         return obj.marche.nt.id.id
@@ -251,6 +251,7 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
         if obj and obj.deleted:
             return False
         return super().has_delete_permission(request, obj)
+
 
 
 
@@ -426,7 +427,7 @@ class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
 @admin.register(Attachements)
 class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
-    list_display=("dqe","qte_precedente","qte_mois","qte_cumule","montant_precedent",'montant_mois','montant_cumule','date')
+    list_display=("qte_precedente","qte_mois","qte_cumule","montant_precedent",'montant_mois','montant_cumule',)
     list_filter = (SafeDeleteAdminFilter,)
 
     def get_import_formats(self):
@@ -464,6 +465,7 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
 
     def designation(self, obj):
         return obj.dqe.designation
+
 
 
 
@@ -535,7 +537,7 @@ class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdm
     def numero_facture(self, obj):
         return obj.facture.numero_facture
     def detail_designation(self,obj):
-        return obj.detail.dqe.designation
+        return obj.detail.dqe.libelle
 
     def detail_estimation(self, obj):
         return obj.detail.montant_estime

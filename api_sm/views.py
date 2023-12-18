@@ -4,6 +4,7 @@ from import_export.admin import ImportMixin
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework import status
+from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -84,6 +85,8 @@ class GetClientsView(generics.ListAPIView):
 
     queryset = Clients.objects.filter()
     serializer_class = ClientsSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['id', 'type_client', ]
 
 
 class AjoutSiteApiView(generics.CreateAPIView):
@@ -121,22 +124,7 @@ class AjoutMarcheApiView(generics.CreateAPIView):
         return Response(custom_response, status=status.HTTP_201_CREATED)
 
 
-class AjoutMarcheApiView(generics.CreateAPIView):
-    queryset = Sites.objects.all()
-    serializer_class = MarcheSerializer
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        self.perform_create(serializer)
-        custom_response = {
-            'status': 'success',
-            'message': 'Marché ajouté',
-            'data': serializer.data,
-        }
-
-        return Response(custom_response, status=status.HTTP_201_CREATED)
 
 
 class AjoutDQEApiView(generics.CreateAPIView):
@@ -173,8 +161,10 @@ class GetSitesView(generics.ListAPIView):
 
 
 class GetMarcheView(generics.ListAPIView):
-    queryset = Marche.objects.all().order_by('nt', 'num_avenant')
+    queryset = Marche.objects.all()
     serializer_class = MarcheSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['nt__nt','nt__code_site__id', 'code_contrat','num_avenant',]
 
 
 class GetDQEView(generics.ListAPIView):
@@ -213,5 +203,12 @@ class GetNTView(generics.ListAPIView):
 class AjoutNTApiView(generics.CreateAPIView):
     queryset = NT.objects.all()
     serializer_class = NTSerializer
+
+class GetDQEbyId(generics.ListAPIView):
+    queryset = DQE.objects.all()
+    serializer_class = DQESerializer
+    lookup_field = 'marche'
+
+
 
 

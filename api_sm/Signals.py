@@ -8,7 +8,7 @@ from .models import *
 @receiver(pre_save, sender=NT)
 def pre_save_nt(sender, instance, **kwargs):
     if not instance.pk:
-        instance.id = instance.code_site.code_site+"-"+instance.nt
+        instance.id = instance.code_site.id+"-"+instance.nt
 
     if (instance.date_cloture_nt <= instance.date_ouverture_nt):
         raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
@@ -17,7 +17,7 @@ def pre_save_nt(sender, instance, **kwargs):
 @receiver(post_save, sender=NT)
 def post_save_nt(sender, instance, created, **kwargs):
     if created:
-        instance.id = instance.code_site.code_site+"-" + instance.nt
+        instance.id = instance.code_site.id+"-" + instance.nt
 
         if (instance.date_cloture_nt <= instance.date_ouverture_nt):
             raise ValidationError("Date de cloture doit etre supérieur ou égale à la date d\'ouverture")
@@ -31,7 +31,11 @@ def post_save_nt(sender, instance, created, **kwargs):
 
 @receiver(pre_save, sender=DQE)
 def pre_save_dqe(sender, instance, **kwargs):
-    instance.designation = instance.designation.lower()
+    if not instance.pk:
+        instance.id = instance.marche.id+"-" + instance.code_tache
+    instance.libelle = instance.libelle.lower()
+
+
     try:
         old_instance = DQE.objects.get(pk=instance.pk)
     except DQE.DoesNotExist:
@@ -46,6 +50,9 @@ pre_save.connect(pre_save_dqe, sender=DQE)
 
 @receiver(post_save, sender=DQE)
 def post_save_dqe(sender, instance, created, **kwargs):
+    if created:
+        instance.id = instance.marche.id+"-" + instance.code_tache
+
     #mise a jour du prix dans  le contrat
     total = DQE.objects.filter(marche=instance.marche).aggregate(models.Sum('prix_q'))[
                 "prix_q__sum"]
@@ -77,6 +84,33 @@ def pre_save_attachements(sender, instance, **kwargs):
         instance.qte_precedente=0
         instance.qte_cumule=instance.qte_precedente+instance.qte_mois
         # montant = montant*prix_unitaire
+
+
+
+#attechements (décompte)
+
+@receiver(pre_save, sender=Attachements)
+def pre_save_attachements(sender, instance, **kwargs):
+    attachements=Attachements.objects.filter(dqe=instance.dqe)
+    if(attachements): #courant
+        previous=attachements.latest('date')
+        instance.qte_precedente = previous.qte_cumule
+        instance.qte_cumule =instance.qte_precedente+instance.qte_mois
+        #montant = montant*prix_unitaire
+
+    else: #debut
+        instance.qte_precedente=0
+        instance.qte_cumule=instance.qte_precedente+instance.qte_mois
+        # montant = montant*prix_unitaire
+
+
+
+
+
+
+
+
+
 
 
 
