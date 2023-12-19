@@ -166,8 +166,7 @@ class GetMarcheView(generics.ListAPIView):
     queryset = Marche.objects.all()
     serializer_class = MarcheSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['nt__nt','nt__code_site__id', 'code_contrat','num_avenant',]
-
+    filterset_class = MarcheFilter
 
 class GetDQEView(generics.ListAPIView):
 

@@ -167,6 +167,7 @@ class MarcheSerializer(serializers.ModelSerializer):
         representation['nt'] = instance.nt.nt
         representation['num_avenant']=instance.num_avenant
 
+
         return representation
 
 

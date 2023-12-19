@@ -19,3 +19,11 @@ class NTFilter(django_filters.FilterSet):
     class Meta:
         model = NT
         fields=['nt','code_site','code_client','situation']
+
+class MarcheFilter(django_filters.FilterSet):
+    code_site = django_filters.CharFilter(field_name='nt__code_site', label='Code du site')
+    nt = django_filters.CharFilter(field_name='nt__nt', label='Numero du travail')
+
+    class Meta:
+        model = Marche
+        fields=['num_avenant','code_contrat','date_signature',]
