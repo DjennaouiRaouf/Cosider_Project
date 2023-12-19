@@ -213,6 +213,7 @@ class Marche(SafeDeleteModel):
     def __str__(self):
         return self.id
 
+
     def save(self, *args, **kwargs):
         super(Marche, self).save(*args, **kwargs)
 

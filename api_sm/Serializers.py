@@ -1,3 +1,4 @@
+from django.contrib.humanize.templatetags import humanize
 from rest_framework import serializers
 from api_sm.models import *
 
@@ -161,8 +162,8 @@ class MarcheSerializer(serializers.ModelSerializer):
         return fields
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['ht'] = instance.ttc
-        representation['ttc'] = instance.ttc
+        representation['ht'] = humanize.intcomma(instance.ttc)
+        representation['ttc'] = humanize.intcomma(instance.ttc)
         representation['code_site'] = instance.nt.code_site.id
         representation['nt'] = instance.nt.nt
         representation['num_avenant']=instance.num_avenant
