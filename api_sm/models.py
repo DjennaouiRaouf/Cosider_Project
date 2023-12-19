@@ -207,7 +207,6 @@ class Marche(SafeDeleteModel):
                                               , verbose_name='Retenue de garantie')
     code_contrat = models.CharField(null=False, blank=True, max_length=20, verbose_name='Code du contrat')
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
-
     objects = DeletedModelManager()
 
     def __str__(self):

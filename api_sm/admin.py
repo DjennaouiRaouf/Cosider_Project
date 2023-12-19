@@ -1,6 +1,7 @@
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.contrib.humanize.templatetags import humanize
 from django.utils.html import format_html
 from django_admin_relation_links import AdminChangeLinksMixin
 from djangoql.admin import DjangoQLSearchMixin
@@ -210,12 +211,20 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
     save_as=True
     list_per_page = lp
     resource_class = DQEResource
-    list_display = ("marche","code_tache","libelle","unite","quantite","prix_u","prix_q",)
+    list_display = ("marche","code_tache","libelle","unite","quantite","pu","pq",)
     list_filter = (SafeDeleteAdminFilter,
 
                    )
     search_fields = ('marche__id','marche__num_avenant')
 
+
+    def pu(self,obj):
+        return humanize.intcomma(obj.prix_u)
+
+    pu.short_description="Prix unitaire"
+    def pq(self,obj):
+        return humanize.intcomma(obj.prix_q)
+    pq.short_description = "Prix quantite"
     def unite(self,obj):
         return obj.unite.libelle
 
@@ -261,7 +270,7 @@ class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,Simp
     save_as = True
     list_per_page = lp
     resource_class = MarcheResource
-    list_display = ('id','nt_link','num_avenant','libelle' ,'ods_depart' ,'delais','ht' ,'ttc' ,'revisable','rg' ,'rabais'
+    list_display = ('id','nt_link','num_avenant','libelle' ,'ods_depart' ,'delais','pht' ,'pttc' ,'revisable','rg' ,'rabais'
     ,'tva','date_signature')
 
 
@@ -271,6 +280,15 @@ class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,Simp
     search_fields = ('nt__nt','id','num_avenant')
     change_links = ('nt',)
 
+    def pht(self,obj):
+        return humanize.intcomma(obj.ht)
+
+    pht.short_description = 'HT'
+
+    def pttc(self, obj):
+        return humanize.intcomma(obj.ttc)
+
+    pttc.short_description = 'TTC'
 
     def get_import_formats(self):
         formats = (

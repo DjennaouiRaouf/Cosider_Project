@@ -127,7 +127,8 @@ class DQESerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['unite']=instance.unite.libelle
-
+        representation['prix_u']=humanize.intcomma(instance.prix_u)
+        representation['prix_q']=humanize.intcomma(instance.prix_q)
 
         return representation
 
