@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate
 from django_filters.rest_framework import DjangoFilterBackend
-from import_export.admin import ImportMixin
+from import_export.admin import ImportMixin, ExportMixin
 from rest_framework import generics, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework import status
@@ -172,6 +172,8 @@ class GetDQEView(generics.ListAPIView):
 
     queryset = DQE.objects.all()
     serializer_class = DQESerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = DQEFilter
 
 
 class ImportDQEAPIView(ImportMixin,  APIView):

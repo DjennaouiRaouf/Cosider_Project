@@ -27,3 +27,9 @@ class MarcheFilter(django_filters.FilterSet):
     class Meta:
         model = Marche
         fields=['num_avenant','code_contrat','date_signature',]
+
+
+class DQEFilter(django_filters.FilterSet):
+    class Meta:
+        model = DQE
+        fields=['marche__id',]
