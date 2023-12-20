@@ -23,6 +23,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -164,6 +165,4 @@ REST_FRAMEWORK = {
 }
 
 
-X_FRAME_OPTIONS = 'SAMEORIGIN'
-PHONENUMBER_DEFAULT_REGION="DZ"
 

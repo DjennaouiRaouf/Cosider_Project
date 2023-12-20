@@ -6,7 +6,7 @@ from api_sm.models import *
 class ClientsFilter(django_filters.FilterSet):
     class Meta:
         model = Clients
-        fields = ['id', 'type_client',]
+        fields = ['id','type_client','est_client_cosider']
 
 
 class SitesFilter(django_filters.FilterSet):

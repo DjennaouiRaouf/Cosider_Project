@@ -4,7 +4,6 @@ from import_export.admin import ImportMixin
 from rest_framework import generics, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework import status
-from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -15,7 +14,7 @@ from .Resources import DQEResource
 from .Serializers import *
 from .models import *
 from .tools import *
-import  pandas as p
+
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -82,6 +81,7 @@ class AjoutClientApiView(generics.CreateAPIView):
 
 
 class GetClientsView(generics.ListAPIView):
+
     queryset = Clients.objects.all()
     serializer_class = ClientsSerializer
     filter_backends = [DjangoFilterBackend]

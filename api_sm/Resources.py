@@ -7,6 +7,7 @@ from import_export import resources, fields
 from import_export.widgets import Widget
 from api_sm.models import *
 
+'''
 class FormattedPriceWidget(Widget):
     def clean(self, value, row=None, *args, **kwargs):
         try:
@@ -19,7 +20,7 @@ class FormattedPriceWidget(Widget):
 
     def render(self, value, obj=None):
         return humanize.intcomma(value)
-
+'''
 class TabUniteDeMesureResource(resources.ModelResource):
     def get_instance(self, instance_loader, row):
         try:
@@ -78,8 +79,8 @@ class SiteResource(resources.ModelResource):
 
 
 class MarcheResource(resources.ModelResource):
-    ttc = fields.Field(column_name='ttc', attribute='ttc', widget=FormattedPriceWidget())
-    ht = fields.Field(column_name='ht', attribute='ht', widget=FormattedPriceWidget())
+    #ttc = fields.Field(column_name='ttc', attribute='ttc', widget=FormattedPriceWidget())
+    #ht = fields.Field(column_name='ht', attribute='ht', widget=FormattedPriceWidget())
     def get_instance(self, instance_loader, row):
         try:
             params = {}
@@ -111,8 +112,8 @@ class ODSResource(resources.ModelResource):
 
 
 class DQEResource(resources.ModelResource):
-    prix_u = fields.Field(column_name='prix_u', attribute='prix_u', widget=FormattedPriceWidget())
-    prix_q = fields.Field(column_name='prix_q', attribute='prix_q', widget=FormattedPriceWidget())
+    #prix_u = fields.Field(column_name='prix_u', attribute='prix_u', widget=FormattedPriceWidget())
+    #prix_q = fields.Field(column_name='prix_q', attribute='prix_q', widget=FormattedPriceWidget())
 
     def get_instance(self, instance_loader, row):
         try:

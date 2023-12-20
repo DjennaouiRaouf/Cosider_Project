@@ -38,7 +38,7 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 
-'''
+
 
 @admin.register(Images)
 class ImagesAdmin(admin.ModelAdmin):
@@ -52,7 +52,6 @@ class ImagesAdmin(admin.ModelAdmin):
             obj.save()
 
 
-'''
 
 @admin.register(TabUniteDeMesure)
 class TabUniteDeMesure(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):

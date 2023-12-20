@@ -61,11 +61,12 @@ class Clients(SafeDeleteModel):
     adresse = models.CharField(db_column='adresse', max_length=500, blank=True, null=True,
                                       verbose_name='Adresse')
 
+
     nif = models.CharField(db_column='NIF', unique=True, max_length=50, blank=True, null=True,verbose_name='NIF')
     raison_social = models.CharField(db_column='Raison_Social', max_length=50, blank=True, null=True,verbose_name='Raison Social')
     num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True, null=True,
                                              verbose_name='Numero du registre de commerce')
-
+    history = HistoricalRecords()
     objects = DeletedModelManager()
     def __str__(self):
         return  self.id
