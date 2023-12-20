@@ -49,6 +49,31 @@ class UserFieldsStateApiView(APIView):
         return Response({'state': state}, status=status.HTTP_200_OK)
 
 
+
+
+class DQEFieldsFilterApiView(APIView):
+    def get(self,request):
+        filter_fields = list(DQEFilter.base_filters.keys())
+        serializer = DQESerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        for field_name, field_instance in fields.items():
+            if field_name in filter_fields:
+                if(field_name!='marche'):
+                    obj = {
+                        'name': field_name,
+                        'type': str(field_instance.__class__.__name__),
+                        'label': field_instance.label or field_name,
+                    }
+                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                        obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+
+                    field_info.append(obj)
+
+        return Response({'fields': field_info},status=status.HTTP_200_OK)
+
+
 class DQEFieldsStateApiView(APIView):
     def get(self, request):
         serializer = DQESerializer()

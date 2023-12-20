@@ -18,6 +18,7 @@ urlpatterns = [
     path('sitefields/', SiteFieldsApiView.as_view()),
     path('sitefieldsstate/',SiteFieldsStateApiView.as_view()),
 
+    path('dqefilterfields/',DQEFieldsFilterApiView.as_view()),
     path('dqefields/', DQEFieldsApiView.as_view()),
     path('dqefieldsstate/',DQEFieldsStateApiView.as_view()),
 

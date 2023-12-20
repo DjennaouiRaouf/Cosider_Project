@@ -32,4 +32,4 @@ class MarcheFilter(django_filters.FilterSet):
 class DQEFilter(django_filters.FilterSet):
     class Meta:
         model = DQE
-        fields=['marche__id',]
+        fields=['marche__id','code_tache']

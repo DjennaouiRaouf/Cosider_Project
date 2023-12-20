@@ -1,6 +1,5 @@
 
 from decimal import Decimal
-
 from _decimal import InvalidOperation
 from django.contrib.humanize.templatetags import humanize
 from import_export import resources, fields
