@@ -68,7 +68,6 @@ class SiteSerializer(serializers.ModelSerializer):
         model = Sites
         fields = '__all__'
 
-
 class SituationNtSerializer(serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
