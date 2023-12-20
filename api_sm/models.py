@@ -153,9 +153,9 @@ class NT(SafeDeleteModel):
                                   , verbose_name='Code du Site')
     code_client = models.ForeignKey(Clients, on_delete=models.DO_NOTHING, db_column='Code_Client',null=True
                                     , verbose_name='Code du client')
-    situation = models.ForeignKey(SituationNt, on_delete=models.DO_NOTHING, blank=True, null=True
+    code_situation = models.ForeignKey(SituationNt, on_delete=models.DO_NOTHING, blank=True, null=True
                                           , verbose_name='Situation')
-    libelle_nt = models.CharField(max_length=900,db_column='Libelle_NT', blank=True, null=True
+    libelle = models.CharField(max_length=900,db_column='Libelle_NT', blank=True, null=True
                                   , verbose_name='Libelle')
     date_ouverture_nt = models.DateField(db_column='Date_Ouverture_NT', blank=True, null=True
                                          , verbose_name='Ouverture')

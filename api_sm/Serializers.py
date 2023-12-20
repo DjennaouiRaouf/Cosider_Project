@@ -90,7 +90,8 @@ class SituationNtSerializer(serializers.ModelSerializer):
 
 
 class NTSerializer(serializers.ModelSerializer):
-
+    code_site=serializers.PrimaryKeyRelatedField(queryset=Sites.objects.all(),write_only=True,label='Code du site')
+    nt = serializers.CharField(write_only=True, label='Numero du travail')
     class Meta:
         model=NT
         fields ='__all__'
@@ -104,7 +105,8 @@ class NTSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['id'] = instance.id
-
+        representation['code_site'] = instance.code_site.id
+        representation['nt'] = instance.nt
 
         return representation
 
@@ -137,17 +139,18 @@ class DQESerializer(serializers.ModelSerializer):
 
 
 class MarcheSerializer(serializers.ModelSerializer):
-    code_site = serializers.CharField(source='nt_code_site_id', write_only=True, label='Code du Site')
-    nt = serializers.CharField(source='nt_nt', write_only=True, label='Numero du Travail')
-
+    code_site=serializers.PrimaryKeyRelatedField(source="nt_code_site",queryset=Sites.objects.all(),write_only=True,label='Code du site')
+    nt=serializers.CharField(source="nt_nt",write_only=True,label='Numero du travail')
     class Meta:
         model = Marche
         fields = "__all__"
 
-    def create(self, validated_data):
-        code_site = validated_data.pop('nt_code_site_id')
-        num_t = validated_data.pop('nt_nt')
 
+
+    def create(self, validated_data):
+        code_site = validated_data.pop('nt_code_site')
+        num_t = validated_data.pop('nt_nt')
+        print(code_site,num_t)
         nt_obj = NT.objects.get(
             code_site_id=code_site,
             nt=num_t

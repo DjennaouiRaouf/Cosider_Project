@@ -152,6 +152,8 @@ class MarcheFieldsStateApiView(APIView):
                     field_name:default_value ,
 
                 })
+
+
                 state = {}
 
             for d in field_info:
@@ -168,7 +170,7 @@ class MarcheFieldsApiView(APIView):
             model_name = model_class.__name__
 
             if(flag=='f'): # react form
-
+                print(fields)
                 field_info = []
                 for field_name, field_instance in fields.items():
                     if(field_name not in ['id','num_avenant']):
@@ -176,10 +178,13 @@ class MarcheFieldsApiView(APIView):
                             'name':field_name,
                             'type': str(field_instance.__class__.__name__),
                             'label': field_instance.label or field_name,
+                            'source':field_instance.source
                         }
+
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
                             obj['queryset']=anySerilizer(field_instance.queryset, many=True).data
+
 
                         field_info.append(obj)
 
@@ -267,7 +272,7 @@ class ClientFieldsApiView(APIView):
                             'info': str(field_instance.__class__.__name__),
                         })
 
-                return Response({'fields': field_info,'models':model_name}, status=status.HTTP_200_OK)
+                return Response({'fields': field_info,'models':model_name,'pk':Clients._meta.pk.name}, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 

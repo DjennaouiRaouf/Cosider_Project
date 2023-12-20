@@ -18,7 +18,7 @@ class SitesFilter(django_filters.FilterSet):
 class NTFilter(django_filters.FilterSet):
     class Meta:
         model = NT
-        fields=['nt','code_site','code_client','situation']
+        fields=['nt','code_site','code_client',]
 
 class MarcheFilter(django_filters.FilterSet):
     code_site = django_filters.CharFilter(field_name='nt__code_site', label='Code du site')
