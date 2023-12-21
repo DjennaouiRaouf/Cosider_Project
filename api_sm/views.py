@@ -4,6 +4,7 @@ from import_export.admin import ImportMixin, ExportMixin
 from rest_framework import generics, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework import status
+from rest_framework.mixins import DestroyModelMixin
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -212,6 +213,26 @@ class GetDQEbyId(generics.ListAPIView):
     queryset = DQE.objects.all()
     serializer_class = DQESerializer
     lookup_field = 'marche'
+
+
+
+class DelDQEByID(generics.DestroyAPIView,DestroyModelMixin):
+    queryset = DQE.objects.all()
+    serializer_class = DQESerializer
+
+    def delete(self, request, *args, **kwargs):
+        pk_list = request.data.get(DQE._meta.pk.name)
+        if pk_list:
+            queryset = self.filter_queryset(self.get_queryset())
+            queryset = queryset.filter(pk__in=pk_list)
+            self.perform_destroy(queryset)
+
+        return Response({'Message': pk_list},status=status.HTTP_200_OK)
+
+
+class UpdateDQEApiVew(generics.UpdateAPIView):
+    queryset = DQE.objects.all()
+    serializer_class = DQESerializer
 
 
 

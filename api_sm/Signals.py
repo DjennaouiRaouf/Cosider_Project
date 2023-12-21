@@ -56,6 +56,8 @@ def post_save_dqe(sender, instance, created, **kwargs):
     #mise a jour du prix dans  le contrat
     total = DQE.objects.filter(marche=instance.marche).aggregate(models.Sum('prix_q'))[
                 "prix_q__sum"]
+    if not total:
+        total=0
     instance.marche.ht=round(total,2)
     instance.marche.ttc= round(total + (total * instance.marche.tva / 100), 2)
     instance.marche.num_avenant=instance.marche.num_avenant

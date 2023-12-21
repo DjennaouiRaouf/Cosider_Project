@@ -239,9 +239,9 @@ class DQE(SafeDeleteModel): # le prix final
     unite =models.ForeignKey(TabUniteDeMesure,on_delete=models.DO_NOTHING,  null=False, verbose_name='Unité de mesure')
 
     est_tache_composite = models.BooleanField(db_column='Est_Tache_Composite', blank=True,
-                                              null=True,verbose_name="Tache composée")
+                                              null=False,default=False,verbose_name="Tache composée")
     est_tache_complementaire = models.BooleanField(db_column='Est_Tache_Complementaire', blank=True,
-                                                   null=True,verbose_name="Tache complementaire")
+                                                   null=False,default=False,verbose_name="Tache complementaire")
 
 
     prix_u = models.DecimalField(

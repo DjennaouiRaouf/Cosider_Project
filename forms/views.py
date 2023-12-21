@@ -79,22 +79,41 @@ class DQEFieldsStateApiView(APIView):
         serializer = DQESerializer()
         fields = serializer.get_fields()
         field_info = []
-        for field_name, field_instance in fields.items():
-            default_value = ''
-            if str(field_instance.__class__.__name__) == 'BooleanField':
-                default_value= False
-            if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
-                                                          'IntegerField',]:
-                default_value = 0
+        dqe_pk = request.query_params.get(DQE._meta.pk.name, None)
+        if dqe_pk:
+            dqe = DQE.objects.get(pk=dqe_pk)
+        else:
+            dqe = None
+        if(dqe == None):
+            for field_name, field_instance in fields.items():
+                default_value = ''
+                if str(field_instance.__class__.__name__) == 'BooleanField':
+                    default_value= False
+                if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
+                                                              'IntegerField',]:
+                    default_value = 0
 
-            field_info.append({
-                field_name:default_value ,
+                field_info.append({
+                    field_name:default_value ,
 
-            })
-            state = {}
+                })
+                state = {}
 
-            for d in field_info:
-                state.update(d)
+                for d in field_info:
+                    state.update(d)
+        else:
+            update_dqe=DQESerializer(dqe).data
+            for field_name, field_instance in fields.items():
+                default_value = update_dqe[field_name]
+                field_info.append({
+                    field_name:default_value ,
+
+                })
+                state = {}
+
+                for d in field_info:
+                    state.update(d)
+
         return Response({'state': state}, status=status.HTTP_200_OK)
 
 class DQEFieldsApiView(APIView):
@@ -102,7 +121,10 @@ class DQEFieldsApiView(APIView):
         flag = request.query_params.get('flag',None)
         if flag=='l' or flag =='f':
             serializer = DQESerializer()
+            model_class = serializer.Meta.model
+            model_name = model_class.__name__
             fields = serializer.get_fields()
+
             if(flag=='f'): # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
@@ -127,7 +149,7 @@ class DQEFieldsApiView(APIView):
 
                     })
 
-            return Response({'fields':field_info},status=status.HTTP_200_OK)
+            return Response({'fields':field_info,'models':model_name,'pk':DQE._meta.pk.name},status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -278,7 +300,6 @@ class ClientFieldsApiView(APIView):
                 fields = serializer.get_fields()
                 model_class = serializer.Meta.model
                 model_name = model_class.__name__
-                print(model_name)
                 if (flag == 'f'):  # react form
                     field_info = []
                     for field_name, field_instance in fields.items():

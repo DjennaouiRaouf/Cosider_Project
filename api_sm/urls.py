@@ -23,9 +23,15 @@ urlpatterns = [
 
 
     path('getclients/', GetClientsView.as_view()),
+
     path('getsites/', GetSitesView.as_view()),
+
     path('getmarche/',GetMarcheView.as_view()),
+
     path('getdqe/', GetDQEView.as_view()),
+    path('deldqe/',DelDQEByID.as_view()),
+    path('updatedqe/<str:pk>/',UpdateDQEApiVew.as_view()),
+
     path('getnt/',GetNTView.as_view()),
     path('getmdqe/<str:marche>/',GetDQEbyId.as_view())
 
