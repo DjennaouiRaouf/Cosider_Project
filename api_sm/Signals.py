@@ -85,16 +85,23 @@ def pre_save_attachements(sender, instance, **kwargs):
         attachements=Attachements.objects.filter(dqe=instance.dqe)
         if(attachements): #courant
             previous=attachements.latest('date')
-            print(previous.qte_cumule)
             instance.qte_precedente = previous.qte_cumule
             instance.qte_cumule =instance.qte_precedente+instance.qte_mois
-        else: #debut
+
+            instance.montant_precedent = instance.qte_precedente * instance.dqe.prix_u
+
+
+            instance.montant_mois= instance.qte_mois * instance.dqe.prix_u
+            instance.montant_cumule = instance.qte_cumule * instance.dqe.prix_u
+
+
+    else: #debut
             instance.qte_precedente=0
             instance.qte_cumule=instance.qte_precedente+instance.qte_mois
+            instance.montant_precedent = instance.qte_precedente * instance.dqe.prix_u
+            instance.montant_mois =instance.qte_mois * instance.dqe.prix_u
 
-        instance.montant_precedent = instance.qte_precedente * instance.dqe.prix_u
-        instance.montant = instance.instance.qte_mois * instance.dqe.prix_u
-        instance.montant_cumule = instance.qte_cumule * instance.dqe.prix_u
+            instance.montant_cumule = instance.qte_cumule * instance.dqe.prix_u
 
 
 
