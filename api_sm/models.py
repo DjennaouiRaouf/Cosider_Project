@@ -447,7 +447,7 @@ class FactureRG(SafeDeleteModel):
 
 class Factures(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    numero_facture=models.PositiveBigIntegerField(primary_key=True)
+    numero_facture=models.CharField(max_length=800,primary_key=True)
     marche=models.ForeignKey(Marche,on_delete=models.DO_NOTHING,null=True)
     du = models.DateField()
     au = models.DateField()
