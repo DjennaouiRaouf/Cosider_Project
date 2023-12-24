@@ -1,9 +1,11 @@
 from django.contrib.auth.models import User
 from rest_framework import permissions
 from rest_framework.exceptions import PermissionDenied
-
-
-
+from decimal import Decimal
+from _decimal import InvalidOperation
+def unhumanize(value):
+    cleaned_value = value.replace(',', '.').replace('\xa0', '')
+    return Decimal(cleaned_value)
 
 
 class AddClientPermission(permissions.BasePermission):

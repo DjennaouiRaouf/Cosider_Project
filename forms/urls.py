@@ -26,5 +26,7 @@ urlpatterns = [
     path('ntfields/',NTFieldsApiView.as_view()),
     path('ntfieldsstate/',NTFieldsApiView.as_view()),
 
+    path('facturefields/', FactureFieldsApiView.as_view()),
+
 
 ]

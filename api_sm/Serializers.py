@@ -1,6 +1,8 @@
 from django.contrib.humanize.templatetags import humanize
 from rest_framework import serializers
 from api_sm.models import *
+from api_sm.tools import unhumanize
+
 
 def create_dynamic_serializer(model_class):
     class DynamicModelSerializer(serializers.ModelSerializer):
@@ -176,5 +178,27 @@ class MarcheSerializer(serializers.ModelSerializer):
 
 
 
+
+
+
+class FactureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Factures
+        fields='__all__'
+
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('deleted', None)
+        fields.pop('deleted_by_cascade', None)
+
+        return fields
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+
+        return representation
 
 

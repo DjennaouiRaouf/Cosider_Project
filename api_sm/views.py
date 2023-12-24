@@ -236,4 +236,6 @@ class UpdateDQEApiVew(generics.UpdateAPIView):
 
 
 
-
+class AddFactureApiView(generics.CreateAPIView):
+    queryset = Factures.objects.all()
+    serializer_class = FactureSerializer

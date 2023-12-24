@@ -33,6 +33,10 @@ urlpatterns = [
     path('updatedqe/<str:pk>/',UpdateDQEApiVew.as_view()),
 
     path('getnt/',GetNTView.as_view()),
-    path('getmdqe/<str:marche>/',GetDQEbyId.as_view())
+    path('getmdqe/<str:marche>/',GetDQEbyId.as_view()),
+
+
+
+    path('addfacture/',AddFactureApiView.as_view()),
 
 ]

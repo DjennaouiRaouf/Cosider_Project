@@ -104,7 +104,10 @@ class DQEFieldsStateApiView(APIView):
         else:
             update_dqe=DQESerializer(dqe).data
             for field_name, field_instance in fields.items():
-                default_value = update_dqe[field_name]
+                if(field_name in ['prix_u','quantite']):
+                    default_value = unhumanize(update_dqe[field_name])
+                else:
+                    default_value = update_dqe[field_name]
                 field_info.append({
                     field_name:default_value ,
 
@@ -424,6 +427,45 @@ class NTFieldsApiView(APIView):
         flag = request.query_params.get('flag', None)
         if flag == 'l' or flag == 'f':
             serializer = NTSerializer()
+            fields = serializer.get_fields()
+            if (flag == 'f'):  # react form
+                field_info = []
+                for field_name, field_instance in fields.items():
+                    obj = {
+                        'name': field_name,
+                        'type': str(field_instance.__class__.__name__),
+                        'label': field_instance.label or field_name,
+                    }
+                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                        obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+
+                    field_info.append(obj)
+
+
+            if (flag == 'l'):  # data grid list (react ag-grid)
+                field_info = []
+                for field_name, field_instance in fields.items():
+                    field_info.append({
+                        'field': field_name,
+                        'headerName': field_instance.label or field_name,
+                        'info': str(field_instance.__class__.__name__),
+                    })
+
+            return Response({'fields': field_info}, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class FactureFieldsApiView(APIView):
+    def get(self, request):
+        flag = request.query_params.get('flag', None)
+        if flag == 'l' or flag == 'f':
+            serializer = FactureSerializer()
             fields = serializer.get_fields()
             if (flag == 'f'):  # react form
                 field_info = []
