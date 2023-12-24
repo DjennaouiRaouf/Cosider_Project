@@ -446,6 +446,7 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
     list_display=("dqe","qte_precedente","qte_mois","qte_cumule","prix_u","montant_prec",'montant_m','montant_c','date')
     list_filter = (SafeDeleteAdminFilter,)
 
+
     def prix_u(self,obj):
         return humanize.intcomma(obj.dqe.prix_u)
     def montant_prec(self,obj):
