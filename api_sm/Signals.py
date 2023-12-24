@@ -126,9 +126,11 @@ def pre_save_attachements(sender, instance, **kwargs):
 
 
 
-
-
-
+'''
+@receiver(post_save, sender=Factures)
+def post_save_facture(sender, instance, created, **kwargs):
+    
+'''
 
 
 
