@@ -443,9 +443,11 @@ class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
 @admin.register(Attachements)
 class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
-    list_display=("qte_precedente","qte_mois","qte_cumule","montant_precedent",'montant_mois','montant_cumule',)
+    list_display=("dqe","qte_precedente","qte_mois","qte_cumule","prix_u","montant_precedent",'montant_mois','montant_cumule','date')
     list_filter = (SafeDeleteAdminFilter,)
 
+    def prix_u(self,obj):
+        return humanize.intcomma(obj.dqe.prix_u)
     def get_import_formats(self):
         formats = (
             base_formats.XLSX,
