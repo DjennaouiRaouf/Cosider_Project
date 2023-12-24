@@ -77,7 +77,7 @@ def pre_save_marche(sender, instance, **kwargs):
 
 
 
-#attechements (décompte)
+#attechements (décompte provisoir)
 
 @receiver(pre_save, sender=Attachements)
 def pre_save_attachements(sender, instance, **kwargs):
