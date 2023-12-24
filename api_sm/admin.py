@@ -451,7 +451,6 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
 
     def montant_prec(self,obj):
         return humanize.intcomma(obj.montant_precedent)
-
     def montant_m(self,obj):
         return humanize.intcomma(obj.montant_mois)
     def montant_c(self,obj):
