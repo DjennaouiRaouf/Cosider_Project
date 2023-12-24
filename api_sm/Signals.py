@@ -76,6 +76,33 @@ def pre_save_marche(sender, instance, **kwargs):
 
 
 
+#attechements (décompte)
+
+@receiver(pre_save, sender=Attachements)
+def pre_save_attachements(sender, instance, **kwargs):
+    attachements=Attachements.objects.filter(dqe=instance.dqe)
+    if(attachements): #courant
+        previous=attachements.latest('date')
+        instance.qte_precedente = previous.qte_cumule
+        instance.qte_cumule =instance.qte_precedente+instance.qte_mois
+        #montant = montant*prix_unitaire
+
+    else: #debut
+        instance.qte_precedente=0
+        instance.qte_cumule=instance.qte_precedente+instance.qte_mois
+        # montant = montant*prix_unitaire
+
+
+
+
+
+
+
+
+
+
+
+
 
 #attechements (décompte provisoir)
 
