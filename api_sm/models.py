@@ -478,11 +478,14 @@ class Factures(SafeDeleteModel):
     date = models.DateField(auto_now=True, editable=False)
     heure = models.TimeField(auto_now=True, editable=False)
     montant_precedent=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                          editable=False)
+                                          verbose_name="Montant precedent"
+                                          ,editable=False)
     montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                      editable=False)
+                                      verbose_name="Montant du mois"
+                                      ,editable=False)
     montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         editable=False)
+                                         verbose_name="Montant du cumulé"
+                                         ,editable=False)
     objects = DeletedModelManager()
 
 
