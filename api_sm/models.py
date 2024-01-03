@@ -467,29 +467,26 @@ class Attachements(SafeDeleteModel):
 class FactureRG(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
-class Factures(models.Model):
+class Factures(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     numero_facture=models.CharField(max_length=800,primary_key=True,verbose_name='Numero de facture')
     marche=models.ForeignKey(Marche,on_delete=models.DO_NOTHING,null=False,verbose_name='Marche',to_field="id")
-    est_annule=models.BooleanField(default=False,null=False)
     du = models.DateField(null=False,verbose_name='Du')
     au = models.DateField(null=False,verbose_name='Au')
     paye = models.BooleanField(default=False, null=False,editable=False)
     date = models.DateField(auto_now=True, editable=False)
     heure = models.TimeField(auto_now=True, editable=False)
     montant_precedent=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                          verbose_name="Montant precedent"
+                                          verbose_name="Montant Precedent"
                                           ,editable=False)
     montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                      verbose_name="Montant du mois"
+                                      verbose_name="Montant du Mois"
                                       ,editable=False)
     montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         verbose_name="Montant cumulé"
+                                         verbose_name="Montant Cumulé"
                                          ,editable=False)
+    objects = DeletedModelManager()
 
-    def delete(self, *args, **kwargs):
-        self.est_annule=True
-        super().save(*args, **kwargs)
 
 
     class Meta:
@@ -498,7 +495,7 @@ class Factures(models.Model):
 
 class DetailFacture(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=False,blank=True)
+    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=False,blank=True,to_field="numero_facture")
     detail=models.ForeignKey(Attachements,on_delete=models.DO_NOTHING)
     objects = DeletedModelManager()
 

@@ -124,15 +124,12 @@ def pre_save_factures(sender, instance, **kwargs):
         instance.montant_precedent = sum["montant_precedent__sum"]
         instance.montant_mois = sum["montant_mois__sum"]
         instance.montant_cumule = sum["montant_cumule__sum"]
-        if (instance.est_annule):
-            instance.numero_facture = 'C-' + instance.numero_facture
+
 
 
 
 @receiver(post_save, sender=Factures)
 def post_save_facture(sender, instance, created, **kwargs):
-    if (instance.est_annule):
-        instance.numero_facture = 'C-' + instance.numero_facture
     if created:
         debut = instance.du
         fin = instance.au
@@ -142,6 +139,12 @@ def post_save_facture(sender, instance, created, **kwargs):
                 facture=instance,
                 detail=d
             ).save()
+
+
+@receiver(post_softdelete, sender=Factures)
+def update_on_softdelete(sender, instance, **kwargs):
+    pass
+
 
 @receiver(pre_save, sender=DetailFacture)
 def pre_save_detail_facture(sender, instance, **kwargs):
