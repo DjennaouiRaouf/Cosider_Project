@@ -31,7 +31,6 @@ class Images(SafeDeleteModel):
 
 class TabUniteDeMesure(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    id = models.PositiveBigIntegerField(db_column='Code_Unite_Mesure', primary_key=True,editable=False)
     libelle = models.CharField(db_column='Symbole_Unite', max_length=10, blank=True, null=True)
     description = models.CharField(db_column='Libelle_Unite', max_length=50, blank=True, null=True)
     objects = DeletedModelManager()
@@ -145,6 +144,7 @@ class SituationNt(SafeDeleteModel):
 
 
 
+
 class NT(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     id=models.CharField(db_column='id',max_length=500,primary_key=True,verbose_name="id",editable=False)
@@ -174,6 +174,8 @@ class NT(SafeDeleteModel):
 
 
 
+
+
 class Marche(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
@@ -181,8 +183,8 @@ class Marche(SafeDeleteModel):
     nt = models.ForeignKey(NT, on_delete=models.DO_NOTHING, db_column='nt', null=False
                            , verbose_name='Numero Travail',to_field="id")
 
-    num_avenant = models.PositiveIntegerField(default=0, null=False, editable=False
-                                              , verbose_name='Avenant Numero')
+
+
     libelle = models.CharField(null=False, blank=True, max_length=500
                                , verbose_name='Libelle')
     ods_depart = models.DateField(null=False, blank=True
@@ -208,14 +210,27 @@ class Marche(SafeDeleteModel):
                                               , verbose_name='Retenue de garantie')
     code_contrat = models.CharField(null=False, blank=True, max_length=20, verbose_name='Code du contrat')
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
+    history=HistoricalRecords()
     objects = DeletedModelManager()
 
     def __str__(self):
         return self.id
 
+    def save_without_historical_record(self, *args, **kwargs):
+        self.skip_history_when_saving = True
+        try:
+            ret = self.save(*args, **kwargs)
+        finally:
+            del self.skip_history_when_saving
+        return ret
 
-    def save(self, *args, **kwargs):
-        super(Marche, self).save(*args, **kwargs)
+    def save_with_historical_record(self, *args, **kwargs):
+        self.skip_history_when_saving = False
+        try:
+            ret = self.save(*args, **kwargs)
+        finally:
+            del self.skip_history_when_saving
+        return ret
 
 
 class Meta:
@@ -232,6 +247,8 @@ class DQE(SafeDeleteModel): # le prix final
     id=models.CharField(db_column='id',max_length=500,primary_key=True,verbose_name="id",editable=False)
     marche = models.ForeignKey(Marche,on_delete=models.DO_NOTHING,  null=False,related_name="marche_dqe",
                                to_field="id",verbose_name="Code du marché")
+
+
     code_tache = models.CharField(db_column='Code_Tache',null=False, max_length=30
                                   ,verbose_name="Code de la tache")
     libelle = models.TextField(db_column='Libelle_Tache',verbose_name="Libelle")
@@ -257,18 +274,16 @@ class DQE(SafeDeleteModel): # le prix final
 
     quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantité')
 
+    history=HistoricalRecords()
     objects = DeletedModelManager()
 
 
     def __str__(self):
         return (str(self.marche) + " " + self.code_tache)
 
-
-
     class Meta:
         verbose_name = 'DQE'
         verbose_name_plural = 'DQE'
-        unique_together = (("marche", "code_tache",))
 
 
 
@@ -417,11 +432,15 @@ class Cautions(SafeDeleteModel):
 class Attachements(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     dqe = models.ForeignKey(DQE, on_delete=models.DO_NOTHING)# item + quantité marche + prix unitaire
+
     qte_precedente = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                          editable=False)
     qte_mois = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
     qte_cumule= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                     editable=False)
+
+    prix_u = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                     editable=False)
     montant_precedent=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                           editable=False)
     montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
@@ -429,13 +448,16 @@ class Attachements(SafeDeleteModel):
     montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                          editable=False)
     date=models.DateField(null=False)
+    heure=models.TimeField(auto_now=True,editable=False)
 
     objects = DeletedModelManager()
 
 
     def __str__(self):
-        return  self.dqe.libelle
+        return  str(self.id)+"-"+self.dqe.code_tache
 
+    def save(self, *args, **kwargs):
+        super(Attachements, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Attachements'
@@ -447,24 +469,24 @@ class FactureRG(SafeDeleteModel):
 
 class Factures(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    numero_facture=models.CharField(max_length=800,primary_key=True)
-    marche=models.ForeignKey(Marche,on_delete=models.DO_NOTHING,null=True)
-    du = models.DateField()
-    au = models.DateField()
+    numero_facture=models.CharField(max_length=800,primary_key=True,verbose_name='Numero de facture')
+    marche=models.ForeignKey(Marche,on_delete=models.DO_NOTHING,null=False,verbose_name='Marche',to_field="id")
+    du = models.DateField(null=False,verbose_name='Du')
+    au = models.DateField(null=False,verbose_name='Au')
+
     paye = models.BooleanField(default=False, null=False,editable=False)
-
+    date = models.DateField(auto_now=True, editable=False)
+    heure = models.TimeField(auto_now=True, editable=False)
+    montant_precedent=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                          editable=False)
+    montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                      editable=False)
+    montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                         editable=False)
     objects = DeletedModelManager()
-    @property
-    def montant_global(self):  # paiement complet ou incomplet
-        df=DetailFacture.objects.filter(facture=self)
-        mg=0
-        for d in df:
-            mg+=d.detail.montant_final
-        return round(mg,2)
 
 
-    def delete(self, *args, **kwargs):
-       super(Factures, self).delete(*args, **kwargs)
+
 
     class Meta:
         verbose_name = 'Factures'
@@ -474,14 +496,13 @@ class DetailFacture(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=False,blank=True)
     detail=models.ForeignKey(Attachements,on_delete=models.DO_NOTHING)
-
     objects = DeletedModelManager()
 
 
     class Meta:
         verbose_name = 'Datails Facture'
         verbose_name_plural = 'Details Facture'
-        unique_together=(("facture","detail"),)
+
 
 class Encaissement(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
@@ -496,6 +517,7 @@ class Encaissement(SafeDeleteModel):
     numero_piece = models.CharField(max_length=300,null=False)
     objects = DeletedModelManager()
 
+    '''
     def save(self, *args, **kwargs):
         sum = Encaissement.objects.filter(facture=self.facture).aggregate(models.Sum('montant_encaisse'))[
             "montant_encaisse__sum"]
@@ -507,7 +529,7 @@ class Encaissement(SafeDeleteModel):
             super(Encaissement, self).save(*args, **kwargs)
         else:
             raise ValidationError('Le paiement de la facture est terminer')
-
+    '''
 
 
     class Meta:

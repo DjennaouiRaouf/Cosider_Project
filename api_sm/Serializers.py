@@ -171,7 +171,6 @@ class MarcheSerializer(serializers.ModelSerializer):
         representation['ttc'] = humanize.intcomma(instance.ttc)
         representation['code_site'] = instance.nt.code_site.id
         representation['nt'] = instance.nt.nt
-        representation['num_avenant']=instance.num_avenant
 
 
         return representation
@@ -182,6 +181,7 @@ class MarcheSerializer(serializers.ModelSerializer):
 
 
 class FactureSerializer(serializers.ModelSerializer):
+
     class Meta:
         model=Factures
         fields='__all__'
@@ -191,6 +191,7 @@ class FactureSerializer(serializers.ModelSerializer):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
         fields.pop('deleted_by_cascade', None)
+
 
         return fields
 

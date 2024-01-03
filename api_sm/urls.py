@@ -38,5 +38,6 @@ urlpatterns = [
 
 
     path('addfacture/',AddFactureApiView.as_view()),
+    path('getfacture/',GetFacture.as_view()),
 
 ]

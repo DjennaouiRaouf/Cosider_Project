@@ -214,7 +214,11 @@ class GetDQEbyId(generics.ListAPIView):
     serializer_class = DQESerializer
     lookup_field = 'marche'
 
-
+class GetFacture(generics.ListAPIView):
+    queryset = Factures.objects.all()
+    serializer_class = FactureSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = FactureFilter
 
 class DelDQEByID(generics.DestroyAPIView,DestroyModelMixin):
     queryset = DQE.objects.all()
@@ -236,6 +240,22 @@ class UpdateDQEApiVew(generics.UpdateAPIView):
 
 
 
+
 class AddFactureApiView(generics.CreateAPIView):
     queryset = Factures.objects.all()
     serializer_class = FactureSerializer
+
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        self.perform_create(serializer)
+        custom_response = {
+            'status': 'success',
+            'message': 'Facture ajoutée',
+            'data': serializer.data,
+        }
+
+        return Response(custom_response, status=status.HTTP_201_CREATED)
+

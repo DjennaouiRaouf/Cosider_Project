@@ -5,7 +5,7 @@ from django.contrib.humanize.templatetags import humanize
 from django.utils.html import format_html
 from django_admin_relation_links import AdminChangeLinksMixin
 from djangoql.admin import DjangoQLSearchMixin
-from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportModelAdmin, ExportMixin
 from import_export.formats import base_formats
 from safedelete.admin import SafeDeleteAdmin, SafeDeleteAdminFilter
 from simple_history.admin import SimpleHistoryAdmin
@@ -210,29 +210,29 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
     save_as=True
     list_per_page = lp
     resource_class = DQEResource
-    list_display = ("marche","code_tache","libelle","unite","quantite","pu","pq",)
+    list_display = ('id',"marche","code_tache","libelle","unite","quantite","prix_unitaire","prix_quntite",)
+    history_list_display = ("marche","code_tache","libelle",'unite',"quantite","prix_unitaire","prix_quntite",)
     list_filter = (SafeDeleteAdminFilter,
 
                    )
-    search_fields = ('marche__id','marche__num_avenant')
+    search_fields = ('marche__id',)
 
+    def num_avenant(self,obj):
+        return obj.marche.num_avenant
 
-    def pu(self,obj):
+    def prix_unitaire(self,obj):
         return humanize.intcomma(obj.prix_u)
 
-    pu.short_description="Prix unitaire"
-    def pq(self,obj):
+    prix_unitaire.short_description="Prix unitaire"
+    def prix_quntite(self,obj):
         return humanize.intcomma(obj.prix_q)
-    pq.short_description = "Prix quantite"
-    def unite(self,obj):
-        return obj.unite.libelle
+    prix_quntite.short_description = "Prix quantite"
+
 
     def id(self,obj):
-        return obj.marche.nt.id.id
+        return obj.marche.nt.id
     def numero_t(self,obj):
         return  obj.marche.nt.nt
-    def avenant (self,obj):
-        return  obj.marche.num_avenant
 
     def get_import_formats(self):
 
@@ -269,14 +269,16 @@ class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,Simp
     save_as = True
     list_per_page = lp
     resource_class = MarcheResource
-    list_display = ('id','nt_link','num_avenant','libelle' ,'ods_depart' ,'delais','pht' ,'pttc' ,'revisable','rg' ,'rabais'
+    history_list_display = ('nt','libelle' ,'ods_depart' ,'delais','pht' ,'pttc' ,'revisable','rg' ,'rabais'
+    ,'tva','date_signature')
+    list_display = ('id','nt_link','libelle' ,'ods_depart' ,'delais','pht' ,'pttc' ,'revisable','rg' ,'rabais'
     ,'tva','date_signature')
 
 
     list_filter = (SafeDeleteAdminFilter,
 
                    )
-    search_fields = ('nt__nt','id','num_avenant')
+    search_fields = ('nt__nt','id')
     change_links = ('nt',)
 
     def pht(self,obj):
@@ -443,11 +445,13 @@ class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
 @admin.register(Attachements)
 class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
-    list_display=("dqe","qte_precedente","qte_mois","qte_cumule","prix_u","montant_prec",'montant_m','montant_c','date')
+    list_display=("dqe",'qte_contr',"qte_precedente","qte_mois","qte_cumule","prix_u","montant_prec",'montant_m','montant_c','date','heure')
     list_filter = (SafeDeleteAdminFilter,)
 
     def prix_u(self,obj):
         return humanize.intcomma(obj.dqe.prix_u)
+    def qte_contr(self,obj):
+        return obj.dqe.quantite
     def montant_prec(self,obj):
         return humanize.intcomma(obj.montant_precedent)
     def montant_m(self,obj):
@@ -498,10 +502,15 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
 
 @admin.register(Factures)
 class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
-    list_display = ('numero_facture','du','au','montant_global',
+    list_display = ('numero_facture','du','au',"montant_prec",'montant_m','montant_c','date',"heure",
                     'etat')
     list_filter = (SafeDeleteAdminFilter,)
-
+    def montant_prec(self,obj):
+        return humanize.intcomma(obj.montant_precedent)
+    def montant_m(self,obj):
+        return humanize.intcomma(obj.montant_mois)
+    def montant_c(self,obj):
+        return humanize.intcomma(obj.montant_cumule)
     def get_import_formats(self):
 
         formats = (
@@ -538,9 +547,10 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
 
 
 @admin.register(DetailFacture)
-class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
-    list_display = ("numero_facture","detail_designation","detail_estimation","detail_montant_rg","detail_montant_rb","detail_montant")
-    list_filter = (SafeDeleteAdminFilter,)
+class DetailFactureAdmin(SimpleHistoryAdmin,ExportMixin,admin.ModelAdmin):
+    list_display = ("numero_facture","code_tache","detail_designation","montant_precedent","montant_mois"
+                    ,"montant_cumule")
+
 
     def get_import_formats(self):
         formats = (
@@ -558,15 +568,30 @@ class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdm
             return False
         return super().has_change_permission(request, obj)
 
- 
+    def has_delete_permission(self, request, obj=None):
+        return False
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def montant_precedent(self,obj):
+        return humanize.intcomma(obj.detail.montant_precedent)
+    def montant_mois(self,obj):
+        return humanize.intcomma(obj.detail.montant_mois)
+    def montant_cumule(self,obj):
+        return humanize.intcomma(obj.detail.montant_cumule)
 
     def numero_facture(self, obj):
         return obj.facture.numero_facture
     def detail_designation(self,obj):
         return obj.detail.dqe.libelle
 
-    def detail_estimation(self, obj):
-        return obj.detail.montant_estime
+    def code_tache(self,obj):
+        return obj.detail.dqe.code_tache
+
+
     def detail_montant_rg(self, obj):
         return obj.detail.montant_rg
     def detail_montant_rb(self, obj):
@@ -578,7 +603,7 @@ class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdm
 
 class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
 
-    list_display = ('numero_facture','date_encaissement','mode_paiement','montant_facture','montant_encaisse','montant_creance')
+    list_display = ('numero_facture','date_encaissement','mode_paiement','montant_encaisse','montant_creance')
     save_as = True
     list_filter = (SafeDeleteAdminFilter,)
 
@@ -598,12 +623,9 @@ class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
             return False
         return super().has_change_permission(request, obj)
 
- 
 
     def numero_facture(self, obj):
         return obj.facture.numero_facture
-    def montant_facture(self,obj):
 
-        return obj.facture.montant_global
 
 admin.site.register(Encaissement, EncaissementAmin)

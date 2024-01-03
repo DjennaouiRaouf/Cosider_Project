@@ -59,17 +59,17 @@ class DQEFieldsFilterApiView(APIView):
         field_info = []
         for field_name, field_instance in fields.items():
             if field_name in filter_fields:
-                if(field_name!='marche'):
-                    obj = {
-                        'name': field_name,
-                        'type': str(field_instance.__class__.__name__),
-                        'label': field_instance.label or field_name,
-                    }
-                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
-                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                        obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
 
-                    field_info.append(obj)
+                obj = {
+                       'name': field_name,
+                       'type': str(field_instance.__class__.__name__),
+                    'label': field_instance.label or field_name,
+                }
+                if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                     anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                     obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+
+                field_info.append(obj)
 
         return Response({'fields': field_info},status=status.HTTP_200_OK)
 
@@ -86,36 +86,38 @@ class DQEFieldsStateApiView(APIView):
             dqe = None
         if(dqe == None):
             for field_name, field_instance in fields.items():
-                default_value = ''
-                if str(field_instance.__class__.__name__) == 'BooleanField':
-                    default_value= False
-                if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
-                                                              'IntegerField',]:
-                    default_value = 0
+                if (not field_name in ['prix_q']):
+                    default_value = ''
+                    if str(field_instance.__class__.__name__) == 'BooleanField':
+                        default_value= False
+                    if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
+                                                                  'IntegerField',]:
+                        default_value = 0
 
-                field_info.append({
-                    field_name:default_value ,
+                    field_info.append({
+                        field_name:default_value ,
 
-                })
-                state = {}
+                    })
+                    state = {}
 
-                for d in field_info:
-                    state.update(d)
+                    for d in field_info:
+                        state.update(d)
         else:
             update_dqe=DQESerializer(dqe).data
             for field_name, field_instance in fields.items():
-                if(field_name in ['prix_u','quantite']):
-                    default_value = unhumanize(update_dqe[field_name])
-                else:
-                    default_value = update_dqe[field_name]
-                field_info.append({
-                    field_name:default_value ,
+                if(not field_name in ['prix_q'] ):
+                    if(field_name in ['prix_u','quantite']):
+                        default_value = unhumanize(update_dqe[field_name])
+                    else:
+                        default_value = update_dqe[field_name]
+                    field_info.append({
+                        field_name:default_value ,
 
-                })
-                state = {}
+                    })
+                    state = {}
 
-                for d in field_info:
-                    state.update(d)
+                    for d in field_info:
+                        state.update(d)
 
         return Response({'state': state}, status=status.HTTP_200_OK)
 
@@ -131,16 +133,18 @@ class DQEFieldsApiView(APIView):
             if(flag=='f'): # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    obj = {
-                        'name': field_name,
-                        'type': str(field_instance.__class__.__name__),
-                        'label': field_instance.label or field_name,
-                    }
-                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
-                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                        obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                    print(field_name)
+                    if (not field_name in ['prix_q']):
+                        obj = {
+                            'name': field_name,
+                            'type': str(field_instance.__class__.__name__),
+                            'label': field_instance.label or field_name,
+                        }
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                            anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                            obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
 
-                    field_info.append(obj)
+                        field_info.append(obj)
 
             if(flag=='l'): #data grid list (react ag-grid)
                 field_info = []
@@ -188,7 +192,7 @@ class MarcheFieldsStateApiView(APIView):
         field_info = []
         for field_name, field_instance in fields.items():
             default_value = ''
-            if (field_name not in ['id', 'num_avenant']):
+            if (field_name not in ['id', ]):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                     default_value= ''
                 if str(field_instance.__class__.__name__) == 'BooleanField':
@@ -223,7 +227,7 @@ class MarcheFieldsApiView(APIView):
                 print(fields)
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if(field_name not in ['id','num_avenant']):
+                    if(field_name not in ['id',]):
                         obj={
                             'name':field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -467,19 +471,22 @@ class FactureFieldsApiView(APIView):
         if flag == 'l' or flag == 'f':
             serializer = FactureSerializer()
             fields = serializer.get_fields()
+
             if (flag == 'f'):  # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    obj = {
-                        'name': field_name,
-                        'type': str(field_instance.__class__.__name__),
-                        'label': field_instance.label or field_name,
-                    }
-                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
-                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                        obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                    if( not field_name in ['paye','montant_mois','montant_precedent','montant_cumule','date','heure',"marche"] ):
+                        obj = {
+                            'name': field_name,
+                            'type': str(field_instance.__class__.__name__),
+                            'label': field_instance.label or field_name,
+                        }
 
-                    field_info.append(obj)
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                            anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                            obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+
+                        field_info.append(obj)
 
 
             if (flag == 'l'):  # data grid list (react ag-grid)
@@ -499,3 +506,53 @@ class FactureFieldsApiView(APIView):
 
 
 
+class FactureFieldsStateApiView(APIView):
+    def get(self, request):
+        serializer = FactureSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        for field_name, field_instance in fields.items():
+            default_value = ''
+            if (field_name not in  ['paye','montant_mois','montant_precedent','montant_cumule','date','heure',"marche"]):
+                if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
+                    default_value= ''
+                if str(field_instance.__class__.__name__) == 'BooleanField':
+                    default_value= True
+
+                if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
+                                                              'IntegerField',]:
+                    default_value = 0
+
+                field_info.append({
+                    field_name:default_value ,
+
+                })
+
+
+                state = {}
+
+            for d in field_info:
+                state.update(d)
+        return Response({'state': state}, status=status.HTTP_200_OK)
+
+
+class FactureFieldsFilterApiView(APIView):
+    def get(self,request):
+        filter_fields = list(FactureFilter.base_filters.keys())
+        serializer = FactureSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        for field_name, field_instance in fields.items():
+            if field_name in filter_fields:
+
+                obj = {
+                    'name': field_name,
+                    'type': str(field_instance.__class__.__name__),
+                    'label': field_instance.label or field_name,
+                }
+                if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                    anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                    obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                field_info.append(obj)
+
+        return Response({'fields': field_info},status=status.HTTP_200_OK)
