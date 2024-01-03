@@ -501,10 +501,10 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
 
 
 @admin.register(Factures)
-class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
-    list_display = ('numero_facture','du','au',"montant_prec",'montant_m','montant_c','date',"heure",
+class FacturesAdmin(SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+    list_display = ('numero_facture','du','au',"montant_prec",'montant_m','montant_c','date',"heure",'paiement_effectue',
                     'etat')
-    list_filter = (SafeDeleteAdminFilter,)
+    list_filter = ('est_annule',)
     def montant_prec(self,obj):
         return humanize.intcomma(obj.montant_precedent)
     def montant_m(self,obj):
@@ -524,14 +524,11 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
             base_formats.XLSX,
         )
         return [f for f in formats if f().can_export()]
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
+
 
  
 
-    def etat(self, obj):
+    def paiement_effectue(self, obj):
         if obj.paye == True:
             return format_html(
                 '''
@@ -545,6 +542,19 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
                 '''
             )
 
+    def etat(self, obj):
+        if obj.est_annule == True:
+            return format_html(
+                '''
+               <img src="/static/admin/img/icon-yes.svg" alt="True">
+                '''
+            )
+        if obj.est_annule == False:
+            return format_html(
+                '''
+               <img src="/static/admin/img/icon-no.svg" alt="False">
+                '''
+            )
 
 @admin.register(DetailFacture)
 class DetailFactureAdmin(SimpleHistoryAdmin,ExportMixin,admin.ModelAdmin):

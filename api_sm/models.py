@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from safedelete import SOFT_DELETE_CASCADE, DELETED_VISIBLE_BY_PK, SOFT_DELETE
+from safedelete import SOFT_DELETE_CASCADE, DELETED_VISIBLE_BY_PK, SOFT_DELETE, HARD_DELETE
 from safedelete.managers import SafeDeleteManager
 from safedelete.models import SafeDeleteModel
 from simple_history.models import HistoricalRecords
@@ -467,13 +467,13 @@ class Attachements(SafeDeleteModel):
 class FactureRG(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
-class Factures(SafeDeleteModel):
+class Factures(models.Model):
     _safedelete_policy = SOFT_DELETE_CASCADE
     numero_facture=models.CharField(max_length=800,primary_key=True,verbose_name='Numero de facture')
     marche=models.ForeignKey(Marche,on_delete=models.DO_NOTHING,null=False,verbose_name='Marche',to_field="id")
+    est_annule=models.BooleanField(default=False,null=False)
     du = models.DateField(null=False,verbose_name='Du')
     au = models.DateField(null=False,verbose_name='Au')
-
     paye = models.BooleanField(default=False, null=False,editable=False)
     date = models.DateField(auto_now=True, editable=False)
     heure = models.TimeField(auto_now=True, editable=False)
@@ -486,9 +486,10 @@ class Factures(SafeDeleteModel):
     montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                          verbose_name="Montant cumulé"
                                          ,editable=False)
-    objects = DeletedModelManager()
 
-
+    def delete(self, *args, **kwargs):
+        self.est_annule=True
+        super().save(*args, **kwargs)
 
 
     class Meta:

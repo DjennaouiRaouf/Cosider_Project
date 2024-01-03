@@ -1,7 +1,10 @@
 # signals.py
+from datetime import datetime
+
 from django.db.models import Q
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
 from django.dispatch import *
+from safedelete.signals import post_softdelete, pre_softdelete
 from simple_history import register
 from simple_history.signals import pre_create_historical_record
 
@@ -121,22 +124,24 @@ def pre_save_factures(sender, instance, **kwargs):
         instance.montant_precedent = sum["montant_precedent__sum"]
         instance.montant_mois = sum["montant_mois__sum"]
         instance.montant_cumule = sum["montant_cumule__sum"]
+        if (instance.est_annule):
+            instance.numero_facture = 'C-' + instance.numero_facture
 
 
 
 @receiver(post_save, sender=Factures)
 def post_save_facture(sender, instance, created, **kwargs):
-    debut = instance.du
-    fin = instance.au
-    details = Attachements.objects.filter(dqe__marche=instance.marche, date__lte=fin, date__gte=debut)
-    for d in details:
-        DetailFacture(
-            facture=instance,
-            detail=d
-        ).save()
-
-
-
+    if (instance.est_annule):
+        instance.numero_facture = 'C-' + instance.numero_facture
+    if created:
+        debut = instance.du
+        fin = instance.au
+        details = Attachements.objects.filter(dqe__marche=instance.marche, date__lte=fin, date__gte=debut)
+        for d in details:
+            DetailFacture(
+                facture=instance,
+                detail=d
+            ).save()
 
 @receiver(pre_save, sender=DetailFacture)
 def pre_save_detail_facture(sender, instance, **kwargs):
