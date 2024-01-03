@@ -484,7 +484,7 @@ class Factures(SafeDeleteModel):
                                       verbose_name="Montant du mois"
                                       ,editable=False)
     montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         verbose_name="Montant du cumulé"
+                                         verbose_name="Montant cumulé"
                                          ,editable=False)
     objects = DeletedModelManager()
 
