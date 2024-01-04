@@ -91,7 +91,7 @@ class MarcheResource(resources.ModelResource):
             return None
     class Meta:
         model = Marche
-        exclude = ('code_marche','num_avenant','deleted', 'deleted_by_cascade')
+        exclude = ('code_marche','deleted', 'deleted_by_cascade')
 
 
 class ODSResource(resources.ModelResource):
@@ -113,6 +113,22 @@ class ODSResource(resources.ModelResource):
 class DQEResource(resources.ModelResource):
     prix_u = fields.Field(column_name='prix_u', attribute='prix_u', widget=FormattedPriceWidget())
     prix_q = fields.Field(column_name='prix_q', attribute='prix_q', widget=FormattedPriceWidget())
+
+    def get_instance(self, instance_loader, row):
+        try:
+            params = {}
+            for key in instance_loader.resource.get_import_id_fields():
+                field = instance_loader.resource.fields[key]
+                params[field.attribute] = field.clean(row)
+            return self.get_queryset().get(**params)
+        except Exception:
+            return None
+    class Meta:
+        model = DQE
+        exclude = ('id','deleted', 'deleted_by_cascade')
+
+class AvanceResource(resources.ModelResource):
+    montant = fields.Field(column_name='montant', attribute='montant', widget=FormattedPriceWidget())
 
     def get_instance(self, instance_loader, row):
         try:

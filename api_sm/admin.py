@@ -148,6 +148,18 @@ class SituationNTAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
     )
     list_filter = (SafeDeleteAdminFilter,)
 
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
 @admin.register(NT)
 class NTAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = NTResource
@@ -336,6 +348,29 @@ class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
 
  
 
+@admin.register(Avance)
+class  AvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+    resource=AvanceResource
+    list_display = ("marche", "type","montant_avance","client" )
+    list_filter = (SafeDeleteAdminFilter,)
+
+    def montant_avance(self,obj):
+        return humanize.intcomma(obj.montant)
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
 
 

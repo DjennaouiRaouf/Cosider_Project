@@ -432,6 +432,8 @@ class NTFieldsApiView(APIView):
         if flag == 'l' or flag == 'f':
             serializer = NTSerializer()
             fields = serializer.get_fields()
+            model_class = serializer.Meta.model
+            model_name = model_class.__name__
             if (flag == 'f'):  # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
@@ -456,7 +458,8 @@ class NTFieldsApiView(APIView):
                         'info': str(field_instance.__class__.__name__),
                     })
 
-            return Response({'fields': field_info}, status=status.HTTP_200_OK)
+            return Response({'fields': field_info,
+            'models': model_name, 'pk': NT._meta.pk.name}, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -468,14 +471,19 @@ class NTFieldsApiView(APIView):
 class FactureFieldsApiView(APIView):
     def get(self, request):
         flag = request.query_params.get('flag', None)
-        if flag == 'l' or flag == 'f':
+        if flag == 'l' or flag == 'f' or flag == 'p': #l : liste , p : print , f : form
             serializer = FactureSerializer()
             fields = serializer.get_fields()
 
+            model_class = serializer.Meta.model
+            model_name = model_class.__name__
             if (flag == 'f'):  # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if( not field_name in ['paye','montant_mois','montant_precedent','montant_cumule','date','heure',"marche"] ):
+                    if( not field_name in ['paye','montant_mois','montant_precedent','montant_cumule','date','heure',"marche",
+                                           'projet','code_contrat','client','pole','num_travail','lib_nt',
+                                           'somme','montant_rg','montant_taxe','montant_rb','a_payer','signature',
+                                           'montant_marche'] ):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -498,7 +506,10 @@ class FactureFieldsApiView(APIView):
                         'info': str(field_instance.__class__.__name__),
                     })
 
-            return Response({'fields': field_info}, status=status.HTTP_200_OK)
+
+
+            return Response({'fields': field_info,
+            'models': model_name, 'pk': Factures._meta.pk.name}, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

@@ -1,4 +1,5 @@
 from django.contrib.humanize.templatetags import humanize
+from num2words import num2words
 from rest_framework import serializers
 from api_sm.models import *
 from api_sm.tools import unhumanize
@@ -181,12 +182,23 @@ class MarcheSerializer(serializers.ModelSerializer):
 
 
 class FactureSerializer(serializers.ModelSerializer):
+    projet=serializers.CharField(source='marche.libelle',read_only=True,label="Projet")
+    code_contrat=serializers.CharField(source='marche.code_contrat',read_only=True,label="Contrat N°")
+    signature=serializers.CharField(source='marche.date_signature',read_only=True,label="Signature")
+    montant_marche = serializers.CharField(source='marche.ht', read_only=True, label="Montant du Marche")
+
+    client = serializers.CharField(source='marche.nt.code_client.id', read_only=True, label="Client")
+    pole = serializers.CharField(source='marche.nt.code_site.id', read_only=True, label="Pole")
+    num_travail=serializers.CharField(source='marche.nt.nt', read_only=True, label="Lumero du travail")
+    lib_nt = serializers.CharField(source='marche.nt.libelle', read_only=True, label="Libelle du travail")
+    somme=serializers.SerializerMethodField(label="Arretée la présenta facture à la somme de")
 
     class Meta:
         model=Factures
         fields='__all__'
 
-
+    def get_somme(self, obj):
+        return num2words(obj.a_payer, to='currency', lang='fr_DZ').upper()
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
@@ -198,8 +210,13 @@ class FactureSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        representation['montant_precedent'] = humanize.intcomma(instance.montant_precedent)
+        representation['montant_mois'] = humanize.intcomma(instance.montant_mois)
+        representation['montant_cumule'] = humanize.intcomma(instance.montant_cumule)
 
 
         return representation
 
 
+class FacturePrinterSerializer(serializers.ModelSerializer):
+     projet=serializers.CharField()

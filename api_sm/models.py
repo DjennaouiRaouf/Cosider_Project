@@ -196,8 +196,8 @@ class Marche(SafeDeleteModel):
     delai_paiement_f=models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
                                          null=True
                                                  , verbose_name='Delai de paiement')
-    rabais = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
-                                         null=False , verbose_name='Taux de rabais')
+    rabais =  models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='Rabais',
+                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     ht=models.DecimalField(default=0, max_digits=38, decimal_places=2,  verbose_name='Prix Hors taxe',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False,editable=False)
     ttc = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='Prix avec taxe',
@@ -375,17 +375,19 @@ class TypeAvance(SafeDeleteModel):
 
 class Avance(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Marche")
+    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Marche",to_field='id')
     type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False)
     montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
-    Client = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Client")
+    client = models.ForeignKey(Clients, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Client" ,to_field='id')
 
     objects = DeletedModelManager()
 
 
-    def save(self, *args, **kwargs):
-        super(Avance, self).save(*args, **kwargs)
 
+    class Meta:
+        verbose_name = 'Avance'
+        verbose_name_plural = 'Avances'
+        unique_together = (("marche", "type"),)
 
 
 
@@ -464,9 +466,6 @@ class Attachements(SafeDeleteModel):
         verbose_name_plural = 'Attachements'
 
 
-class FactureRG(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
-
 class Factures(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     numero_facture=models.CharField(max_length=800,primary_key=True,verbose_name='Numero de facture')
@@ -485,6 +484,20 @@ class Factures(SafeDeleteModel):
     montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                          verbose_name="Montant Cumulé"
                                          ,editable=False)
+
+    montant_rg=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                         verbose_name="Montant Retenue de garantie"
+                                         ,editable=False)
+
+    montant_taxe=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                         verbose_name="Montant Retenue de garantie"
+                                         ,editable=False)
+    montant_rb = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                       verbose_name="Montant Retenue de garantie"
+                                       , editable=False)
+    a_payer=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                         verbose_name="Net à Payer"
+                                         ,editable=False)
     objects = DeletedModelManager()
 
 
@@ -499,6 +512,18 @@ class DetailFacture(SafeDeleteModel):
     detail=models.ForeignKey(Attachements,on_delete=models.DO_NOTHING)
     objects = DeletedModelManager()
 
+    class FactureRG(SafeDeleteModel):
+        _safedelete_policy = SOFT_DELETE_CASCADE
+        facture = models.ForeignKey(Factures, on_delete=models.DO_NOTHING, null=False, blank=True,
+                                    to_field="numero_facture")
+        montant_rg= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)],
+                                                default=0,
+                                                verbose_name="Montant de la retenue de garantie"
+                                                , editable=False)
+
+        class Meta:
+            verbose_name = 'Factures'
+            verbose_name_plural = 'Factures'
 
     class Meta:
         verbose_name = 'Datails Facture'

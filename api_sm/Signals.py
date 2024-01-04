@@ -1,13 +1,14 @@
 # signals.py
+import sys
 from datetime import datetime
 
 from django.db.models import Q
 from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
 from django.dispatch import *
+from num2words import num2words
 from safedelete.signals import post_softdelete, pre_softdelete
 from simple_history import register
 from simple_history.signals import pre_create_historical_record
-
 from .models import *
 
 
@@ -120,10 +121,23 @@ def pre_save_factures(sender, instance, **kwargs):
             models.Sum('montant_precedent'),
             models.Sum('montant_mois'),
             models.Sum('montant_cumule'))
+        mm=sum["montant_mois__sum"]
+        mp=sum["montant_precedent__sum"]
+        mc=sum["montant_cumule__sum"]
+        instance.montant_precedent = mp
+        instance.montant_mois = mm
+        instance.montant_cumule = mc
 
-        instance.montant_precedent = sum["montant_precedent__sum"]
-        instance.montant_mois = sum["montant_mois__sum"]
-        instance.montant_cumule = sum["montant_cumule__sum"]
+        instance.montant_rg= mm * (instance.marche.rg/100)
+        instance.montant_taxe = mm * (instance.marche.tva / 100)
+        instance.montant_rb = mm * (instance.marche.rabais / 100)
+
+        instance.a_payer=mm-instance.montant_rg-instance.montant_rb+instance.montant_taxe
+
+
+
+
+
 
 
 
@@ -140,16 +154,19 @@ def post_save_facture(sender, instance, created, **kwargs):
                 detail=d
             ).save()
 
-
 @receiver(post_softdelete, sender=Factures)
 def update_on_softdelete(sender, instance, **kwargs):
     pass
-
 
 @receiver(pre_save, sender=DetailFacture)
 def pre_save_detail_facture(sender, instance, **kwargs):
     if(instance.detail.dqe.marche != instance.facture.marche):
         raise ValidationError("Cette attachement ne fais pas partie du marche")
+
+@receiver(pre_save, sender=Avance)
+def pre_save_avance(sender, instance, **kwargs):
+    if(instance.marche.nt.code_client.id != instance.client.id):
+        raise ValidationError("Ce client ne fais pas partie du marche")
 
 
 
