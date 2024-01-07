@@ -220,6 +220,19 @@ class GetFacture(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = FactureFilter
 
+
+class GetFactureRG(generics.ListAPIView):
+    queryset = Factures.objects.all()
+    serializer_class = FactureSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = FactureFilter
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        total = queryset.aggregate(montant_rg=models.Sum('montant_rg'))['montant_rg']
+        response_data = super().list(request, *args, **kwargs).data
+        return Response({'factures':response_data,'total_rg':humanize.intcomma(total)},status=status.HTTP_200_OK)
+
 class DelDQEByID(generics.DestroyAPIView,DestroyModelMixin):
     queryset = DQE.objects.all()
     serializer_class = DQESerializer

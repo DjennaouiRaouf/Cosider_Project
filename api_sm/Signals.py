@@ -2,7 +2,7 @@
 import sys
 from datetime import datetime
 
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
 from django.dispatch import *
 from num2words import num2words
@@ -115,7 +115,6 @@ def pre_save_factures(sender, instance, **kwargs):
     if(instance.du > instance.au):
         raise ValidationError('Date de debut doit etre inferieur à la date de fin')
     else:
-        instance.num_situation=Factures.objects.filter(marche=instance.marche).count()
         debut = instance.du
         fin = instance.au
         sum = Attachements.objects.filter(dqe__marche=instance.marche, date__lte=fin, date__gte=debut).aggregate(
@@ -154,6 +153,8 @@ def post_save_facture(sender, instance, created, **kwargs):
                 facture=instance,
                 detail=d
             ).save()
+        instance.num_situation = Factures.objects.filter(marche=instance.marche).count()
+        instance.save()
 
 
 
