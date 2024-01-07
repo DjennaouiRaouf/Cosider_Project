@@ -189,9 +189,12 @@ class FactureSerializer(serializers.ModelSerializer):
 
     client = serializers.CharField(source='marche.nt.code_client.id', read_only=True, label="Client")
     pole = serializers.CharField(source='marche.nt.code_site.id', read_only=True, label="Pole")
-    num_travail=serializers.CharField(source='marche.nt.nt', read_only=True, label="Lumero du travail")
+    num_travail=serializers.CharField(source='marche.nt.nt', read_only=True, label="Numero du travail")
     lib_nt = serializers.CharField(source='marche.nt.libelle', read_only=True, label="Libelle du travail")
     somme=serializers.SerializerMethodField(label="Arretée la présenta facture à la somme de")
+    tva=serializers.CharField(source='marche.tva', read_only=True, label="TVA")
+    rabais=serializers.CharField(source='marche.rabais', read_only=True, label="Rabais")
+    retenue_garantie = serializers.CharField(source='marche.rg', read_only=True, label="Retenue de Garantie")
 
     class Meta:
         model=Factures
@@ -218,5 +221,3 @@ class FactureSerializer(serializers.ModelSerializer):
         return representation
 
 
-class FacturePrinterSerializer(serializers.ModelSerializer):
-     projet=serializers.CharField()

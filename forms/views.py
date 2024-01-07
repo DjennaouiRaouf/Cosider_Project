@@ -483,7 +483,8 @@ class FactureFieldsApiView(APIView):
                     if( not field_name in ['paye','montant_mois','montant_precedent','montant_cumule','date','heure',"marche",
                                            'projet','code_contrat','client','pole','num_travail','lib_nt',
                                            'somme','montant_rg','montant_taxe','montant_rb','a_payer','signature',
-                                           'montant_marche','num_situation'] ):
+                                           'montant_marche','num_situation','tva','rabais',
+                                           'retenue_garantie'] ):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
