@@ -16,17 +16,26 @@ class Images(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     key = models.BigAutoField(primary_key=True)
     src = models.ImageField(upload_to="Images/Login", null=False, blank=True, default='default.png')
-    
     objects = DeletedModelManager()
-
-
     class Meta:
         verbose_name = 'Images'
         verbose_name_plural = 'Images'
 
 
-
-
+class OptionImpression(SafeDeleteModel):
+    Types = [
+        ('H', 'Header'),
+        ('F', 'Footer'),
+    ]
+    _safedelete_policy = SOFT_DELETE_CASCADE
+    key = models.BigAutoField(primary_key=True)
+    src = models.ImageField(upload_to="Images/Impression", null=False, blank=True)
+    type=models.CharField( max_length=20,
+        choices=Types, unique=True,null=False)
+    objects = DeletedModelManager()
+    class Meta:
+        verbose_name = 'Option d\'Impression'
+        verbose_name_plural = 'Option d\'Impression'
 
 
 class TabUniteDeMesure(SafeDeleteModel):
@@ -469,6 +478,7 @@ class Attachements(SafeDeleteModel):
 class Factures(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     numero_facture=models.CharField(max_length=800,primary_key=True,verbose_name='Numero de facture')
+    num_situation=models.PositiveIntegerField(default=0,null=False,blank=True,editable=False)
     marche=models.ForeignKey(Marche,on_delete=models.DO_NOTHING,null=False,verbose_name='Marche',to_field="id")
     du = models.DateField(null=False,verbose_name='Du')
     au = models.DateField(null=False,verbose_name='Au')
@@ -508,7 +518,7 @@ class Factures(SafeDeleteModel):
 
 class DetailFacture(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=False,blank=True,to_field="numero_facture")
+    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,blank=True,to_field="numero_facture")
     detail=models.ForeignKey(Attachements,on_delete=models.DO_NOTHING)
     objects = DeletedModelManager()
 

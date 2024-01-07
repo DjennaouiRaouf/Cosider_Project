@@ -38,10 +38,14 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 
+@admin.register(OptionImpression)
+class OptionImpressionAdmin(SafeDeleteAdmin,admin.ModelAdmin):
+    list_per_page = lp
+    list_display = ('key', 'src','type')
 
 
 @admin.register(Images)
-class ImagesAdmin(admin.ModelAdmin):
+class ImagesAdmin(SafeDeleteAdmin,admin.ModelAdmin):
     list_per_page = lp
     list_display = ('key','src')
     list_filter = ()
@@ -537,7 +541,7 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
 
 @admin.register(Factures)
 class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
-    list_display = ('numero_facture','du','au',"montant_prec",'montant_m','montant_c','date',"heure",
+    list_display = ('numero_facture','num_situation','du','au',"montant_prec",'montant_m','montant_c','date',"heure",
                     'etat')
     list_filter = (SafeDeleteAdminFilter,)
     def montant_prec(self,obj):

@@ -115,6 +115,7 @@ def pre_save_factures(sender, instance, **kwargs):
     if(instance.du > instance.au):
         raise ValidationError('Date de debut doit etre inferieur à la date de fin')
     else:
+        instance.num_situation=Factures.objects.filter(marche=instance.marche).count()
         debut = instance.du
         fin = instance.au
         sum = Attachements.objects.filter(dqe__marche=instance.marche, date__lte=fin, date__gte=debut).aggregate(
@@ -154,9 +155,15 @@ def post_save_facture(sender, instance, created, **kwargs):
                 detail=d
             ).save()
 
+
+
 @receiver(post_softdelete, sender=Factures)
 def update_on_softdelete(sender, instance, **kwargs):
-    pass
+    num_f='C-'+instance.pk
+
+    DetailFacture.objects.filter(facture=instance.pk).update(facture=None)
+    Factures.objects.filter(numero_facture=instance.pk).update(numero_facture=num_f)
+    DetailFacture.objects.filter(facture=None).update(facture=num_f)
 
 @receiver(pre_save, sender=DetailFacture)
 def pre_save_detail_facture(sender, instance, **kwargs):
