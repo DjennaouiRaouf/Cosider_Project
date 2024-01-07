@@ -231,7 +231,21 @@ class GetFactureRG(generics.ListAPIView):
         queryset = self.get_queryset()
         total = queryset.aggregate(montant_rg=models.Sum('montant_rg'))['montant_rg']
         response_data = super().list(request, *args, **kwargs).data
-        return Response({'factures':response_data,'total_rg':humanize.intcomma(total)},status=status.HTTP_200_OK)
+        return Response({'factures':response_data,
+                         'extra':{
+                             'total_rg': humanize.intcomma(total),
+                             'total_rgl':num2words(total, to='currency', lang='fr_DZ').upper(),
+                              'code_contrat':queryset[0].marche.code_contrat,
+                             'signature': queryset[0].marche.date_signature,
+                             'projet': queryset[0].marche.libelle,
+                             'montant_marche':humanize.intcomma(queryset[0].marche.ht),
+                             'client': queryset[0].marche.nt.code_client.id,
+                             'nt': queryset[0].marche.nt.nt,
+                             'lib_nt': queryset[0].marche.nt.libelle,
+                            'pole':queryset[0].marche.nt.code_site.id,
+
+                         }},status=status.HTTP_200_OK)
+
 
 class DelDQEByID(generics.DestroyAPIView,DestroyModelMixin):
     queryset = DQE.objects.all()

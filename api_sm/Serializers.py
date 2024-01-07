@@ -216,7 +216,9 @@ class FactureSerializer(serializers.ModelSerializer):
         representation['montant_precedent'] = humanize.intcomma(instance.montant_precedent)
         representation['montant_mois'] = humanize.intcomma(instance.montant_mois)
         representation['montant_cumule'] = humanize.intcomma(instance.montant_cumule)
-
+        representation['montant_rg']=humanize.intcomma(instance.montant_rg)
+        representation['montant_taxe']=humanize.intcomma(instance.montant_taxe)
+        representation['montant_rb']=humanize.intcomma(instance.montant_rb)
 
         return representation
 
