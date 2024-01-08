@@ -286,3 +286,20 @@ class AddFactureApiView(generics.CreateAPIView):
 
         return Response(custom_response, status=status.HTTP_201_CREATED)
 
+
+class AddEncaissement(generics.CreateAPIView):
+    queryset = Encaissement.objects.all()
+    serializer_class = EncaissementSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        self.perform_create(serializer)
+        custom_response = {
+            'status': 'success',
+            'message': "L'Encaissement c'est deroulé avec succé",
+            'data': serializer.data,
+        }
+
+        return Response(custom_response, status=status.HTTP_201_CREATED)

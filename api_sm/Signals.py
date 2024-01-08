@@ -136,7 +136,9 @@ def pre_save_factures(sender, instance, **kwargs):
 
 
 
-
+@receiver(pre_save, sender=ModePaiement)
+def pre_save_mp(sender, instance, **kwargs):
+    instance.libelle = instance.libelle.lower()
 
 
 

@@ -346,10 +346,12 @@ class Banque(SafeDeleteModel):
     adresse = models.CharField(max_length=300, null=False)
     ville = models.CharField(max_length=300, null=False)
     wilaya = models.CharField(max_length=300, null=False)
+    libelle=models.CharField(max_length=600, editable=False)
 
     objects = DeletedModelManager()
 
     def save(self, *args, **kwargs):
+        self.libelle=self.nom+" "+self.ville
         super(Banque, self).save(*args, **kwargs)
 
 
@@ -525,29 +527,30 @@ class DetailFacture(SafeDeleteModel):
     detail=models.ForeignKey(Attachements,on_delete=models.DO_NOTHING)
     objects = DeletedModelManager()
 
-    class FactureRG(SafeDeleteModel):
-        _safedelete_policy = SOFT_DELETE_CASCADE
-        facture = models.ForeignKey(Factures, on_delete=models.DO_NOTHING, null=False, blank=True,
-                                    to_field="numero_facture")
-        montant_rg= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)],
-                                                default=0,
-                                                verbose_name="Montant de la retenue de garantie"
-                                                , editable=False)
-
-        class Meta:
-            verbose_name = 'Factures'
-            verbose_name_plural = 'Factures'
-
     class Meta:
         verbose_name = 'Datails Facture'
         verbose_name_plural = 'Details Facture'
+
+
+class ModePaiement(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+    libelle=models.CharField(max_length=500,null=False,unique=True)
+
+    def __str__(self):
+        return  self.libelle
+    class Meta:
+        verbose_name = 'Mode de Paiement'
+        verbose_name_plural = 'Mode de Paiement'
+
+
+
 
 
 class Encaissement(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=False,blank=True)
     date_encaissement=models.DateField(null=False)
-    mode_paiement=models.CharField(max_length=100,null=False)
+    mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,null=False,blank=True)
     montant_encaisse=models.DecimalField(max_digits=38, decimal_places=2, blank=True,
                                      validators=[MinValueValidator(0)], default=0)
     montant_creance = models.DecimalField(max_digits=38, decimal_places=2, blank=True,
@@ -556,25 +559,28 @@ class Encaissement(SafeDeleteModel):
     numero_piece = models.CharField(max_length=300,null=False)
     objects = DeletedModelManager()
 
-    '''
+
     def save(self, *args, **kwargs):
         sum = Encaissement.objects.filter(facture=self.facture).aggregate(models.Sum('montant_encaisse'))[
             "montant_encaisse__sum"]
         if(sum==None):
             sum=0
         sum=sum+self.montant_encaisse
-        self.montant_creance = round(self.facture.montant_global - sum,2)
+        self.montant_creance = round(self.facture.a_payer - sum,2)
         if(self.montant_creance >= 0):
             super(Encaissement, self).save(*args, **kwargs)
         else:
             raise ValidationError('Le paiement de la facture est terminer')
-    '''
+
 
 
     class Meta:
         verbose_name = 'Encaissement'
         verbose_name_plural = 'Encaissement'
         unique_together=(("facture","date_encaissement"),)
+
+
+
 
 
 

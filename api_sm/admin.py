@@ -414,7 +414,7 @@ class  TypeCautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmi
 class BanqueAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     resource_class = BanqueResource
-    list_display = ( "nom", "adresse", "ville", "wilaya",)
+    list_display = ( "nom", "adresse", "ville", "wilaya","libelle")
     list_filter = (SafeDeleteAdminFilter,)
 
     def get_import_formats(self):
@@ -640,23 +640,22 @@ class DetailFactureAdmin(SimpleHistoryAdmin,ExportMixin,admin.ModelAdmin):
 
 
 
-class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,admin.ModelAdmin):
 
-    list_display = ('numero_facture','date_encaissement','mode_paiement','montant_encaisse','montant_creance')
+    list_display = ('numero_facture','date_encaissement','mode_paiement','montant_facture','encaisse','creance')
     save_as = True
     list_filter = (SafeDeleteAdminFilter,)
 
-    def get_import_formats(self):
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_import()]
+    def montant_facture(self,obj):
+        return humanize.intcomma(obj.facture.a_payer)
 
-    def get_export_formats(self):
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_export()]
+    def encaisse(self, obj):
+        return humanize.intcomma(obj.montant_encaisse)
+
+    def creance(self, obj):
+        return humanize.intcomma(obj.montant_creance)
+
+
     def has_change_permission(self, request, obj=None):
         if obj and obj.deleted:
             return False
@@ -668,3 +667,19 @@ class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
 
 
 admin.site.register(Encaissement, EncaissementAmin)
+
+
+@admin.register(ModePaiement)
+class ModePaiementAdmin(SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+    list_display = ("id","libelle")
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]

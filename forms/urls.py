@@ -28,7 +28,11 @@ urlpatterns = [
 
     path('facturefields/', FactureFieldsApiView.as_view()),
     path('facturefieldsstate/',FactureFieldsStateApiView.as_view()),
-    path('facturefilterfields/',FactureFieldsFilterApiView.as_view())
+    path('facturefilterfields/',FactureFieldsFilterApiView.as_view()),
+
+
+    path('encaissmentfields/',EncaissementFieldsApiView.as_view()),
+    path('encaissementfieldsstate/',EncaissementFieldsStateApiView.as_view()),
 
 
 ]
