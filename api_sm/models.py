@@ -26,6 +26,9 @@ class OptionImpression(SafeDeleteModel):
     Types = [
         ('H', 'Header'),
         ('F', 'Footer'),
+        ('EH', 'Empty Header'),
+        ('EF', 'Empty Footer'),
+
     ]
     _safedelete_policy = SOFT_DELETE_CASCADE
     key = models.BigAutoField(primary_key=True)
