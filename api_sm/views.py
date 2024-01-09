@@ -205,9 +205,33 @@ class GetNTView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = NTFilter
 
+
 class AjoutNTApiView(generics.CreateAPIView):
     queryset = NT.objects.all()
     serializer_class = NTSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            self.perform_create(serializer)
+            custom_response = {
+                'status': 'success',
+                'message': 'NT ajouté',
+                'data': serializer.data,
+            }
+
+            return Response(custom_response, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            custom_response = {
+                'status': 'error',
+                'message': str(e),
+                'data': None,
+            }
+
+            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
 
 class GetDQEbyId(generics.ListAPIView):
     queryset = DQE.objects.all()
@@ -327,3 +351,11 @@ class OptionImpressionApiView(generics.ListAPIView):
         else:
             Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+class DeletedDQE(generics.ListAPIView):
+    queryset = DQE.all_objects.deleted_only()
+    serializer_class = DQESerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = DQEFilter
