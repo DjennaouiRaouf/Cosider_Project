@@ -38,3 +38,8 @@ class FactureFilter(django_filters.FilterSet):
     class Meta:
         model = Factures
         fields=['marche','numero_facture','paye']
+
+class EncaissementFilter(django_filters.FilterSet):
+    class Meta:
+        model = Encaissement
+        fields=['date_encaissement','mode_paiement','facture']

@@ -259,6 +259,7 @@ class ModePaiementSerializer(serializers.ModelSerializer):
 
 
 class EncaissementSerializer(serializers.ModelSerializer):
+
     class Meta:
         model=Encaissement
         fields='__all__'
@@ -275,7 +276,10 @@ class EncaissementSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-
+        representation['montant_creance']=humanize.intcomma(instance.montant_creance)
+        representation['montant_encaisse'] = humanize.intcomma(instance.montant_encaisse)
+        representation['banque'] = instance.banque.libelle
+        representation['mode_paiement'] = instance.mode_paiement.libelle
 
         return representation
 

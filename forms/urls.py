@@ -33,6 +33,7 @@ urlpatterns = [
 
     path('encaissmentfields/',EncaissementFieldsApiView.as_view()),
     path('encaissementfieldsstate/',EncaissementFieldsStateApiView.as_view()),
+    path('encaissementfilterfields/',EncaissementFieldsFilterApiView.as_view()),
 
 
 ]

@@ -550,7 +550,7 @@ class Encaissement(SafeDeleteModel):
     mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,null=False,blank=True,verbose_name="Mode de paiement")
     montant_encaisse=models.DecimalField(max_digits=38, decimal_places=2, blank=True,verbose_name="Montant encaissé",
                                      validators=[MinValueValidator(0)], default=0)
-    montant_creance = models.DecimalField(max_digits=38, decimal_places=2, blank=True,verbose_name="Mode en créance",
+    montant_creance = models.DecimalField(max_digits=38, decimal_places=2, blank=True,verbose_name="Montant en créance",
                                            validators=[MinValueValidator(0)], default=0,editable=False)
     banque=models.ForeignKey(Banque,on_delete=models.DO_NOTHING,null=False,verbose_name="Banque")
     numero_piece = models.CharField(max_length=300,null=False,verbose_name="Numero de piéce")
@@ -564,6 +564,9 @@ class Encaissement(SafeDeleteModel):
             sum=0
         sum=sum+self.montant_encaisse
         self.montant_creance = round(self.facture.a_payer - sum,2)
+        if(self.montant_creance == 0):
+            self.facture.paye=True
+            self.facture.save()
         if(self.montant_creance >= 0):
             super(Encaissement, self).save(*args, **kwargs)
         else:

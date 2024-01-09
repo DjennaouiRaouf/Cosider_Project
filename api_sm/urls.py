@@ -42,6 +42,7 @@ urlpatterns = [
     path('getfacturerg/',GetFactureRG.as_view()),
 
     path('encaisser/',AddEncaissement.as_view()),
+    path('encaissements/',GetEncaissement.as_view()),
 
 
 
