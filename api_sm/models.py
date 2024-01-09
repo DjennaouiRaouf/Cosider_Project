@@ -290,9 +290,12 @@ class DQE(SafeDeleteModel): # le prix final
     def __str__(self):
         return (str(self.marche) + " " + self.code_tache)
 
+
+
     class Meta:
         verbose_name = 'DQE'
         verbose_name_plural = 'DQE'
+
 
 
 
