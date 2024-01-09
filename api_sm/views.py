@@ -303,3 +303,20 @@ class AddEncaissement(generics.CreateAPIView):
         }
 
         return Response(custom_response, status=status.HTTP_201_CREATED)
+
+
+class OptionImpressionApiView(generics.ListAPIView):
+    serializer_class = OptionImpressionSerializer
+    def get_queryset(self):
+        option = self.request.query_params.get('option', None)
+
+        if option in ["1","0"]:
+            if(option == "1"):
+                return OptionImpression.objects.filter(type__in=['H', 'F'])
+
+            if(option == "0"):
+                return OptionImpression.objects.filter(type__in=['EH', 'EF'])
+
+        else:
+            Response(status=status.HTTP_400_BAD_REQUEST)
+

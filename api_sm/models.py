@@ -26,9 +26,6 @@ class OptionImpression(SafeDeleteModel):
     Types = [
         ('H', 'Header'),
         ('F', 'Footer'),
-        ('EH', 'Empty Header'),
-        ('EF', 'Empty Footer'),
-
     ]
     _safedelete_policy = SOFT_DELETE_CASCADE
     key = models.BigAutoField(primary_key=True)
@@ -548,15 +545,15 @@ class ModePaiement(SafeDeleteModel):
 
 class Encaissement(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=False,blank=True)
-    date_encaissement=models.DateField(null=False)
-    mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,null=False,blank=True)
-    montant_encaisse=models.DecimalField(max_digits=38, decimal_places=2, blank=True,
+    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=False,blank=True,verbose_name="Facture")
+    date_encaissement=models.DateField(null=False,verbose_name="Date d'encaissement")
+    mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,null=False,blank=True,verbose_name="Mode de paiement")
+    montant_encaisse=models.DecimalField(max_digits=38, decimal_places=2, blank=True,verbose_name="Montant encaissé",
                                      validators=[MinValueValidator(0)], default=0)
-    montant_creance = models.DecimalField(max_digits=38, decimal_places=2, blank=True,
+    montant_creance = models.DecimalField(max_digits=38, decimal_places=2, blank=True,verbose_name="Mode en créance",
                                            validators=[MinValueValidator(0)], default=0,editable=False)
-    banque=models.ForeignKey(Banque,on_delete=models.DO_NOTHING,null=False)
-    numero_piece = models.CharField(max_length=300,null=False)
+    banque=models.ForeignKey(Banque,on_delete=models.DO_NOTHING,null=False,verbose_name="Banque")
+    numero_piece = models.CharField(max_length=300,null=False,verbose_name="Numero de piéce")
     objects = DeletedModelManager()
 
 

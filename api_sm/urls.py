@@ -19,7 +19,7 @@ urlpatterns = [
 
 
     path('importdqe/',ImportDQEAPIView.as_view()),
-
+    path('optionimpression/',OptionImpressionApiView.as_view()),
 
 
     path('getclients/', GetClientsView.as_view()),
