@@ -657,15 +657,16 @@ class EncaissementFieldsFilterApiView(APIView):
         field_info = []
         for field_name, field_instance in fields.items():
             if field_name in filter_fields:
+                if( field_name not in ['facture']):
 
-                obj = {
-                    'name': field_name,
-                    'type': str(field_instance.__class__.__name__),
-                    'label': field_instance.label or field_name,
-                }
-                if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
-                    anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                    obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
-                field_info.append(obj)
+                    obj = {
+                        'name': field_name,
+                        'type': str(field_instance.__class__.__name__),
+                        'label': field_instance.label or field_name,
+                    }
+                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                        obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                    field_info.append(obj)
 
         return Response({'fields': field_info},status=status.HTTP_200_OK)

@@ -278,8 +278,6 @@ class EncaissementSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['montant_creance']=humanize.intcomma(instance.montant_creance)
         representation['montant_encaisse'] = humanize.intcomma(instance.montant_encaisse)
-        representation['banque'] = instance.banque.libelle
-        representation['mode_paiement'] = instance.mode_paiement.libelle
 
         return representation
 
