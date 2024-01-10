@@ -683,3 +683,4 @@ class ModePaiementAdmin(SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdm
             base_formats.XLSX,
         )
         return [f for f in formats if f().can_export()]
+

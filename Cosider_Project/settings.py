@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'import_export',
     'api_sm',
+    'api_sch',
+
     'forms',
 
 
@@ -98,7 +100,7 @@ DATABASES = {
     }
 }
 '''
-
+DATABASE_ROUTERS = ['api_sm.routers.AppRouter']
 DATABASES = {
     'default': {
         "ENGINE": "mssql",
@@ -109,6 +111,18 @@ DATABASES = {
         "PORT":"1433",
         "OPTIONS": {"driver": "ODBC Driver 13 for SQL Server",
         },
+
+    },
+    'ca_ch': {
+        "ENGINE": "mssql",
+        "NAME": "ca_ch",
+        "USER": "",
+        "PASSWORD": "",
+        "HOST": "localhost",
+        "PORT": "1433",
+        "OPTIONS": {"driver": "ODBC Driver 13 for SQL Server",
+                    },
+
     },
 
 }

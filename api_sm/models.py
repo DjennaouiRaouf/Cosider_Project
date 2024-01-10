@@ -11,6 +11,7 @@ from simple_history.models import HistoricalRecords
 class DeletedModelManager(SafeDeleteManager):
     _safedelete_visibility = DELETED_VISIBLE_BY_PK
 
+
 # Create your models here.
 class Images(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
@@ -20,6 +21,8 @@ class Images(SafeDeleteModel):
     class Meta:
         verbose_name = 'Images'
         verbose_name_plural = 'Images'
+        app_label = 'api_sm'
+        
 
 
 class OptionImpression(SafeDeleteModel):
@@ -36,6 +39,8 @@ class OptionImpression(SafeDeleteModel):
     class Meta:
         verbose_name = 'Option d\'Impression'
         verbose_name_plural = 'Option d\'Impression'
+        app_label = 'api_sm'
+        
 
 
 class TabUniteDeMesure(SafeDeleteModel):
@@ -50,6 +55,8 @@ class TabUniteDeMesure(SafeDeleteModel):
         verbose_name = 'Unite de Mesure'
         verbose_name_plural = 'Unite de Mesure'
         db_table = 'Tab_Unite_de_Mesure'
+        app_label = 'api_sm'
+        
 
 
 
@@ -84,6 +91,8 @@ class Clients(SafeDeleteModel):
     class Meta:
         verbose_name = 'Clients'
         verbose_name_plural = 'Clients'
+        app_label = 'api_sm'
+        
 
 
 class Sites(SafeDeleteModel):
@@ -118,6 +127,7 @@ class Sites(SafeDeleteModel):
     def __str__(self):
         return self.id
 
+
     def save(self, *args, **kwargs):
         if self.date_cloture_site and self.date_ouverture_site:
             if (self.date_cloture_site >= self.date_ouverture_site):
@@ -134,6 +144,8 @@ class Sites(SafeDeleteModel):
     class Meta:
         verbose_name = 'Sites'
         verbose_name_plural = 'Sites'
+        app_label = 'api_sm'
+        
 
 
 class SituationNt(SafeDeleteModel):
@@ -143,7 +155,8 @@ class SituationNt(SafeDeleteModel):
     class Meta:
         verbose_name = 'Situation du Travail'
         verbose_name_plural = 'Situation du Travail'
-
+        app_label = 'api_sm'
+        
     def __str__(self):
         return  self.libelle
     def save(self, *args, **kwargs):
@@ -180,6 +193,8 @@ class NT(SafeDeleteModel):
         verbose_name = 'Numero du travail'
         verbose_name_plural = 'Numero du travail'
         unique_together = (('code_site', 'nt'),)
+        app_label = 'api_sm'
+        
 
 
 
@@ -246,6 +261,8 @@ class Meta:
         verbose_name = 'Marchés'
         verbose_name_plural = 'Marchés'
         unique_together=(('nt','num_avenant'),)
+        app_label = 'api_sm'
+        
 
 
 
@@ -295,6 +312,8 @@ class DQE(SafeDeleteModel): # le prix final
     class Meta:
         verbose_name = 'DQE'
         verbose_name_plural = 'DQE'
+        app_label = 'api_sm'
+        
 
 
 
@@ -317,6 +336,8 @@ class Ordre_De_Service(SafeDeleteModel):
     class Meta:
         verbose_name = 'Ordre de service'
         verbose_name_plural = 'Ordre de service'
+        app_label = 'api_sm'
+        
 
 
 class TypeCaution(SafeDeleteModel):
@@ -338,6 +359,8 @@ class TypeCaution(SafeDeleteModel):
     class Meta:
         verbose_name = 'Type_Caution'
         verbose_name_plural = 'Type_Caution'
+        app_label = 'api_sm'
+        
 
 
 class Banque(SafeDeleteModel):
@@ -363,6 +386,8 @@ class Banque(SafeDeleteModel):
     class Meta:
         verbose_name = 'Banque'
         verbose_name_plural = 'Banque'
+        app_label = 'api_sm'
+        
 
 
 class TypeAvance(SafeDeleteModel):
@@ -385,6 +410,8 @@ class TypeAvance(SafeDeleteModel):
     class Meta:
         verbose_name = 'Type Avance'
         verbose_name_plural = 'Type Avance'
+        app_label = 'api_sm'
+        
 
 
 class Avance(SafeDeleteModel):
@@ -402,6 +429,8 @@ class Avance(SafeDeleteModel):
         verbose_name = 'Avance'
         verbose_name_plural = 'Avances'
         unique_together = (("marche", "type"),)
+        app_label = 'api_sm'
+        
 
 
 
@@ -443,6 +472,8 @@ class Cautions(SafeDeleteModel):
     class Meta:
         verbose_name = 'Caution'
         verbose_name_plural = 'Caution'
+        app_label = 'api_sm'
+        
 
 
 class Attachements(SafeDeleteModel):
@@ -478,6 +509,8 @@ class Attachements(SafeDeleteModel):
     class Meta:
         verbose_name = 'Attachements'
         verbose_name_plural = 'Attachements'
+        app_label = 'api_sm'
+        
 
 
 class Factures(SafeDeleteModel):
@@ -520,6 +553,8 @@ class Factures(SafeDeleteModel):
     class Meta:
         verbose_name = 'Factures'
         verbose_name_plural = 'Factures'
+        app_label = 'api_sm'
+        
 
 class DetailFacture(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
@@ -530,6 +565,8 @@ class DetailFacture(SafeDeleteModel):
     class Meta:
         verbose_name = 'Datails Facture'
         verbose_name_plural = 'Details Facture'
+        app_label = 'api_sm'
+        
 
 
 class ModePaiement(SafeDeleteModel):
@@ -541,6 +578,8 @@ class ModePaiement(SafeDeleteModel):
     class Meta:
         verbose_name = 'Mode de Paiement'
         verbose_name_plural = 'Mode de Paiement'
+        app_label = 'api_sm'
+        
 
 
 
@@ -581,6 +620,8 @@ class Encaissement(SafeDeleteModel):
         verbose_name = 'Encaissement'
         verbose_name_plural = 'Encaissement'
         unique_together=(("facture","date_encaissement"),)
+        app_label = 'api_sm'
+        
 
 
 

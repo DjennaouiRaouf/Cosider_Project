@@ -362,6 +362,7 @@ class DeletedDQE(generics.ListAPIView):
 
 
 class LibUM(generics.ListAPIView):
+
     queryset = TabUniteDeMesure.objects.all()
     serializer_class = UniteDeMesureSerializer
     filter_backends = [DjangoFilterBackend]

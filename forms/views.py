@@ -231,7 +231,7 @@ class MarcheFieldsApiView(APIView):
             model_name = model_class.__name__
 
             if(flag=='f'): # react form
-                print(fields)
+
                 field_info = []
                 for field_name, field_instance in fields.items():
                     if(field_name not in ['id',]):
