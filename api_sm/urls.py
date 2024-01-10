@@ -45,6 +45,7 @@ urlpatterns = [
     path('encaisser/',AddEncaissement.as_view()),
     path('encaissements/',GetEncaissement.as_view()),
 
+    path('getlibum/',LibUM.as_view()),
 
 
 

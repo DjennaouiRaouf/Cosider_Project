@@ -43,3 +43,8 @@ class EncaissementFilter(django_filters.FilterSet):
     class Meta:
         model = Encaissement
         fields=['date_encaissement','mode_paiement','facture']
+
+class UMFilter(django_filters.FilterSet):
+    class Meta:
+        model = TabUniteDeMesure
+        fields=['id',]

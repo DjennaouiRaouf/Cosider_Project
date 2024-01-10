@@ -85,6 +85,7 @@ class DQEFieldsStateApiView(APIView):
         else:
             dqe = None
         if(dqe == None):
+
             for field_name, field_instance in fields.items():
                 if (not field_name in ['prix_q']):
                     default_value = ''
@@ -132,6 +133,7 @@ class DQEFieldsApiView(APIView):
 
             if(flag=='f'): # react form
                 field_info = []
+
                 for field_name, field_instance in fields.items():
                     print(field_name)
                     if (not field_name in ['prix_q']):
@@ -139,6 +141,7 @@ class DQEFieldsApiView(APIView):
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
                             'label': field_instance.label or field_name,
+
                         }
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
@@ -149,12 +152,16 @@ class DQEFieldsApiView(APIView):
             if(flag=='l'): #data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    field_info.append({
+                    obj = {
                         'field': field_name,
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
+                    }
+                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField") and field_name not in ['marche']:
+                        obj['related'] = str(field_instance.queryset.model.__name__)
+                        obj['cellRenderer']= 'InfoRenderer'
+                    field_info.append(obj)
 
-                    })
 
             return Response({'fields':field_info,'models':model_name,'pk':DQE._meta.pk.name},status=status.HTTP_200_OK)
         else:

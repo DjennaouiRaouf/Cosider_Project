@@ -142,7 +142,7 @@ class DQESerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        #representation['unite']=instance.unite.libelle
+
         representation['prix_u']=humanize.intcomma(instance.prix_u)
         representation['prix_q']=humanize.intcomma(instance.prix_q)
 
@@ -281,3 +281,23 @@ class EncaissementSerializer(serializers.ModelSerializer):
 
         return representation
 
+
+
+class UniteDeMesureSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model=TabUniteDeMesure
+        fields='__all__'
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('deleted', None)
+        fields.pop('deleted_by_cascade', None)
+
+
+        return fields
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return representation
