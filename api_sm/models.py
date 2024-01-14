@@ -81,7 +81,7 @@ class Clients(SafeDeleteModel):
     raison_social = models.CharField(db_column='Raison_Social', max_length=50, blank=True, null=True,verbose_name='Raison Social')
     num_registre_commerce = models.CharField(db_column='Num_Registre_Commerce', max_length=20, blank=True, null=True,
                                              verbose_name='Numero du registre de commerce')
-    history = HistoricalRecords()
+
     objects = DeletedModelManager()
     def __str__(self):
         return  self.id
@@ -207,8 +207,6 @@ class Marche(SafeDeleteModel):
     nt = models.ForeignKey(NT, on_delete=models.DO_NOTHING, db_column='nt', null=False
                            , verbose_name='Numero Travail',to_field="id")
 
-
-
     libelle = models.CharField(null=False, blank=True, max_length=500
                                , verbose_name='Libelle')
     ods_depart = models.DateField(null=False, blank=True
@@ -234,7 +232,7 @@ class Marche(SafeDeleteModel):
                                               , verbose_name='Retenue de garantie')
     code_contrat = models.CharField(null=False, blank=True, max_length=20, verbose_name='Code du contrat')
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
-    history=HistoricalRecords()
+   
     objects = DeletedModelManager()
 
     def __str__(self):
@@ -300,7 +298,7 @@ class DQE(SafeDeleteModel): # le prix final
 
     quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantité')
 
-    history=HistoricalRecords()
+   
     objects = DeletedModelManager()
 
 
@@ -360,34 +358,37 @@ class TypeCaution(SafeDeleteModel):
         verbose_name = 'Type_Caution'
         verbose_name_plural = 'Type_Caution'
         app_label = 'api_sm'
-        
+
+
+
 
 
 class Banque(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE
-    nom = models.CharField(max_length=300, null=False)
-    adresse = models.CharField(max_length=300, null=False)
-    ville = models.CharField(max_length=300, null=False)
-    wilaya = models.CharField(max_length=300, null=False)
-    libelle=models.CharField(max_length=600, editable=False)
-
+    _safedelete_policy = SOFT_DELETE_CASCADE
+    id = models.CharField(db_column='Code_Banque', primary_key=True, max_length=15)  # Field name made lowercase.
+    libelle = models.CharField(db_column='Libelle_Banque', max_length=50, blank=True, null=True)  # Field name made lowercase.
+    acronyme = models.CharField(db_column='Acronyme', max_length=20, blank=True, null=True)  # Field name made lowercase.
     objects = DeletedModelManager()
-
-    def save(self, *args, **kwargs):
-        self.libelle=self.nom+" "+self.ville
-        super(Banque, self).save(*args, **kwargs)
-
-
-
-
-    def __str__(self):
-        return self.nom + " " + self.ville + '(' + self.wilaya + ')'
-
     class Meta:
         verbose_name = 'Banque'
         verbose_name_plural = 'Banque'
+        db_table = 'Tab_Banque'
         app_label = 'api_sm'
-        
+
+
+
+class Agence(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+    id = models.CharField(db_column='Code_Agence', primary_key=True, max_length=15)  # Field name made lowercase.
+    banque = models.ForeignKey(Banque, models.DO_NOTHING, db_column='Code_banque')  # Field name made lowercase.
+    libelle= models.CharField(db_column='Libelle_Agence', max_length=50)  # Field name made lowercase.
+    compte_comptable = models.CharField(db_column='Compte_Comptable', max_length=10, blank=True, null=True)  # Field name made lowercase.
+    objects = DeletedModelManager()
+    class Meta:
+        verbose_name = 'Agence'
+        verbose_name_plural = 'Agence'
+        db_table = 'Tab_Agence'
+        app_label = 'api_sm'
 
 
 class TypeAvance(SafeDeleteModel):
@@ -395,6 +396,8 @@ class TypeAvance(SafeDeleteModel):
     libelle = models.CharField(max_length=500, null=False, unique=True)
     taux_reduction_facture=models.DecimalField(default=0, max_digits=38, decimal_places=2,
                                validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    taux_max = models.DecimalField(default=0, max_digits=38, decimal_places=2,
+                                                 validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
     objects = DeletedModelManager()
 
@@ -419,6 +422,8 @@ class Avance(SafeDeleteModel):
     marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Marche",to_field='id')
     type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False)
     montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    taux_avance = models.DecimalField(default=0, max_digits=38, decimal_places=2,
+                                   validators=[MinValueValidator(0), MaxValueValidator(100)], null=False,editable=False)
     client = models.ForeignKey(Clients, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Client" ,to_field='id')
 
     objects = DeletedModelManager()
@@ -428,7 +433,7 @@ class Avance(SafeDeleteModel):
     class Meta:
         verbose_name = 'Avance'
         verbose_name_plural = 'Avances'
-        unique_together = (("marche", "type"),)
+
         app_label = 'api_sm'
         
 
@@ -440,7 +445,7 @@ class Cautions(SafeDeleteModel):
     type = models.ForeignKey(TypeCaution, on_delete=models.DO_NOTHING, null=False)
     avance = models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
     date_soumission = models.DateField(blank=True, null=False)
-    banque = models.ForeignKey(Banque, on_delete=models.DO_NOTHING, null=False)
+    banque = models.ForeignKey(Agence, on_delete=models.DO_NOTHING, null=False)
     montant = models.DecimalField(
         max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0,
@@ -594,7 +599,7 @@ class Encaissement(SafeDeleteModel):
                                      validators=[MinValueValidator(0)], default=0)
     montant_creance = models.DecimalField(max_digits=38, decimal_places=2, blank=True,verbose_name="Montant en créance",
                                            validators=[MinValueValidator(0)], default=0,editable=False)
-    banque=models.ForeignKey(Banque,on_delete=models.DO_NOTHING,null=False,verbose_name="Banque")
+    banque=models.ForeignKey(Agence,on_delete=models.DO_NOTHING,null=False,verbose_name="Banque")
     numero_piece = models.CharField(max_length=300,null=False,verbose_name="Numero de piéce")
     objects = DeletedModelManager()
 

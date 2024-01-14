@@ -610,12 +610,16 @@ class EncaissementFieldsApiView(APIView):
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    field_info.append({
+                    obj = {
                         'field': field_name,
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
-                    })
-
+                    }
+                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                        obj['related'] = str(field_instance.queryset.model.__name__)
+                        if(field_name=="mode_paiement"):
+                            obj['cellRenderer'] = 'InfoRenderer'
+                    field_info.append(obj)
 
 
             return Response({'fields': field_info,

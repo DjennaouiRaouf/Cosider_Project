@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'import_export',
     'api_sm',
     'api_sch',
-
     'forms',
 
 
@@ -100,7 +99,7 @@ DATABASES = {
     }
 }
 '''
-DATABASE_ROUTERS = ['api_sm.routers.AppRouter']
+
 DATABASES = {
     'default': {
         "ENGINE": "mssql",

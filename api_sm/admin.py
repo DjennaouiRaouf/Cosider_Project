@@ -331,8 +331,14 @@ class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,Simp
 @admin.register(TypeAvance)
 class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeAvanceResource
-    list_display = ("id", "libelle","taux_reduction_facture" )
+    list_display = ("id", "libelle","reduction" ,"max")
     list_filter = (SafeDeleteAdminFilter,)
+
+    def max(self,obj):
+        return str(obj.taux_max)+'%'
+
+    def reduction(self, obj):
+        return str(obj.taux_reduction_facture) + '%'
 
     def get_import_formats(self):
         formats = (
@@ -355,9 +361,12 @@ class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
 @admin.register(Avance)
 class  AvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource=AvanceResource
-    list_display = ("marche", "type","montant_avance","client" )
+    list_display = ("marche", "type","montant_avance","client",'taux' )
     list_filter = (SafeDeleteAdminFilter,)
+    save_as = True
 
+    def taux(self,obj):
+        return str(obj.taux_avance)+'%'
     def montant_avance(self,obj):
         return humanize.intcomma(obj.montant)
     def get_import_formats(self):
@@ -380,7 +389,7 @@ class  AvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
 
 
 @admin.register(TypeCaution)
-class  TypeCautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class  TypeCautionAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeCautionResource
     list_display = ("id", "libelle", "taux",)
     list_filter = (SafeDeleteAdminFilter,)
@@ -404,7 +413,30 @@ class  TypeCautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmi
  
 
 
+@admin.register(Agence)
+class AgenceAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+    save_as = True
+    list_per_page = lp
+    resource_class = AgenceResource
+    list_display = ( "id","compte_comptable","banque","libelle")
+    list_filter = (SafeDeleteAdminFilter,)
 
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
+    def has_change_permission(self, request, obj=None):
+        if obj and obj.deleted:
+            return False
+        return super().has_change_permission(request, obj)
 
 
 
@@ -414,7 +446,8 @@ class  TypeCautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmi
 class BanqueAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     resource_class = BanqueResource
-    list_display = ( "nom", "adresse", "ville", "wilaya","libelle")
+    list_per_page = lp
+    list_display = ( "id","acronyme","libelle")
     list_filter = (SafeDeleteAdminFilter,)
 
     def get_import_formats(self):

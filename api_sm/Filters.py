@@ -48,3 +48,8 @@ class UMFilter(django_filters.FilterSet):
     class Meta:
         model = TabUniteDeMesure
         fields=['id',]
+
+class MPFilter(django_filters.FilterSet):
+    class Meta:
+        model = ModePaiement
+        fields=['id',]

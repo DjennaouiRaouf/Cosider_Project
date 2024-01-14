@@ -46,6 +46,7 @@ urlpatterns = [
     path('encaissements/',GetEncaissement.as_view()),
 
     path('getlibum/',LibUM.as_view()),
+    path('getlibmp/',LibMP.as_view())
 
 
 

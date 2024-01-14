@@ -24,7 +24,5 @@ class AppRouter:
         return None
 
     def allow_migrate(self, db, app_label, model_name=None, **hints):
-        if app_label == 'api_sm' and db == 'default':
-            return True
-        else:
+        if db == 'ca_ch':
             return False

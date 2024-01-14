@@ -177,6 +177,22 @@ def pre_save_detail_facture(sender, instance, **kwargs):
 def pre_save_avance(sender, instance, **kwargs):
     if(instance.marche.nt.code_client.id != instance.client.id):
         raise ValidationError("Ce client ne fais pas partie du marche")
+    instance.taux_avance= round((instance.montant/instance.marche.ttc)*100,2)
+    if (instance.taux_avance > instance.type.taux_max):
+        raise ValidationError(
+            f'Vous avez une avance de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
+
+
+
+@receiver(post_save, sender=Avance)
+def post_save_avance(sender, instance, created, **kwargs):
+    sum = Avance.objects.filter(marche=instance.marche, type=instance.type).aggregate(models.Sum('taux_avance'))[
+        "taux_avance__sum"]
+    if (sum > instance.type.taux_max):
+        raise ValidationError(
+            f'Vous avez plusieurs avances de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
+
+
 
 
 

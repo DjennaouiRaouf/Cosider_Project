@@ -2,6 +2,7 @@
 from decimal import Decimal
 from _decimal import InvalidOperation
 from django.contrib.humanize.templatetags import humanize
+from django.db import transaction
 from import_export import resources, fields
 from import_export.widgets import Widget
 from api_sm.models import *
@@ -11,6 +12,7 @@ class FormattedPriceWidget(Widget):
     def clean(self, value, row=None, *args, **kwargs):
         try:
             cleaned_value = value.replace(',', '.').replace('\xa0', '')
+
             return Decimal(cleaned_value)
         except (ValueError, InvalidOperation) as e:
             print(f"Erreur de conversion de la valeur ({value}) en decimal: {e}")
@@ -113,7 +115,6 @@ class ODSResource(resources.ModelResource):
 class DQEResource(resources.ModelResource):
     prix_u = fields.Field(column_name='prix_u', attribute='prix_u', widget=FormattedPriceWidget())
     prix_q = fields.Field(column_name='prix_q', attribute='prix_q', widget=FormattedPriceWidget())
-
     def get_instance(self, instance_loader, row):
         try:
             params = {}
@@ -123,9 +124,14 @@ class DQEResource(resources.ModelResource):
             return self.get_queryset().get(**params)
         except Exception:
             return None
+
     class Meta:
         model = DQE
         exclude = ('id','deleted', 'deleted_by_cascade')
+
+
+
+
 
 class AvanceResource(resources.ModelResource):
     montant = fields.Field(column_name='montant', attribute='montant', widget=FormattedPriceWidget())
@@ -199,6 +205,21 @@ class BanqueResource(resources.ModelResource):
     class Meta:
         model = Banque
         exclude = ('deleted', 'deleted_by_cascade')
+
+class AgenceResource(resources.ModelResource):
+    def get_instance(self, instance_loader, row):
+        try:
+            params = {}
+            for key in instance_loader.resource.get_import_id_fields():
+                field = instance_loader.resource.fields[key]
+                params[field.attribute] = field.clean(row)
+            return self.get_queryset().get(**params)
+        except Exception:
+            return None
+    class Meta:
+        model = Agence
+        exclude = ('deleted', 'deleted_by_cascade')
+
 class CautionResource(resources.ModelResource):
     def get_instance(self, instance_loader, row):
         try:
