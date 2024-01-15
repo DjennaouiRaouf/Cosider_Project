@@ -115,6 +115,20 @@ class ODSResource(resources.ModelResource):
 class DQEResource(resources.ModelResource):
     prix_u = fields.Field(column_name='prix_u', attribute='prix_u', widget=FormattedPriceWidget())
     prix_q = fields.Field(column_name='prix_q', attribute='prix_q', widget=FormattedPriceWidget())
+    annule = fields.Field(column_name='annule', attribute=None)
+    def dehydrate_annule(self, obj):
+        return f"0"
+    def before_export(self, queryset, *args, **kwargs):
+        for obj in queryset:
+            setattr(obj, 'annule', '0')
+    def skip_row(self, instance, original, row, import_validation_errors=None):
+        if(row.get('annule') == 1):
+            DQE.objects.get(id=row.get('id')).delete()
+            return True
+        if(row.get('annule') == None):
+                return  False
+
+
     def get_instance(self, instance_loader, row):
         try:
             params = {}
@@ -127,9 +141,7 @@ class DQEResource(resources.ModelResource):
 
     class Meta:
         model = DQE
-        exclude = ('id','deleted', 'deleted_by_cascade')
-
-
+        exclude = ('deleted', 'deleted_by_cascade')
 
 
 
