@@ -301,3 +301,35 @@ class UniteDeMesureSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         return representation
+
+
+
+
+class DetailFactureSerializer(serializers.ModelSerializer):
+    code_tache = serializers.CharField(source='detail.dqe.code_tache', read_only=True, label="Code Tache")
+    libelle_tache = serializers.CharField(source='detail.dqe.libelle', read_only=True, label="Libelle Tache")
+    qte_attache = serializers.CharField(source='detail.qte_mois', read_only=True, label="Quantite attachée")
+    unite = serializers.CharField(source='detail.dqe.unite.libelle', read_only=True, label="Unite")
+    prix_attache = serializers.CharField(source='detail.montant_mois', read_only=True, label="Prix attaché")
+    qte_contr = serializers.CharField(source='detail.dqe.quantite', read_only=True, label="Quantite Contrat")
+    prix_contr = serializers.CharField(source='detail.dqe.prix_u', read_only=True, label="Prix Contrat")
+
+    class Meta:
+            model=DetailFacture
+            fields='__all__'
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('id', None)
+        fields.pop('deleted', None)
+        fields.pop('deleted_by_cascade', None)
+
+
+        return fields
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        del representation['facture']
+        del representation['detail']
+        return representation

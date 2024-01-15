@@ -681,3 +681,51 @@ class EncaissementFieldsFilterApiView(APIView):
                     field_info.append(obj)
 
         return Response({'fields': field_info},status=status.HTTP_200_OK)
+
+
+
+class DetailFactureFieldsApiView(APIView):
+    def get(self, request):
+        serializer = DetailFactureSerializer()
+        fields = serializer.get_fields()
+
+        model_class = serializer.Meta.model
+        model_name = model_class.__name__
+
+        field_info = []
+        for field_name, field_instance in fields.items():
+            if (field_name not in ['facture','detail']):
+                obj = {
+                    'field': field_name,
+                    'headerName': field_instance.label or field_name,
+                    'info': str(field_instance.__class__.__name__),
+                }
+                field_info.append(obj)
+
+        return Response({'fields': field_info,
+        'models': model_name, 'pk': DetailFacture._meta.pk.name}, status=status.HTTP_200_OK)
+
+
+class DetailFactureFieldsFilterApiView(APIView):
+    def get(self,request):
+        filter_fields = list(DetailFactureFilter.base_filters.keys())
+        print(filter_fields)
+        serializer = DetailFactureSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        for field_name, field_instance in fields.items():
+            if field_name in filter_fields:
+                if (field_name not in ['facture','detail']):
+
+                    obj = {
+                        'name': field_name,
+                        'type': str(field_instance.__class__.__name__),
+                        'label': field_instance.label or field_name,
+                    }
+                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                        obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                    field_info.append(obj)
+
+        return Response({'fields': field_info},status=status.HTTP_200_OK)
+

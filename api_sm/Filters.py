@@ -53,3 +53,11 @@ class MPFilter(django_filters.FilterSet):
     class Meta:
         model = ModePaiement
         fields=['id',]
+
+class DetailFactureFilter(django_filters.FilterSet):
+    code_tache = django_filters.CharFilter(field_name='detail__dqe__code_tache', lookup_expr='icontains',label="Code Tache")
+    libelle_tache = django_filters.CharFilter(field_name='detail__dqe__libelle', lookup_expr='icontains',label="Libelle")
+
+    class Meta:
+        model = DetailFacture
+        fields = ['facture','code_tache','libelle_tache' ]

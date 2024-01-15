@@ -373,3 +373,11 @@ class LibMP(generics.ListAPIView):
     serializer_class = ModePaiementSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = MPFilter
+
+
+
+class getDetailFacture(generics.ListAPIView):
+    queryset = DetailFacture.objects.all()
+    serializer_class = DetailFactureSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = DetailFactureFilter
