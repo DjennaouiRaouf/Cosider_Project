@@ -177,6 +177,12 @@ class DQEFieldsApiView(APIView):
 class MarcheFieldsFilterApiView(APIView):
     def get(self,request):
         filter_fields = list(MarcheFilter.base_filters.keys())
+        for name, filter_instance in MarcheFilter.base_filters.items():
+
+            print(f"Filter Name: {name}, Filter Type: {type(filter_instance).__name__}, Filter Label: {filter_instance.label}")
+            # croisement entre les 2 boucles
+
+
         serializer = MarcheSerializer()
         fields = serializer.get_fields()
         field_info = []
