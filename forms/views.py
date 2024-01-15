@@ -137,11 +137,15 @@ class DQEFieldsApiView(APIView):
                 for field_name, field_instance in fields.items():
                     print(field_name)
                     if (not field_name in ['prix_q']):
+                        if( field_name in ['prix_u','quantite']):
+                            readOnly=False
+                        else:
+                            readOnly = True
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
                             'label': field_instance.label or field_name,
-
+                            'readOnly': readOnly
                         }
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
