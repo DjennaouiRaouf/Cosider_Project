@@ -189,7 +189,7 @@ def update_on_softdelete(sender, instance, **kwargs):
     DetailFacture.objects.filter(facture=instance.pk).update(facture=None)
     Factures.objects.filter(numero_facture=instance.pk).update(numero_facture=num_f)
     DetailFacture.objects.filter(facture=None).update(facture=num_f)
-    DetailFacture.objects.filter(num_f).delete()
+    DetailFacture.objects.filter(facture=num_f).delete()
 
 @receiver(pre_save, sender=DetailFacture)
 def pre_save_detail_facture(sender, instance, **kwargs):
