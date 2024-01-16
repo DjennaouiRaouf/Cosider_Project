@@ -181,8 +181,11 @@ def post_save_remboursement(sender, instance, created, **kwargs):
 
 @receiver(post_softdelete, sender=Factures)
 def update_on_softdelete(sender, instance, **kwargs):
-    num_f='C-'+instance.pk
+    count=Factures.objects.filter(numero_facture=f'C-{instance.pk}').count()
+    if(count==None):
+        count=0
 
+    num_f='C-'+instance.pk+'-'+str(count)
     DetailFacture.objects.filter(facture=instance.pk).update(facture=None)
     Factures.objects.filter(numero_facture=instance.pk).update(numero_facture=num_f)
     DetailFacture.objects.filter(facture=None).update(facture=num_f)

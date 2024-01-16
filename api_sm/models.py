@@ -427,9 +427,9 @@ class Avance(SafeDeleteModel):
     client = models.ForeignKey(Clients, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Client" ,to_field='id')
     date=models.DateField(null=False)
     heure = models.TimeField(auto_now=True,null=False,editable=False)
+
+
     objects = DeletedModelManager()
-
-
 
     class Meta:
         verbose_name = 'Avance'
