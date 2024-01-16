@@ -642,11 +642,11 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
 
 
 @admin.register(DetailFacture)
-class DetailFactureAdmin(SimpleHistoryAdmin,ExportMixin,admin.ModelAdmin):
+class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ExportMixin,admin.ModelAdmin):
     list_display = ("numero_facture","code_tache","detail_designation","montant_precedent","montant_mois"
                     ,"montant_cumule")
 
-
+    list_filter = (SafeDeleteAdminFilter,)
     def get_import_formats(self):
         formats = (
             base_formats.XLSX,
