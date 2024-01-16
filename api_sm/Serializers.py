@@ -306,6 +306,7 @@ class UniteDeMesureSerializer(serializers.ModelSerializer):
 
 
 class DetailFactureSerializer(serializers.ModelSerializer):
+    date = serializers.CharField(source='detail.date', read_only=True, label="Date Attachement")
     code_tache = serializers.CharField(source='detail.dqe.code_tache', read_only=True, label="Code Tache")
     libelle_tache = serializers.CharField(source='detail.dqe.libelle', read_only=True, label="Libelle Tache")
     qte_attache = serializers.CharField(source='detail.qte_mois', read_only=True, label="Quantite attachée")

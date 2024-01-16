@@ -176,28 +176,25 @@ class DQEFieldsApiView(APIView):
 
 class MarcheFieldsFilterApiView(APIView):
     def get(self,request):
-        filter_fields = list(MarcheFilter.base_filters.keys())
-        for name, filter_instance in MarcheFilter.base_filters.items():
-
-            print(f"Filter Name: {name}, Filter Type: {type(filter_instance).__name__}, Filter Label: {filter_instance.label}")
-            # croisement entre les 2 boucles
-
-
-        serializer = MarcheSerializer()
-        fields = serializer.get_fields()
         field_info = []
-        for field_name, field_instance in fields.items():
-            if field_name in filter_fields:
-                obj = {
-                    'name': field_name,
-                    'type': str(field_instance.__class__.__name__),
-                    'label': field_instance.label or field_name,
-                }
-                if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
-                    anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                    obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+        print(MarcheFilter.base_filters.items())
+        for field_name, field_instance  in MarcheFilter.base_filters.items():
 
-                field_info.append(obj)
+
+            obj = {
+                'name': field_name,
+                'type': str(field_instance.__class__.__name__),
+                'label': field_instance.label or field_name,
+
+            }
+            if str(field_instance.__class__.__name__) == 'ModelChoiceFilter':
+                anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+
+            if isinstance(field_instance.lookup_expr, list):
+                obj['lookup_expr']=field_instance.lookup_expr
+
+            field_info.append(obj)
 
         return Response({'fields': field_info},status=status.HTTP_200_OK)
 

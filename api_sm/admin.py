@@ -440,6 +440,29 @@ class AgenceAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
 
 
 
+@admin.register(Remboursement)
+class AgenceAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+    save_as = True
+    list_per_page = lp
+    list_display = ("facture","montant_precedent","montant_mois","montant_cumule","rst_remb")
+    list_filter = (SafeDeleteAdminFilter,)
+
+    def get_import_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_import()]
+
+    def get_export_formats(self):
+        formats = (
+            base_formats.XLSX,
+        )
+        return [f for f in formats if f().can_export()]
+
+
+
+
+
 
 
 @admin.register(Banque)

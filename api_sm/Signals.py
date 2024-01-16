@@ -156,9 +156,28 @@ def post_save_facture(sender, instance, created, **kwargs):
                 detail=d
             ).save()
         instance.num_situation = Factures.objects.filter(marche=instance.marche).count()
+        avance=Avance.objects.get(Q(marche=instance.marche) & Q(client=instance.marche.nt.code_client) & Q(date__range=[instance.du,instance.au] ))
+        Remboursement.objects.create(facture=instance,avance=avance)
         instance.save()
 
 
+
+@receiver(pre_save, sender=Remboursement)
+def pre_save_remboursement(sender, instance, **kwargs):
+    if not instance.pk:
+        instance.montant_precedent=0
+        instance.montant_mois=round(instance.facture.montant_mois*instance.avance.type.taux_reduction_facture/100,2)
+        instance.montant_cumule=round(instance.facture.montant_mois*instance.avance.type.taux_reduction_facture/100,2)
+        instance.rst_remb=round(instance.avance.montant-instance.montant_cumule,2)
+
+
+
+
+@receiver(post_save, sender=Remboursement)
+def post_save_remboursement(sender, instance, created, **kwargs):
+
+
+    pass
 
 @receiver(post_softdelete, sender=Factures)
 def update_on_softdelete(sender, instance, **kwargs):
@@ -173,11 +192,13 @@ def pre_save_detail_facture(sender, instance, **kwargs):
     if(instance.detail.dqe.marche != instance.facture.marche):
         raise ValidationError("Cette attachement ne fais pas partie du marche")
 
+
 @receiver(pre_save, sender=Avance)
 def pre_save_avance(sender, instance, **kwargs):
+
     if(instance.marche.nt.code_client.id != instance.client.id):
         raise ValidationError("Ce client ne fais pas partie du marche")
-    instance.taux_avance= round((instance.montant/instance.marche.ttc)*100,2)
+    instance.montant= round((instance.marche.ttc)*instance.taux_avance/100,2)
     if (instance.taux_avance > instance.type.taux_max):
         raise ValidationError(
             f'Vous avez une avance de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')

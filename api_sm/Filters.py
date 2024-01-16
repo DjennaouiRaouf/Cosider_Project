@@ -1,4 +1,5 @@
 import django_filters
+from django.db.models import Q
 
 from api_sm.models import *
 
@@ -21,15 +22,20 @@ class NTFilter(django_filters.FilterSet):
         fields=['nt','code_site','code_client',]
 
 class MarcheFilter(django_filters.FilterSet):
-    code_site = django_filters.CharFilter(field_name='nt__code_site', label='Code du site')
+    code_site = django_filters.ModelChoiceFilter(field_name='nt__code_site', label='Code du site',
+                                                 queryset=Sites.objects.all(),)
+    code_contrat = django_filters.CharFilter(field_name='code_contrat', label='Code du contrat')
+    date_signature=django_filters.DateFilter(field_name="date_signature",label='Date de signature')
     nt = django_filters.CharFilter(field_name='nt__nt', label='Numero du travail')
-    rabais=django_filters.CharFilter(field_name='rabais', label='Rabais',lookup_expr='gt')
-    tva = django_filters.CharFilter(field_name='tva', label='TVA', lookup_expr='gt')
-    rg = django_filters.CharFilter(field_name='rg', label='Retenue de garantie', lookup_expr='gt')
-    client=django_filters.BooleanFilter(field_name='nt__code_client__est_client_cosider', label='Client')
+    rabais=django_filters.CharFilter(field_name='rabais', label='Rabais')
+    tva = django_filters.CharFilter(field_name='tva', label='TVA')
+    rg = django_filters.NumberFilter(field_name='rg', label='Retenue de garantie')
+    client=django_filters.BooleanFilter(field_name='nt__code_client__est_client_cosider', label='Cosider client')
+
+
     class Meta:
         model = Marche
-        fields=['code_contrat','date_signature','rabais']
+        fields=['code_contrat','date_signature','rabais','code_site','nt','tva','rg','client']
 
 
 class DQEFilter(django_filters.FilterSet):

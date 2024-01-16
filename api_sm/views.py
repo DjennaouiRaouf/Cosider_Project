@@ -169,6 +169,7 @@ class GetMarcheView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = MarcheFilter
 
+
 class GetDQEView(generics.ListAPIView):
 
     queryset = DQE.objects.all()

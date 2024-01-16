@@ -421,11 +421,12 @@ class Avance(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Marche",to_field='id')
     type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False)
-    montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+    montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,editable=False)
     taux_avance = models.DecimalField(default=0, max_digits=38, decimal_places=2,
-                                   validators=[MinValueValidator(0), MaxValueValidator(100)], null=False,editable=False)
+                                   validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     client = models.ForeignKey(Clients, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Client" ,to_field='id')
-
+    date=models.DateField(null=False)
+    heure = models.TimeField(auto_now=True,null=False,editable=False)
     objects = DeletedModelManager()
 
 
@@ -538,19 +539,25 @@ class Factures(SafeDeleteModel):
                                          verbose_name="Montant Cumulé"
                                          ,editable=False)
 
+    montant_rb = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                       verbose_name="Montant du rabais"
+                                       , editable=False) #montant du rabais du mois
+
+
     montant_rg=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                          verbose_name="Montant Retenue de garantie"
+                                         ,editable=False) #retenue de garantie le montant du mois
+
+
+    montant_factureHT=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                         verbose_name="Montant de la facture"
                                          ,editable=False)
 
-    montant_taxe=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         verbose_name="Montant Retenue de garantie"
-                                         ,editable=False)
-    montant_rb = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                       verbose_name="Montant Retenue de garantie"
-                                       , editable=False)
-    a_payer=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+    montant_factureTTC=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                          verbose_name="Net à Payer"
                                          ,editable=False)
+
+
     objects = DeletedModelManager()
 
 
@@ -560,6 +567,36 @@ class Factures(SafeDeleteModel):
         verbose_name_plural = 'Factures'
         app_label = 'api_sm'
         
+class Remboursement(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+    facture = models.ForeignKey(Factures, on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
+    avance=models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
+    montant_precedent=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                         verbose_name="Montant precedent"
+                                         ,editable=False)
+    montant_mois =models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                         verbose_name="Montant Mois"
+                                         ,editable=False)
+    montant_cumule=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                         verbose_name="Montant Cumule"
+                                         ,editable=False)
+    rst_remb=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                         verbose_name="Reste à rembourser"
+                                         ,editable=False)
+
+    date=models.DateField(auto_now=True,null=False,editable=False)
+    heure=models.TimeField(auto_now=True,null=False,editable=False)
+
+    objects = DeletedModelManager()
+
+
+
+    class Meta:
+        verbose_name = 'Remboursement'
+        verbose_name_plural = 'Remboursements'
+        app_label = 'api_sm'
+
+
 
 class DetailFacture(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
