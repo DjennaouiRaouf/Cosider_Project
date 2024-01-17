@@ -392,6 +392,12 @@ class GetAvance(generics.ListAPIView):
 
 
 
+class LibAV(generics.ListAPIView):
+    queryset = TypeAvance.objects.all()
+    serializer_class = TypeAvanceSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TypeAvanceFilter
+
 class AddAvanceApiView(generics.CreateAPIView):
     queryset = Avance.objects.all()
     serializer_class = AvanceSerializer
@@ -419,3 +425,5 @@ class AddAvanceApiView(generics.CreateAPIView):
             }
 
             return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
+
+

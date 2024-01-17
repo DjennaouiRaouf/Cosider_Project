@@ -78,3 +78,7 @@ class AvanceFilter(django_filters.FilterSet):
         model = Avance
         fields=['marche',]
 
+class TypeAvanceFilter(django_filters.FilterSet):
+    class Meta:
+        model = TypeAvance
+        fields=['id',]

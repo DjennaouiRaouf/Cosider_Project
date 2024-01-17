@@ -355,5 +355,24 @@ class AvanceSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        representation['type']=instance.type.libelle
+        return representation
 
+
+
+class TypeAvanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=TypeAvance
+        fields='__all__'
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('deleted', None)
+        fields.pop('deleted_by_cascade', None)
+
+
+        return fields
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
         return representation
