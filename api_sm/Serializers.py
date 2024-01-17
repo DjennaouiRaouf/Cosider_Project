@@ -334,3 +334,26 @@ class DetailFactureSerializer(serializers.ModelSerializer):
         del representation['facture']
         del representation['detail']
         return representation
+
+
+
+class AvanceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+            model=Avance
+            fields='__all__'
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('id', None)
+        fields.pop('deleted', None)
+        fields.pop('deleted_by_cascade', None)
+
+
+        return fields
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        return representation

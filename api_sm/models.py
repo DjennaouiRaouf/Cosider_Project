@@ -399,14 +399,12 @@ class TypeAvance(SafeDeleteModel):
     taux_max = models.DecimalField(default=0, max_digits=38, decimal_places=2,
                                                  validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
+
+
     objects = DeletedModelManager()
 
     def __str__(self):
         return self.libelle
-
-    def save(self, *args, **kwargs):
-        super(TypeAvance, self).save(*args, **kwargs)
-
 
 
 
@@ -420,12 +418,11 @@ class TypeAvance(SafeDeleteModel):
 class Avance(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Marche",to_field='id')
-    type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False)
+    type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False,to_field='id',verbose_name="Type d'avance")
     montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,editable=False)
-    taux_avance = models.DecimalField(default=0, max_digits=38, decimal_places=2,
+    taux_avance = models.DecimalField(default=0, max_digits=38, decimal_places=2,verbose_name="Taux d'avance",
                                    validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    client = models.ForeignKey(Clients, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Client" ,to_field='id')
-    date=models.DateField(null=False)
+    date=models.DateField(null=False,verbose_name="Date d'avance")
     heure = models.TimeField(auto_now=True,null=False,editable=False)
 
 
@@ -571,9 +568,7 @@ class Remboursement(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     facture = models.ForeignKey(Factures, on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
     avance=models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
-    montant_precedent=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         verbose_name="Montant precedent"
-                                         ,editable=False)
+
     montant_mois =models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                          verbose_name="Montant Mois"
                                          ,editable=False)

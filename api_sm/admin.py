@@ -361,7 +361,7 @@ class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
 @admin.register(Avance)
 class  AvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource=AvanceResource
-    list_display = ("marche", "type","montant_avance","client",'taux' )
+    list_display = ("marche", "type","montant_avance",'taux' )
     list_filter = (SafeDeleteAdminFilter,)
     save_as = True
 
@@ -441,10 +441,10 @@ class AgenceAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
 
 
 @admin.register(Remboursement)
-class AgenceAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
+class RembAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     list_per_page = lp
-    list_display = ("facture","montant_precedent","montant_mois","montant_cumule","rst_remb")
+    list_display = ("facture","montant_mois","montant_cumule","rst_remb")
     list_filter = (SafeDeleteAdminFilter,)
 
     def get_import_formats(self):

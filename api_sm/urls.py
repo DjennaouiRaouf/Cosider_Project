@@ -49,7 +49,12 @@ urlpatterns = [
     path('getlibmp/',LibMP.as_view()),
 
 
-    path('detail/',getDetailFacture.as_view())
+    path('detail/',getDetailFacture.as_view()),
+
+
+
+    path('getavance/',GetAvance.as_view()),
+    path('addavance/',AddAvanceApiView.as_view()),
 
 
 

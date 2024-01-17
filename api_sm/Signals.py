@@ -128,11 +128,9 @@ def pre_save_factures(sender, instance, **kwargs):
         instance.montant_mois = mm
         instance.montant_cumule = mc
 
-        instance.montant_rg= mm * (instance.marche.rg/100)
-        instance.montant_taxe = mm * (instance.marche.tva / 100)
         instance.montant_rb = mm * (instance.marche.rabais / 100)
 
-        instance.a_payer=mm-instance.montant_rg-instance.montant_rb+instance.montant_taxe
+
 
 
 
@@ -156,20 +154,28 @@ def post_save_facture(sender, instance, created, **kwargs):
                 detail=d
             ).save()
         instance.num_situation = Factures.objects.filter(marche=instance.marche).count()
-        avance=Avance.objects.get(Q(marche=instance.marche) & Q(client=instance.marche.nt.code_client) & Q(date__range=[instance.du,instance.au] ))
-        Remboursement.objects.create(facture=instance,avance=avance)
+        avances=Avance.objects.filter(Q(marche=instance.marche) & Q(client=instance.marche.nt.code_client) & Q(date__range=[instance.du,instance.au]))
+
+        for avance in avances:
+            facture=Factures.objects.get(Q(marche=instance.marche) & Q(num_situation=instance.num_situation-1))
+            Remboursement(
+                facture=instance,
+                avance=avance,
+            )
+            mm = round((instance.montant_mois-instance.montant_rb) * (avance.type.taux_reduction_facture / 100), 2)
+            mc= round(mm + prec, 2)
+            mar = round(avance.montant-mc, 2)
+            print(avance.type.libelle)
+            print(avance.type.taux_reduction_facture)
+            print(mm,mc,mar,instance.montant_rb)
+
         instance.save()
 
 
 
 @receiver(pre_save, sender=Remboursement)
 def pre_save_remboursement(sender, instance, **kwargs):
-    if not instance.pk:
-        instance.montant_precedent=0
-        instance.montant_mois=round(instance.facture.montant_mois*instance.avance.type.taux_reduction_facture/100,2)
-        instance.montant_cumule=round(instance.facture.montant_mois*instance.avance.type.taux_reduction_facture/100,2)
-        instance.rst_remb=round(instance.avance.montant-instance.montant_cumule,2)
-
+    pass
 
 
 
@@ -199,24 +205,27 @@ def pre_save_detail_facture(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=Avance)
 def pre_save_avance(sender, instance, **kwargs):
+    if(instance.type.id == 3 and  instance.taux_avance != instance.type.taux_max):
+        raise ValidationError(
+            f'L\'avance de type {instance.type.libelle} doit etre égale  {instance.type.taux_max}%')
 
-    if(instance.marche.nt.code_client.id != instance.client.id):
-        raise ValidationError("Ce client ne fais pas partie du marche")
-    instance.montant= round((instance.marche.ttc)*instance.taux_avance/100,2)
-    if (instance.taux_avance > instance.type.taux_max):
+    if (instance.type.id != 3 and instance.taux_avance > instance.type.taux_max):
         raise ValidationError(
             f'Vous avez une avance de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
 
-
+    instance.montant= round((instance.marche.ttc)*instance.taux_avance/100,2)
 
 @receiver(post_save, sender=Avance)
 def post_save_avance(sender, instance, created, **kwargs):
     sum = Avance.objects.filter(marche=instance.marche, type=instance.type).aggregate(models.Sum('taux_avance'))[
         "taux_avance__sum"]
-    if (sum > instance.type.taux_max):
+    if (instance.type.id != 3 and sum > instance.type.taux_max):
         raise ValidationError(
             f'Vous avez plusieurs avances de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
 
+    if(instance.type.id == 3 and  instance.taux_avance != instance.type.taux_max):
+        raise ValidationError(
+            f'L\'avance de type {instance.type.libelle} doit etre égale  {instance.type.taux_max}%')
 
 
 

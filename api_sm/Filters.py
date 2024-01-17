@@ -70,3 +70,11 @@ class DetailFactureFilter(django_filters.FilterSet):
     class Meta:
         model = DetailFacture
         fields = ['facture','code_tache','libelle_tache' ]
+
+
+class AvanceFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Avance
+        fields=['marche',]
+

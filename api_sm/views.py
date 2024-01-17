@@ -382,3 +382,40 @@ class getDetailFacture(generics.ListAPIView):
     serializer_class = DetailFactureSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = DetailFactureFilter
+
+
+class GetAvance(generics.ListAPIView):
+    queryset = Avance.objects.all()
+    serializer_class = AvanceSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = AvanceFilter
+
+
+
+class AddAvanceApiView(generics.CreateAPIView):
+    queryset = Avance.objects.all()
+    serializer_class = AvanceSerializer
+
+
+    def create(self, request, *args, **kwargs):
+        try:
+
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            self.perform_create(serializer)
+            custom_response = {
+                'status': 'success',
+                'message': 'Avance ajouté',
+                'data': serializer.data,
+            }
+
+            return Response(custom_response, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            custom_response = {
+                'status': 'error',
+                'message': str(e),
+                'data': None,
+            }
+
+            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
