@@ -417,6 +417,8 @@ class TypeAvance(SafeDeleteModel):
 
 class Avance(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
+    num_avance = models.PositiveIntegerField(default=0, null=False, blank=True, editable=False,
+                                                verbose_name="Numero d'avance")
     marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Marche",to_field='id')
     type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False,to_field='id',verbose_name="Type d'avance")
     montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,editable=False)
