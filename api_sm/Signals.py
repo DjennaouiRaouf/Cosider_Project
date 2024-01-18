@@ -157,6 +157,7 @@ def post_save_facture(sender, instance, created, **kwargs):
         avances=Avance.objects.filter(Q(marche=instance.marche) & Q(client=instance.marche.nt.code_client) & Q(date__range=[instance.du,instance.au]))
 
         for avance in avances:
+            prec=0
             facture=Factures.objects.get(Q(marche=instance.marche) & Q(num_situation=instance.num_situation-1))
             Remboursement(
                 facture=instance,
@@ -217,15 +218,16 @@ def pre_save_avance(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Avance)
 def post_save_avance(sender, instance, created, **kwargs):
-    sum = Avance.objects.filter(marche=instance.marche, type=instance.type).aggregate(models.Sum('taux_avance'))[
-        "taux_avance__sum"]
-    if (instance.type.id != 3 and sum > instance.type.taux_max):
-        raise ValidationError(
-            f'Vous avez plusieurs avances de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
+    if(not instance.deleted):
+        sum = Avance.objects.filter(marche=instance.marche, type=instance.type).aggregate(models.Sum('taux_avance'))[
+            "taux_avance__sum"]
+        if (instance.type.id != 3 and sum > instance.type.taux_max):
+            raise ValidationError(
+                f'Vous avez plusieurs avances de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
 
-    if(instance.type.id == 3 and  instance.taux_avance != instance.type.taux_max):
-        raise ValidationError(
-            f'L\'avance de type {instance.type.libelle} doit etre égale  {instance.type.taux_max}%')
+        if(instance.type.id == 3 and  instance.taux_avance != instance.type.taux_max):
+            raise ValidationError(
+                f'L\'avance de type {instance.type.libelle} doit etre égale  {instance.type.taux_max}%')
 
 
 
@@ -259,6 +261,32 @@ def pre_save_type_caution(sender, instance, **kwargs):
                 f'Le taux  MIN de la caution  doit etre supérieur au taux MAX')
 
 
+
+
+@receiver(pre_save, sender=Cautions)
+def pre_save_caution(sender, instance, **kwargs):
+    if(instance.avance):
+        if(instance.avance.marche != instance.marche):
+            raise ValidationError(
+                f'Le Marché {instance.marche} ne posséde pas cette avance  de type {instance.avance.type}')
+        else:
+            if(instance.avance.type != instance.type.type_avance):
+                raise ValidationError(
+                    f'Cette avance est de type {instance.avance.type} n\'est pas compatible avec la caution de type {instance.type.type_avance} ')
+
+
+    exact = instance.type.taux_exact
+    max = instance.type.taux_max
+    min = instance.type.taux_min
+    if (exact != None):
+        if (instance.taux != exact):
+            raise ValidationError(
+                 f'le taux de la caution du marché  {instance.taux} doit etre égale à {exact}')
+
+        if (min != None and max != None):
+            if (not min <= instance.taux <= max):
+                raise ValidationError(
+                    f'le taux de la caution du marché  {instance.taux}  doit etre comprise entre [{min},{max}]')
 
 
 

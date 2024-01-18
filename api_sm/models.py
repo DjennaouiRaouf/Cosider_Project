@@ -415,6 +415,8 @@ class Avance(SafeDeleteModel):
 
     objects = DeletedModelManager()
 
+    def __str__(self):
+        return str(self.marche)+"-"+self.type.libelle+'-'+str(self.num_avance)
     class Meta:
         verbose_name = 'Avance'
         verbose_name_plural = 'Avances'
@@ -642,6 +644,8 @@ class Cautions(SafeDeleteModel):
     type = models.ForeignKey(TypeCaution, on_delete=models.DO_NOTHING, null=False)
     avance = models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
     date_soumission = models.DateField(blank=True, null=False)
+    taux = models.DecimalField(default=0,max_digits=38, decimal_places=2,
+                                     validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     banque = models.ForeignKey(Agence, on_delete=models.DO_NOTHING, null=False)
     montant = models.DecimalField(
         max_digits=38, decimal_places=2,
@@ -652,22 +656,7 @@ class Cautions(SafeDeleteModel):
 
     objects = DeletedModelManager()
 
-    def recuperation(self):
-        self.est_recupere = True  # la caution est récupérée
 
-    def soumission(self):
-        if (self.avance and self.avance.type.libelle == self.type.libelle):
-            taux_c = TypeCaution.objects.get(libelle=self.avance.type.libelle).taux
-            self.montant = self.avance.montant * taux_c
-        if (not self.avance):
-            self.montant = (self.marche.ttc * self.type.taux) / 100
-
-        self.est_recupere = False  # la caution est déposée
-
-    def save(self, *args, **kwargs):
-        self.soumission()
-
-        super(Cautions, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Caution'
