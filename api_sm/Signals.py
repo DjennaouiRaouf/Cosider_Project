@@ -230,9 +230,33 @@ def post_save_avance(sender, instance, created, **kwargs):
 
 
 
+@receiver(pre_save, sender=TypeCaution)
+def pre_save_type_caution(sender, instance, **kwargs):
+    if(instance.type_avance):
+        instance.libelle=instance.type_avance.libelle
+    if (not instance.type_avance and not instance.libelle ):
+        raise ValidationError(
+            f'Libelle de la caution est obligatoire')
+    if (not instance.taux_exact and not instance.taux_min and not instance.taux_max):
+        raise ValidationError(
+            f'Le taux de la caution doit etre soit une valeur exact ou intervale')
 
+    if((instance.taux_exact and instance.taux_min) or(instance.taux_exact and instance.taux_max)):
+        raise ValidationError(
+            f'Le taux de la caution doit etre soit une valeur exact ou intervale')
 
+    if( instance.taux_min and not instance.taux_max):
+        raise ValidationError(
+            f'Le taux  MAX de la caution est obligatoir')
 
+    if (not instance.taux_min and  instance.taux_max):
+        raise ValidationError(
+            f'Le taux  MIN de la caution est obligatoir')
+
+    if (instance.taux_min and instance.taux_max):
+        if(instance.taux_min >= instance.taux_max):
+            raise ValidationError(
+                f'Le taux  MIN de la caution  doit etre supérieur au taux MAX')
 
 
 

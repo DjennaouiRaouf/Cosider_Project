@@ -391,8 +391,26 @@ class  AvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
 @admin.register(TypeCaution)
 class  TypeCautionAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeCautionResource
-    list_display = ("id", "libelle", "taux",)
+    list_display = ("id", "libelle", "taux_exacte","taux_minimum","taux_maximum")
     list_filter = (SafeDeleteAdminFilter,)
+
+    def taux_exacte(self,obj):
+        if(obj.taux_exact):
+            return str(obj.taux_exact)+'%'
+        else:
+            return '-'
+
+    def taux_minimum(self, obj):
+        if (obj.taux_min):
+            return str(obj.taux_min) + '%'
+        else:
+            return '-'
+
+    def taux_maximum(self, obj):
+        if (obj.taux_max):
+            return str(obj.taux_max) + '%'
+        else:
+            return '-'
 
     def get_import_formats(self):
         formats = (

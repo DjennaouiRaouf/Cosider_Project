@@ -427,3 +427,9 @@ class AddAvanceApiView(generics.CreateAPIView):
             return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+class GetCautions(generics.ListAPIView):
+    queryset = Cautions.objects.all()
+    serializer_class = TypeAvanceSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CautionFilter

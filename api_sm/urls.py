@@ -57,6 +57,9 @@ urlpatterns = [
     path('addavance/',AddAvanceApiView.as_view()),
 
 
+    path('getcautions/',GetCautions.as_view()),
+
+
 
 
 ]

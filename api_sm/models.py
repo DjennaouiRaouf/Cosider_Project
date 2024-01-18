@@ -338,27 +338,6 @@ class Ordre_De_Service(SafeDeleteModel):
         
 
 
-class TypeCaution(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
-    libelle = models.CharField(max_length=500, null=False)
-    taux = models.DecimalField(default=0, max_digits=38, decimal_places=2,
-                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-
-    objects = DeletedModelManager()
-
-    def __str__(self):
-        return self.libelle
-
-    def save(self, *args, **kwargs):
-        super(TypeCaution, self).save(*args, **kwargs)
-
-
-
-    class Meta:
-        verbose_name = 'Type_Caution'
-        verbose_name_plural = 'Type_Caution'
-        app_label = 'api_sm'
-
 
 
 
@@ -417,15 +396,21 @@ class TypeAvance(SafeDeleteModel):
 
 class Avance(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
+    type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False, to_field='id',
+                             verbose_name="Type d'avance")
     num_avance = models.PositiveIntegerField(default=0, null=False, blank=True, editable=False,
                                                 verbose_name="Numero d'avance")
     marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Marche",to_field='id')
-    type = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=False,to_field='id',verbose_name="Type d'avance")
+
+    taux_avance = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Taux d'avance",
+                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+
     montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,editable=False)
-    taux_avance = models.DecimalField(default=0, max_digits=38, decimal_places=2,verbose_name="Taux d'avance",
-                                   validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+
+
     date=models.DateField(null=False,verbose_name="Date d'avance")
     heure = models.TimeField(auto_now=True,null=False,editable=False)
+    remboursee = models.BooleanField(default=False, null=False,verbose_name='Est Remboursée')
 
 
     objects = DeletedModelManager()
@@ -439,46 +424,6 @@ class Avance(SafeDeleteModel):
 
 
 
-class Cautions(SafeDeleteModel):
-    _safedelete_policy = SOFT_DELETE_CASCADE
-    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Caution_Marche")
-    type = models.ForeignKey(TypeCaution, on_delete=models.DO_NOTHING, null=False)
-    avance = models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
-    date_soumission = models.DateField(blank=True, null=False)
-    banque = models.ForeignKey(Agence, on_delete=models.DO_NOTHING, null=False)
-    montant = models.DecimalField(
-        max_digits=38, decimal_places=2,
-        validators=[MinValueValidator(0)], default=0,
-        editable=False
-    )
-    est_recupere = models.BooleanField(default=True, null=False, editable=False)
-
-    objects = DeletedModelManager()
-
-    def recuperation(self):
-        self.est_recupere = True  # la caution est récupérée
-
-    def soumission(self):
-        if (self.avance and self.avance.type.libelle == self.type.libelle):
-            taux_c = TypeCaution.objects.get(libelle=self.avance.type.libelle).taux
-            self.montant = self.avance.montant * taux_c
-        if (not self.avance):
-            self.montant = (self.marche.ttc * self.type.taux) / 100
-
-        self.est_recupere = False  # la caution est déposée
-
-    def save(self, *args, **kwargs):
-        self.soumission()
-
-        super(Cautions, self).save(*args, **kwargs)
-
-
-
-    class Meta:
-        verbose_name = 'Caution'
-        verbose_name_plural = 'Caution'
-        app_label = 'api_sm'
-        
 
 
 class Attachements(SafeDeleteModel):
@@ -663,8 +608,71 @@ class Encaissement(SafeDeleteModel):
         
 
 
+class TypeCaution(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+    libelle = models.CharField(max_length=500,null=True,blank=True)
+    type_avance = models.ForeignKey(TypeAvance, on_delete=models.DO_NOTHING, null=True,blank=True, to_field='id',
+                             verbose_name="Type d'avance")
+    taux_exact= models.DecimalField(max_digits=38, decimal_places=2,
+                                   validators=[MinValueValidator(0), MaxValueValidator(100)], null=True,blank=True)
+    taux_min = models.DecimalField(max_digits=38, decimal_places=2,
+                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=True,blank=True)
+    taux_max = models.DecimalField( max_digits=38, decimal_places=2,
+                                   validators=[MinValueValidator(0), MaxValueValidator(100)], null=True,blank=True)
+
+    objects = DeletedModelManager()
+
+    def __str__(self):
+        return self.libelle
+
+    def save(self, *args, **kwargs):
+        super(TypeCaution, self).save(*args, **kwargs)
 
 
+
+    class Meta:
+        verbose_name = 'Type_Caution'
+        verbose_name_plural = 'Type_Caution'
+        app_label = 'api_sm'
+
+
+class Cautions(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Caution_Marche")
+    type = models.ForeignKey(TypeCaution, on_delete=models.DO_NOTHING, null=False)
+    avance = models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
+    date_soumission = models.DateField(blank=True, null=False)
+    banque = models.ForeignKey(Agence, on_delete=models.DO_NOTHING, null=False)
+    montant = models.DecimalField(
+        max_digits=38, decimal_places=2,
+        validators=[MinValueValidator(0)], default=0,
+        editable=False
+    )
+    est_recupere = models.BooleanField(default=True, null=False, editable=False)
+
+    objects = DeletedModelManager()
+
+    def recuperation(self):
+        self.est_recupere = True  # la caution est récupérée
+
+    def soumission(self):
+        if (self.avance and self.avance.type.libelle == self.type.libelle):
+            taux_c = TypeCaution.objects.get(libelle=self.avance.type.libelle).taux
+            self.montant = self.avance.montant * taux_c
+        if (not self.avance):
+            self.montant = (self.marche.ttc * self.type.taux) / 100
+
+        self.est_recupere = False  # la caution est déposée
+
+    def save(self, *args, **kwargs):
+        self.soumission()
+
+        super(Cautions, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Caution'
+        verbose_name_plural = 'Caution'
+        app_label = 'api_sm'
 
 
 
