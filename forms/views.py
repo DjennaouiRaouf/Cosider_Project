@@ -135,7 +135,7 @@ class DQEFieldsApiView(APIView):
                 field_info = []
 
                 for field_name, field_instance in fields.items():
-                    print(field_name)
+
                     if (not field_name in ['prix_q']):
                         if( field_name in ['prix_u','quantite']):
                             readOnly=False
@@ -177,7 +177,7 @@ class DQEFieldsApiView(APIView):
 class MarcheFieldsFilterApiView(APIView):
     def get(self,request):
         field_info = []
-        print(MarcheFilter.base_filters.items())
+
         for field_name, field_instance  in MarcheFilter.base_filters.items():
 
 
@@ -716,7 +716,7 @@ class DetailFactureFieldsApiView(APIView):
 class DetailFactureFieldsFilterApiView(APIView):
     def get(self,request):
         filter_fields = list(DetailFactureFilter.base_filters.keys())
-        print(filter_fields)
+
         serializer = DetailFactureSerializer()
         fields = serializer.get_fields()
         field_info = []
@@ -754,12 +754,15 @@ class AvanceFieldsApiView(APIView):
             model_name = model_class.__name__
             if (flag == 'f'):  # react form
                 field_info = []
+
                 for field_name, field_instance in fields.items():
-                    if( not field_name in ['montant','heure','marche'] ):
+
+                    if( not field_name in ['montant','heure','marche','id'] ):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
                             'label': field_instance.label or field_name,
+
                         }
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
@@ -772,7 +775,7 @@ class AvanceFieldsApiView(APIView):
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if (field_name not in ['heure','marche']):
+                    if (field_name not in ['heure','marche','id']):
                         field_info.append({
                             'field': field_name,
                             'headerName': field_instance.label or field_name,
@@ -797,7 +800,7 @@ class AvanceFieldsStateApiView(APIView):
         field_info = []
         for field_name, field_instance in fields.items():
             default_value = ''
-            if (field_name not in  ['montant','heure','marche']):
+            if (field_name not in  ['montant','heure','marche','id']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                     default_value= ''
                 if str(field_instance.__class__.__name__) == 'BooleanField':
@@ -819,3 +822,89 @@ class AvanceFieldsStateApiView(APIView):
                 state.update(d)
         return Response({'state': state}, status=status.HTTP_200_OK)
 
+
+class CautionFieldsApiView(APIView):
+    def get(self, request):
+        flag = request.query_params.get('flag', None)
+        marche = request.query_params.get('marche', None)
+
+        if flag == 'l' or flag == 'f' :
+            serializer = CautionSerializer()
+            fields = serializer.get_fields()
+
+            model_class = serializer.Meta.model
+            model_name = model_class.__name__
+            if (flag == 'f'):  # react form
+                field_info = []
+                for field_name, field_instance in fields.items():
+
+                    if( not field_name in ['est_recupere','marche','montant'] ):
+                        obj = {
+                            'name': field_name,
+                            'type': str(field_instance.__class__.__name__),
+                            'label': field_instance.label or field_name,
+                            "required":field_instance.required
+                        }
+
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                            if(str(field_instance.queryset.model.__name__)=="Avance"):
+                                obj['queryset'] = AvanceSerializer(field_instance.queryset.filter(marche=marche), many=True).data
+
+                            else:
+                                anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                                obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+
+                        field_info.append(obj)
+
+
+            if (flag == 'l'):  # data grid list (react ag-grid)
+                field_info = []
+                for field_name, field_instance in fields.items():
+                    if (field_name not in ['heure','marche']):
+                        field_info.append({
+                            'field': field_name,
+                            'headerName': field_instance.label or field_name,
+                            'info': str(field_instance.__class__.__name__),
+                        })
+
+
+
+            return Response({'fields': field_info,
+            'models': model_name, 'pk': Cautions._meta.pk.name}, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+class CautionFieldsStateApiView(APIView):
+    def get(self, request):
+        serializer = CautionSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        for field_name, field_instance in fields.items():
+            default_value = ''
+            if (field_name not in  ['est_recupere','marche','montant']):
+                if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
+                    default_value= ''
+                if str(field_instance.__class__.__name__) == 'BooleanField':
+                    default_value= True
+
+                if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
+                                                              'IntegerField',]:
+                    default_value = 0
+
+                field_info.append({
+                    field_name:default_value ,
+
+                })
+
+
+                state = {}
+
+            for d in field_info:
+                state.update(d)
+        return Response({'state': state}, status=status.HTTP_200_OK)
