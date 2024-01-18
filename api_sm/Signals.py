@@ -288,8 +288,13 @@ def pre_save_caution(sender, instance, **kwargs):
                 raise ValidationError(
                     f'le taux de la caution du marché  {instance.taux}  doit etre comprise entre [{min},{max}]')
 
+    montant=0
+    if(instance.avance):
+        montant=instance.avance.montant
+    else:
+        montant=instance.marche.ttc
 
-
+    instance.montant=round(montant*instance.taux/100,2)
 
 
 

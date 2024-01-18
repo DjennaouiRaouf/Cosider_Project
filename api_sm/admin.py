@@ -516,12 +516,13 @@ class BanqueAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
 @admin.register(Cautions)
 class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = BanqueResource
-    list_display = ("marche", "Type_Caution","montant", "date_soumission", "montant","est_recupere")
+    list_display = ("marche", "Type_Caution","montant_caution",'taux_caution', "date_soumission", "est_recupere")
     list_filter = (SafeDeleteAdminFilter,)
-    existing_actions = list(SafeDeleteAdmin.actions)
-    existing_actions.append('recuperer')
-    actions = existing_actions
 
+    def montant_caution(self,obj):
+        return humanize.intcomma(obj.montant)
+    def taux_caution(self,obj):
+        return  str(obj.taux)+"%"
     def get_import_formats(self):
 
         formats = (
