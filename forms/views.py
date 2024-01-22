@@ -757,7 +757,7 @@ class AvanceFieldsApiView(APIView):
 
                 for field_name, field_instance in fields.items():
 
-                    if( not field_name in ['montant','heure','marche','id'] ):
+                    if( not field_name in ['montant','heure','marche','id','num_avance','remboursee'] ):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -827,6 +827,7 @@ class CautionFieldsApiView(APIView):
     def get(self, request):
         flag = request.query_params.get('flag', None)
         marche = request.query_params.get('marche', None)
+        banque = request.query_params.get('banque', None)
 
         if flag == 'l' or flag == 'f' :
             serializer = CautionSerializer()
@@ -849,6 +850,7 @@ class CautionFieldsApiView(APIView):
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             if(str(field_instance.queryset.model.__name__)=="Avance"):
                                 obj['queryset'] = AvanceSerializer(field_instance.queryset.filter(marche=marche), many=True).data
+
 
                             else:
                                 anySerilizer = create_dynamic_serializer(field_instance.queryset.model)

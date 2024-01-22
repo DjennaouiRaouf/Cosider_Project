@@ -643,10 +643,10 @@ class Cautions(SafeDeleteModel):
     marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Caution_Marche")
     type = models.ForeignKey(TypeCaution, on_delete=models.DO_NOTHING, null=False)
     avance = models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
-    date_soumission = models.DateField(null=False)
+    date_soumission = models.DateField(null=False,verbose_name="Date dépot")
     taux = models.DecimalField(default=0,max_digits=38, decimal_places=2,
                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    banque = models.ForeignKey(Agence, on_delete=models.DO_NOTHING, null=False)
+    agence = models.ForeignKey(Agence, on_delete=models.DO_NOTHING, null=False)
     montant = models.DecimalField(
         max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0,

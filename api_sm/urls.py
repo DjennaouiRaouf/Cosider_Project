@@ -58,6 +58,7 @@ urlpatterns = [
 
 
     path('getcautions/',GetCautions.as_view()),
+    path('addcautions/',AddCautions.as_view()),
 
 
 

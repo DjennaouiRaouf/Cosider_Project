@@ -5,6 +5,7 @@ from rest_framework import generics, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from rest_framework.mixins import DestroyModelMixin
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -433,3 +434,34 @@ class GetCautions(generics.ListAPIView):
     serializer_class = TypeAvanceSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = CautionFilter
+
+
+
+
+class AddCautions(generics.CreateAPIView):
+    queryset = Cautions.objects.all()
+    serializer_class = CautionSerializer
+
+
+    def create(self, request, *args, **kwargs):
+        try:
+
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            self.perform_create(serializer)
+            custom_response = {
+                'status': 'success',
+                'message': 'Caution ajouté',
+                'data': serializer.data,
+            }
+
+            return Response(custom_response, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            custom_response = {
+                'status': 'error',
+                'message': str(e),
+                'data': None,
+            }
+
+            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)

@@ -86,6 +86,7 @@ class CautionFilter(django_filters.FilterSet):
         fields=['marche',]
 
 
+
 class TypeAvanceFilter(django_filters.FilterSet):
     class Meta:
         model = TypeAvance
