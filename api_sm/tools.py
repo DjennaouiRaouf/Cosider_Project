@@ -34,11 +34,6 @@ class ViewMarchePermission(permissions.BasePermission):
         return True
 
 
-class ViewDQEPermission(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if ( not User.objects.get(id=request.user.id).has_perm('api_sm.view_dqe')):
-            raise PermissionDenied("Vous n'êtes pas habilité à visualiser la liste des dqe")
-        return True
 
 
 
@@ -54,6 +49,36 @@ class ViewNTPermission(permissions.BasePermission):
         return True
 
 
+class AddDQEPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if( not User.objects.get(id=request.user.id).has_perm('api_sm.add_dqe')) :
+            raise PermissionDenied("Vous n'êtes pas habilité à ajouter un DQE")
+        return True
+class ViewDQEPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if ( not User.objects.get(id=request.user.id).has_perm('api_sm.view_dqe')):
+            raise PermissionDenied("Vous n'êtes pas habilité à visualiser la liste des DQE")
+        return True
+
+
+class UploadDQEPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if ( not User.objects.get(id=request.user.id).has_perm('api_sm.upload_dqe')):
+            raise PermissionDenied("Vous n'êtes pas habilité à de charger le dqe")
+        return True
+
+class DownloadDQEPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if ( not User.objects.get(id=request.user.id).has_perm('api_sm.download_dqe')):
+            raise PermissionDenied("Vous n'êtes pas habilité à de telecharger le dqe")
+        return True
+
+class DeleteDQEPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if ( not User.objects.get(id=request.user.id).has_perm('api_sm.delete_dqe')):
+            raise PermissionDenied("Vous n'êtes pas habilité à de supprimer le dqe")
+        return True
+
 
 class AddSitePermission(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -66,4 +91,12 @@ class ViewSitePermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if ( not User.objects.get(id=request.user.id).has_perm('api_sm.view_sites')):
             raise PermissionDenied("Vous n'êtes pas habilité à visualiser la liste des sites")
+        return True
+
+
+
+class AddAvancePermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if ( not User.objects.get(id=request.user.id).has_perm('api_sm.add_avance')):
+            raise PermissionDenied("Vous n'êtes pas habilité à ajouter une avance")
         return True

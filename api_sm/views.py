@@ -149,6 +149,7 @@ class AjoutMarcheApiView(generics.CreateAPIView):
 
 
 class AjoutDQEApiView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated, AddDQEPermission]
     queryset = Sites.objects.all()
     serializer_class = DQESerializer
 
@@ -203,6 +204,7 @@ class GetDQEView(generics.ListAPIView):
 
 
 class ImportDQEAPIView(ImportMixin,  APIView):
+    permission_classes = [IsAuthenticated, UploadDQEPermission]
     parser_classes = (MultiPartParser, FormParser,)
 
     def post(self, request, *args, **kwargs):
@@ -306,6 +308,7 @@ class GetFactureRG(generics.ListAPIView):
 
 
 class DelDQEByID(generics.DestroyAPIView,DestroyModelMixin):
+    permission_classes = [IsAuthenticated,DeleteDQEPermission]
     queryset = DQE.objects.all()
     serializer_class = DQESerializer
 
@@ -425,6 +428,7 @@ class LibAV(generics.ListAPIView):
     filterset_class = TypeAvanceFilter
 
 class AddAvanceApiView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated,AddAvancePermission]
     queryset = Avance.objects.all()
     serializer_class = AvanceSerializer
 

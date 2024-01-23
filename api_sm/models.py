@@ -311,6 +311,11 @@ class DQE(SafeDeleteModel): # le prix final
         verbose_name = 'DQE'
         verbose_name_plural = 'DQE'
         app_label = 'api_sm'
+        permissions = [
+            ("upload_dqe", "Can upload DQE"),
+            ("download_dqe", "Can download DQE"),
+
+        ]
         
 
 
