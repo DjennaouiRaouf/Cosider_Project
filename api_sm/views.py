@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth import authenticate
 from django_filters.rest_framework import DjangoFilterBackend
 from import_export.admin import ImportMixin, ExportMixin
@@ -27,16 +29,30 @@ class LoginView(APIView):
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
+        app_name = 'api_sm'
 
         if user is not None:
             Token.objects.filter(user=user).delete()
             token, created = Token.objects.get_or_create(user=user)
+            app_permissions = self.get_app_permissions(user, app_name)
             response = Response(status=status.HTTP_200_OK)
-            response.set_cookie('token',token.key )
+            role = '|'.join(list(app_permissions))
+            response.set_cookie('token', token.key)
+            response.set_cookie('role', role)
             return response
         else:
             return Response({'message': 'Informations d’identification non valides'}, status=status.HTTP_400_BAD_REQUEST)
 
+    def get_app_permissions(self, user, app_name):
+        # Get all permissions for the specified app
+        all_permissions = user.get_all_permissions()
+        app_permissions = set()
+
+        for permission in all_permissions:
+            if permission.split('.')[0] == app_name:
+                app_permissions.add(permission)
+
+        return app_permissions
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
@@ -44,6 +60,7 @@ class LogoutView(APIView):
         Token.objects.get(user_id=request.user.id).delete()
         response=Response({'message': 'Vous etes déconnecté'}, status=status.HTTP_200_OK)
         response.delete_cookie('token')
+        response.delete_cookie('role')
         return response
 
 
@@ -83,7 +100,7 @@ class AjoutClientApiView(generics.CreateAPIView):
 
 
 class GetClientsView(generics.ListAPIView):
-
+    permission_classes = [permissions.IsAuthenticated, ViewClientPermission]
     queryset = Clients.objects.all()
     serializer_class = ClientsSerializer
     filter_backends = [DjangoFilterBackend]
@@ -91,6 +108,7 @@ class GetClientsView(generics.ListAPIView):
 
 
 class AjoutSiteApiView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated,AddSitePermission]
 
     queryset = Sites.objects.all()
     serializer_class = SiteSerializer
@@ -108,6 +126,8 @@ class AjoutSiteApiView(generics.CreateAPIView):
 
 
 class AjoutMarcheApiView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated, AddMarchePermission]
+
     queryset = Sites.objects.all()
     serializer_class = MarcheSerializer
 
@@ -156,6 +176,8 @@ class AjoutDQEApiView(generics.CreateAPIView):
             return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
 
 class GetSitesView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated, ViewSitePermission]
+
     queryset = Sites.objects.all()
     serializer_class = SiteSerializer
     filter_backends = [DjangoFilterBackend]
@@ -165,6 +187,7 @@ class GetSitesView(generics.ListAPIView):
 
 
 class GetMarcheView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated, ViewMarchePermission]
     queryset = Marche.objects.all()
     serializer_class = MarcheSerializer
     filter_backends = [DjangoFilterBackend]
@@ -172,7 +195,7 @@ class GetMarcheView(generics.ListAPIView):
 
 
 class GetDQEView(generics.ListAPIView):
-
+    permission_classes = [permissions.IsAuthenticated,ViewDQEPermission]
     queryset = DQE.objects.all()
     serializer_class = DQESerializer
     filter_backends = [DjangoFilterBackend]
@@ -202,6 +225,7 @@ class ImportDQEAPIView(ImportMixin,  APIView):
 
 
 class GetNTView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated,ViewNTPermission]
     queryset = NT.objects.all()
     serializer_class = NTSerializer
     filter_backends = [DjangoFilterBackend]
@@ -209,6 +233,7 @@ class GetNTView(generics.ListAPIView):
 
 
 class AjoutNTApiView(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated, AddNTPermission]
     queryset = NT.objects.all()
     serializer_class = NTSerializer
 
@@ -436,6 +461,27 @@ class GetCautions(generics.ListAPIView):
     filterset_class = CautionFilter
 
 
+class PermissionApiView(APIView):
+    def get(self, request, *args, **kwargs):
+        '''
+        user_permissions = self.request.user.get_all_permissions()
+        return Response({"permissions": user_permissions})
+        '''
+        app_name = 'api_sm'
+        app_permissions = self.get_app_permissions(request.user, app_name)
+        role = '|'.join(list(app_permissions))
+        return Response({"role":role},status=status.HTTP_200_OK)
+
+    def get_app_permissions(self, user, app_name):
+        # Get all permissions for the specified app
+        all_permissions = user.get_all_permissions()
+        app_permissions = set()
+
+        for permission in all_permissions:
+            if permission.split('.')[0] == app_name:
+                app_permissions.add(permission)
+
+        return app_permissions
 
 
 class AddCautions(generics.CreateAPIView):

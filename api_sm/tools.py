@@ -19,6 +19,42 @@ class ViewClientPermission(permissions.BasePermission):
             raise PermissionDenied("Vous n'êtes pas habilité à visualiser la liste des clients")
         return True
 
+
+
+class AddMarchePermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if ( not User.objects.get(id=request.user.id).has_perm('api_sm.add_marche')):
+            raise PermissionDenied("Vous n'êtes pas habilité à visualiser la liste des Marchés")
+        return True
+
+class ViewMarchePermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if ( not User.objects.get(id=request.user.id).has_perm('api_sm.view_marche')):
+            raise PermissionDenied("Vous n'êtes pas habilité à visualiser la liste des Marchés")
+        return True
+
+
+class ViewDQEPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if ( not User.objects.get(id=request.user.id).has_perm('api_sm.view_dqe')):
+            raise PermissionDenied("Vous n'êtes pas habilité à visualiser la liste des dqe")
+        return True
+
+
+
+class AddNTPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if( not User.objects.get(id=request.user.id).has_perm('api_sm.add_nt')) :
+            raise PermissionDenied("Vous n'êtes pas habilité à ajouter un NT")
+        return True
+class ViewNTPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if ( not User.objects.get(id=request.user.id).has_perm('api_sm.view_nt')):
+            raise PermissionDenied("Vous n'êtes pas habilité à visualiser la liste des NT")
+        return True
+
+
+
 class AddSitePermission(permissions.BasePermission):
     def has_permission(self, request, view):
         if( not User.objects.get(id=request.user.id).has_perm('api_sm.add_sites')) :

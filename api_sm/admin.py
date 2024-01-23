@@ -401,13 +401,13 @@ class  TypeCautionAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin)
             return '-'
 
     def taux_minimum(self, obj):
-        if (obj.taux_min):
+        if (obj.taux_min != None):
             return str(obj.taux_min) + '%'
         else:
             return '-'
 
     def taux_maximum(self, obj):
-        if (obj.taux_max):
+        if (obj.taux_max!= None):
             return str(obj.taux_max) + '%'
         else:
             return '-'

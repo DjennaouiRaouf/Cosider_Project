@@ -221,11 +221,12 @@ def post_save_avance(sender, instance, created, **kwargs):
     if(not instance.deleted):
         sum = Avance.objects.filter(marche=instance.marche, type=instance.type).aggregate(models.Sum('taux_avance'))[
             "taux_avance__sum"]
+        print(sum)
         if (instance.type.id != 3 and sum > instance.type.taux_max):
             raise ValidationError(
                 f'Vous avez plusieurs avances de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
 
-        if(instance.type.id == 3 and  instance.taux_avance != instance.type.taux_max):
+        if(instance.type.id == 3 and  (instance.taux_avance != instance.type.taux_max or sum > instance.type.taux_max )):
             raise ValidationError(
                 f'L\'avance de type {instance.type.libelle} doit etre égale  {instance.type.taux_max}%')
 
@@ -251,9 +252,8 @@ def pre_save_type_caution(sender, instance, **kwargs):
         raise ValidationError(
             f'Le taux  MAX de la caution est obligatoir')
 
-    if (not instance.taux_min and  instance.taux_max):
-        raise ValidationError(
-            f'Le taux  MIN de la caution est obligatoir')
+    if (not instance.taux_min  and  instance.taux_max):
+        instance.taux_min=0
 
     if (instance.taux_min and instance.taux_max):
         if(instance.taux_min >= instance.taux_max):

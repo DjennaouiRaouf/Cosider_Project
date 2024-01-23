@@ -57,6 +57,8 @@ urlpatterns = [
     path('addavance/',AddAvanceApiView.as_view()),
 
 
+    path('permission/',PermissionApiView.as_view()),
+
     path('getcautions/',GetCautions.as_view()),
     path('addcautions/',AddCautions.as_view()),
 

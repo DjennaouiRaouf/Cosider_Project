@@ -827,7 +827,6 @@ class CautionFieldsApiView(APIView):
     def get(self, request):
         flag = request.query_params.get('flag', None)
         marche = request.query_params.get('marche', None)
-        banque = request.query_params.get('banque', None)
 
         if flag == 'l' or flag == 'f' :
             serializer = CautionSerializer()
