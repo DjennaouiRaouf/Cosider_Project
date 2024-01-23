@@ -54,11 +54,7 @@ class LoginView(APIView):
 
         return app_permissions
 
-class TokenView(APIView):
-    def get(self, request):
-        token=Token.objects.get(user_id=request.user.id)
-        print(token.key)
-        return Response({'token': token.key}, status=status.HTTP_200_OK)
+
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
@@ -420,6 +416,7 @@ class getDetailFacture(generics.ListAPIView):
 
 
 class GetAvance(generics.ListAPIView):
+    permission_classes = [IsAuthenticated,ViewAvancePermission]
     queryset = Avance.objects.all()
     serializer_class = AvanceSerializer
     filter_backends = [DjangoFilterBackend]

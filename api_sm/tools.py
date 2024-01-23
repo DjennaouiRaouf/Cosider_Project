@@ -100,3 +100,9 @@ class AddAvancePermission(permissions.BasePermission):
         if ( not User.objects.get(id=request.user.id).has_perm('api_sm.add_avance')):
             raise PermissionDenied("Vous n'êtes pas habilité à ajouter une avance")
         return True
+
+class ViewAvancePermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if ( not User.objects.get(id=request.user.id).has_perm('api_sm.view_avance')):
+            raise PermissionDenied("Vous n'êtes pas habilité à visualiser  les avances")
+        return True
