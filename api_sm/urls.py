@@ -6,6 +6,7 @@ urlpatterns = [
     path('adduser/',CreateUserView.as_view()),
     path('login/', LoginView.as_view()),
     path('logout/', LogoutView.as_view()),
+    path('token/',TokenView.as_view()),
     path('whoami/', WhoamiView.as_view()),
     path('ic_images/', GetICImages.as_view()),
 
