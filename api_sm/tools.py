@@ -106,3 +106,20 @@ class ViewAvancePermission(permissions.BasePermission):
         if ( not User.objects.get(id=request.user.id).has_perm('api_sm.view_avance')):
             raise PermissionDenied("Vous n'êtes pas habilité à visualiser  les avances")
         return True
+
+
+
+
+
+class AddODSPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if( not User.objects.get(id=request.user.id).has_perm('api_sm.add_ods')) :
+            raise PermissionDenied("Vous n'êtes pas habilité à ajouter un ods")
+        return True
+
+
+class ViewODSPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if ( not User.objects.get(id=request.user.id).has_perm('api_sm.view_ods')):
+            raise PermissionDenied("Vous n'êtes pas habilité à visualiser la liste des ods")
+        return True

@@ -332,8 +332,11 @@ class Ordre_De_Service(SafeDeleteModel):
     objects = DeletedModelManager()
 
     def save(self, *args, **kwargs):
-       if (self.date_reprise > self.date_interruption):
-            super(Ordre_De_Service, self).save(*args, **kwargs)
+        if(self.date_reprise and self.date_reprise):
+           if (self.date_reprise > self.date_interruption):
+                super(Ordre_De_Service, self).save(*args, **kwargs)
+           else:
+               raise  ValidationError('Date de reprise doit etre superieur à la date d\'interruption')
 
 
     class Meta:
@@ -571,8 +574,6 @@ class ModePaiement(SafeDeleteModel):
         verbose_name_plural = 'Mode de Paiement'
         app_label = 'api_sm'
         
-
-
 
 
 

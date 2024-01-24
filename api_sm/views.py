@@ -524,3 +524,11 @@ class AddCautions(generics.CreateAPIView):
             }
 
             return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetODS(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Ordre_De_Service.objects.all()
+    serializer_class = Ordre_De_ServiceSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = Ordre_De_ServiceFilter

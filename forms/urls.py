@@ -44,4 +44,7 @@ urlpatterns = [
     path('cautionfields/',CautionFieldsApiView.as_view()),
     path('cautionfieldsstate/',CautionFieldsStateApiView.as_view()),
 
+
+    path('odsfields/',ODSFieldsApiView.as_view()),
+
 ]

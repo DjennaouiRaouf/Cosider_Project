@@ -910,3 +910,84 @@ class CautionFieldsStateApiView(APIView):
             for d in field_info:
                 state.update(d)
         return Response({'state': state}, status=status.HTTP_200_OK)
+
+
+
+
+
+
+class ODSFieldsApiView(APIView):
+    def get(self, request):
+        flag = request.query_params.get('flag', None)
+        if flag == 'l' or flag == 'f' or flag == 'p':
+            serializer = Ordre_De_ServiceSerializer()
+            fields = serializer.get_fields()
+
+            model_class = serializer.Meta.model
+            model_name = model_class.__name__
+            if (flag == 'f'):  # react form
+                field_info = []
+                for field_name, field_instance in fields.items():
+                    if( not field_name in ['marche',] ):
+                        obj = {
+                            'name': field_name,
+                            'type': str(field_instance.__class__.__name__),
+                            'label': field_instance.label or field_name,
+                        }
+
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                            anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                            obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+
+                        field_info.append(obj)
+
+
+            if (flag == 'l'):  # data grid list (react ag-grid)
+                field_info = []
+                for field_name, field_instance in fields.items():
+                    obj = {
+                        'field': field_name,
+                        'headerName': field_instance.label or field_name,
+                        'info': str(field_instance.__class__.__name__),
+                    }
+                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                        obj['related'] = str(field_instance.queryset.model.__name__)
+                        if(field_name=="mode_paiement"):
+                            obj['cellRenderer'] = 'InfoRenderer'
+                    field_info.append(obj)
+
+
+            return Response({'fields': field_info,
+            'models': model_name, 'pk': Ordre_De_Service._meta.pk.name}, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class OdsFieldsFilterApiView(APIView):
+    def get(self,request):
+        filter_fields = list(DetailFactureFilter.base_filters.keys())
+
+        serializer = DetailFactureSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        for field_name, field_instance in fields.items():
+            if field_name in filter_fields:
+                if (field_name not in ['marche']):
+
+                    obj = {
+                        'name': field_name,
+                        'type': str(field_instance.__class__.__name__),
+                        'label': field_instance.label or field_name,
+                    }
+                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                        obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                    field_info.append(obj)
+
+        return Response({'fields': field_info},status=status.HTTP_200_OK)
+
+

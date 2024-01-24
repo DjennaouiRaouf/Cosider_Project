@@ -65,5 +65,9 @@ urlpatterns = [
 
 
 
+    path('ods/',GetODS.as_view()),
+
+
+
 
 ]

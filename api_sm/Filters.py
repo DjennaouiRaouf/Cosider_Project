@@ -85,6 +85,11 @@ class CautionFilter(django_filters.FilterSet):
         model = Cautions
         fields=['marche',]
 
+class Ordre_De_ServiceFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Ordre_De_Service
+        fields=['marche',]
 
 
 class TypeAvanceFilter(django_filters.FilterSet):
