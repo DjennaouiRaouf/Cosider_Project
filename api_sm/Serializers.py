@@ -1,8 +1,6 @@
-from django.contrib.humanize.templatetags import humanize
 from num2words import num2words
 from rest_framework import serializers
 from api_sm.models import *
-from api_sm.tools import unhumanize
 
 
 def create_dynamic_serializer(model_class):
@@ -143,9 +141,6 @@ class DQESerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
 
-        representation['prix_u']=humanize.intcomma(instance.prix_u)
-        representation['prix_q']=humanize.intcomma(instance.prix_q)
-
         return representation
 
 
@@ -180,8 +175,8 @@ class MarcheSerializer(serializers.ModelSerializer):
         return fields
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['ht'] = humanize.intcomma(instance.ttc)
-        representation['ttc'] = humanize.intcomma(instance.ttc)
+        representation['ht'] = instance.ttc
+        representation['ttc'] = instance.ttc
         representation['code_site'] = instance.nt.code_site.id
         representation['nt'] = instance.nt.nt
 
@@ -213,24 +208,23 @@ class FactureSerializer(serializers.ModelSerializer):
         fields='__all__'
 
     def get_somme(self, obj):
-        return num2words(obj.a_payer, to='currency', lang='fr_DZ').upper()
+        return num2words(obj.montant_factureTTC, to='currency', lang='fr_DZ').upper()
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
         fields.pop('deleted_by_cascade', None)
-
+        fields.pop('deleted_by_cascade', None)
 
         return fields
 
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['montant_precedent'] = humanize.intcomma(instance.montant_precedent)
-        representation['montant_mois'] = humanize.intcomma(instance.montant_mois)
-        representation['montant_cumule'] = humanize.intcomma(instance.montant_cumule)
-        representation['montant_rg']=humanize.intcomma(instance.montant_rg)
-        representation['montant_taxe']=humanize.intcomma(instance.montant_taxe)
-        representation['montant_rb']=humanize.intcomma(instance.montant_rb)
+        representation['montant_precedent'] = instance.montant_precedent
+        representation['montant_mois'] = instance.montant_mois
+        representation['montant_cumule'] = instance.montant_cumule
+        representation['montant_rg']=instance.montant_rg
+        representation['montant_rb']=instance.montant_rb
 
         return representation
 
@@ -276,8 +270,8 @@ class EncaissementSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['montant_creance']=humanize.intcomma(instance.montant_creance)
-        representation['montant_encaisse'] = humanize.intcomma(instance.montant_encaisse)
+        representation['montant_creance']=instance.montant_creance
+        representation['montant_encaisse'] = instance.montant_encaisse
 
         return representation
 

@@ -585,7 +585,7 @@ class Encaissement(SafeDeleteModel):
                                      validators=[MinValueValidator(0)], default=0)
     montant_creance = models.DecimalField(max_digits=38, decimal_places=2, blank=True,verbose_name="Montant en créance",
                                            validators=[MinValueValidator(0)], default=0,editable=False)
-    banque=models.ForeignKey(Agence,on_delete=models.DO_NOTHING,null=False,verbose_name="Banque")
+    agence=models.ForeignKey(Agence,on_delete=models.DO_NOTHING,null=False,blank=True)
     numero_piece = models.CharField(max_length=300,null=False,verbose_name="Numero de piéce")
     objects = DeletedModelManager()
 
@@ -596,7 +596,7 @@ class Encaissement(SafeDeleteModel):
         if(sum==None):
             sum=0
         sum=sum+self.montant_encaisse
-        self.montant_creance = round(self.facture.a_payer - sum,2)
+        self.montant_creance = round(self.facture.montant_factureTTC - sum,2)
         if(self.montant_creance == 0):
             self.facture.paye=True
             self.facture.save()

@@ -108,7 +108,7 @@ class DQEFieldsStateApiView(APIView):
             for field_name, field_instance in fields.items():
                 if(not field_name in ['prix_q'] ):
                     if(field_name in ['prix_u','quantite']):
-                        default_value = unhumanize(update_dqe[field_name])
+                        default_value = update_dqe[field_name]
                     else:
                         default_value = update_dqe[field_name]
                     field_info.append({
@@ -499,6 +499,7 @@ class FactureFieldsApiView(APIView):
                                            'somme','montant_rg','montant_taxe','montant_rb','signature',
                                            'montant_marche','num_situation','tva','rabais',
                                            'retenue_garantie',"montant_factureHT",'montant_factureTTC'] ):
+
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),

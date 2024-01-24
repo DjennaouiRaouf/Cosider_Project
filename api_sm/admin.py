@@ -226,22 +226,23 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
     save_as=True
     list_per_page = lp
     resource_class = DQEResource
-    list_display = ('id',"marche","code_tache","libelle","unite","quantite","prix_unitaire","prix_quntite",)
-    history_list_display = ("marche","code_tache","libelle",'unite',"quantite","prix_unitaire","prix_quntite",)
+    list_display = ('id',"marche","code_tache","libelle","qte","prix_unitaire","prix_quntite",)
+    history_list_display = ("marche","code_tache","libelle",'unite',"qte","prix_unitaire","prix_quntite",)
     list_filter = (SafeDeleteAdminFilter,
 
                    )
     search_fields = ('marche__id',)
 
-    def num_avenant(self,obj):
-        return obj.marche.num_avenant
 
     def prix_unitaire(self,obj):
-        return humanize.intcomma(obj.prix_u)
+        return humanize.intcomma(obj.prix_u)+" DA"
 
     prix_unitaire.short_description="Prix unitaire"
     def prix_quntite(self,obj):
-        return humanize.intcomma(obj.prix_q)
+        return humanize.intcomma(obj.prix_q)+" DA"
+    def qte(self,obj):
+        return str(obj.quantite)+" "+obj.unite.libelle
+
     prix_quntite.short_description = "Prix quantite"
 
 

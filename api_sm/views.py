@@ -3,6 +3,7 @@ import json
 from django.contrib.auth import authenticate
 from django_filters.rest_framework import DjangoFilterBackend
 from import_export.admin import ImportMixin, ExportMixin
+from import_export.results import RowResult
 from rest_framework import generics, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework import status
@@ -18,6 +19,7 @@ from .Resources import DQEResource
 from .Serializers import *
 from .models import *
 from .tools import *
+import  numpy as np
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -220,11 +222,15 @@ class ImportDQEAPIView(ImportMixin,  APIView):
         filtered_dataset.headers = imported_data.headers
         filtered_dataset.extend([row.values() for row in filtered_rows])
         result = resource.import_data(filtered_dataset, dry_run=True)
-        if not result.has_errors():
-            resource.import_data(filtered_dataset, dry_run=False)
 
-        # Check if the import was successful
-        return Response({'message': 'Import successful'}, status=200)
+        try:
+            resource.import_data(filtered_dataset, dry_run=False)
+            return Response({'message': 'Import successful'}, status=200)
+        except Exception as e:
+            print(e)
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 
@@ -295,12 +301,12 @@ class GetFactureRG(generics.ListAPIView):
         response_data = super().list(request, *args, **kwargs).data
         return Response({'factures':response_data,
                          'extra':{
-                             'total_rg': humanize.intcomma(total),
+                             'total_rg': total,
                              'total_rgl':num2words(total, to='currency', lang='fr_DZ').upper(),
                               'code_contrat':queryset[0].marche.code_contrat,
                              'signature': queryset[0].marche.date_signature,
                              'projet': queryset[0].marche.libelle,
-                             'montant_marche':humanize.intcomma(queryset[0].marche.ht),
+                             'montant_marche':queryset[0].marche.ht,
                              'client': queryset[0].marche.nt.code_client.id,
                              'nt': queryset[0].marche.nt.nt,
                              'lib_nt': queryset[0].marche.nt.libelle,

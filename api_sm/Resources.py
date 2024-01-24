@@ -113,8 +113,6 @@ class ODSResource(resources.ModelResource):
 
 
 class DQEResource(resources.ModelResource):
-    prix_u = fields.Field(column_name='prix_u', attribute='prix_u', widget=FormattedPriceWidget())
-    prix_q = fields.Field(column_name='prix_q', attribute='prix_q', widget=FormattedPriceWidget())
     annule = fields.Field(column_name='annule', attribute=None)
     def dehydrate_annule(self, obj):
         return f"0"
@@ -139,9 +137,19 @@ class DQEResource(resources.ModelResource):
         except Exception:
             return None
 
+    def before_import_row(self, row, **kwargs):
+        fields=['prix_u','annule','id','marche','code_tache','libelle','unite','est_tache_composite',
+                'est_tache_complementaire','quantite',]
+        for field in fields:
+            if  row.get(field) == None :
+                raise Exception(f"le champ {field} est obligatoir ")
+
+
+
     class Meta:
         model = DQE
         exclude = ('deleted', 'deleted_by_cascade')
+
 
 
 
