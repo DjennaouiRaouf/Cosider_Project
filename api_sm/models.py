@@ -327,6 +327,7 @@ class Ordre_De_Service(SafeDeleteModel):
     marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=True, related_name="ods_marche")
     date_interruption = models.DateField(null=True, blank=True,verbose_name='Date Interruption')
     date_reprise = models.DateField(null=True, blank=True,verbose_name='Date Reprise')
+
     motif = models.TextField(null=False, blank=True,verbose_name='Motif')
 
     objects = DeletedModelManager()
