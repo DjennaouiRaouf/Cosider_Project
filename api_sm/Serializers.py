@@ -138,10 +138,7 @@ class DQESerializer(serializers.ModelSerializer):
         return fields
 
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
 
-        return representation
 
 
 
