@@ -925,16 +925,19 @@ class ODSFieldsApiView(APIView):
 
             model_class = serializer.Meta.model
             model_name = model_class.__name__
+            print(fields.items())
             if (flag == 'f'):  # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
+
                     if( not field_name in ['marche',] ):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
                             'label': field_instance.label or field_name,
                         }
-
+                        if(str(field_instance.style.get("base_template")).find('textarea')!=-1):
+                            obj['textarea']=True
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
                             obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
@@ -969,8 +972,8 @@ class ODSFieldsApiView(APIView):
 
 class OdsFieldsFilterApiView(APIView):
     def get(self,request):
-        filter_fields = list(DetailFactureFilter.base_filters.keys())
-
+        filter_fields = list(Ordre_De_ServiceFilter.base_filters.keys())
+        
         serializer = DetailFactureSerializer()
         fields = serializer.get_fields()
         field_info = []
@@ -991,3 +994,33 @@ class OdsFieldsFilterApiView(APIView):
         return Response({'fields': field_info},status=status.HTTP_200_OK)
 
 
+class OdsFieldsStateApiView(APIView):
+    def get(self, request):
+        serializer = Ordre_De_ServiceSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+
+
+        for field_name, field_instance in fields.items():
+            default_value = ''
+            if (field_name not in  ['marche']):
+                if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
+                    default_value= ''
+                if str(field_instance.__class__.__name__) == 'BooleanField':
+                    default_value= True
+
+                if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
+                                                              'IntegerField',]:
+                    default_value = 0
+
+                field_info.append({
+                    field_name:default_value ,
+
+                })
+
+
+                state = {}
+
+            for d in field_info:
+                state.update(d)
+        return Response({'state': state}, status=status.HTTP_200_OK)

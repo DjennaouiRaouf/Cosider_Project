@@ -325,9 +325,9 @@ class DQE(SafeDeleteModel): # le prix final
 class Ordre_De_Service(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=True, related_name="ods_marche")
-    date_interruption = models.DateField(null=False, blank=True)
-    date_reprise = models.DateField(null=False, blank=True)
-    motif = models.TextField(null=False, blank=True)
+    date_interruption = models.DateField(null=True, blank=True,verbose_name='Date Interruption')
+    date_reprise = models.DateField(null=True, blank=True,verbose_name='Date Reprise')
+    motif = models.TextField(null=False, blank=True,verbose_name='Motif')
 
     objects = DeletedModelManager()
 

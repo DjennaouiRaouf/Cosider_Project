@@ -532,3 +532,34 @@ class GetODS(generics.ListAPIView):
     serializer_class = Ordre_De_ServiceSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = Ordre_De_ServiceFilter
+
+
+
+class AddODS(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated,AddODSPermission]
+    queryset = Ordre_De_Service.objects.all()
+    serializer_class = Ordre_De_ServiceSerializer
+
+
+    def create(self, request, *args, **kwargs):
+        try:
+
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            self.perform_create(serializer)
+            custom_response = {
+                'status': 'success',
+                'message': 'ODS ajouté',
+                'data': serializer.data,
+            }
+
+            return Response(custom_response, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            custom_response = {
+                'status': 'error',
+                'message': str(e),
+                'data': None,
+            }
+
+            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)

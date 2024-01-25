@@ -46,5 +46,7 @@ urlpatterns = [
 
 
     path('odsfields/',ODSFieldsApiView.as_view()),
+    path('odsfieldsstate/',OdsFieldsStateApiView.as_view()),
+    path('odsfilterfields/',OdsFieldsFilterApiView.as_view()),
 
 ]
