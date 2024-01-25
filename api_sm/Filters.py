@@ -27,8 +27,8 @@ class MarcheFilter(django_filters.FilterSet):
     code_contrat = django_filters.CharFilter(field_name='code_contrat', label='Code du contrat')
     date_signature=django_filters.DateFilter(field_name="date_signature",label='Date de signature')
     nt = django_filters.CharFilter(field_name='nt__nt', label='Numero du travail')
-    rabais=django_filters.CharFilter(field_name='rabais', label='Rabais')
-    tva = django_filters.CharFilter(field_name='tva', label='TVA')
+    rabais=django_filters.NumberFilter(field_name='rabais', label='Rabais')
+    tva = django_filters.NumberFilter(field_name='tva', label='TVA')
     rg = django_filters.NumberFilter(field_name='rg', label='Retenue de garantie')
     client=django_filters.BooleanFilter(field_name='nt__code_client__est_client_cosider', label='Cosider client')
 

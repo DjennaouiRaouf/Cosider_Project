@@ -207,6 +207,7 @@ class Marche(SafeDeleteModel):
     nt = models.ForeignKey(NT, on_delete=models.DO_NOTHING, db_column='nt', null=False
                            , verbose_name='Numero Travail',to_field="id")
 
+
     libelle = models.CharField(null=False, blank=True, max_length=500
                                , verbose_name='Libelle')
     ods_depart = models.DateField(null=False, blank=True

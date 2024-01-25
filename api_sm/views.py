@@ -390,6 +390,10 @@ class OptionImpressionApiView(generics.ListAPIView):
             Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+class UpdateMarcheView(generics.UpdateAPIView):
+    queryset = Marche.objects.all()
+    serializer_class = MarcheSerializer
+
 
 
 class DeletedDQE(generics.ListAPIView):

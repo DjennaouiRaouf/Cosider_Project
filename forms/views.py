@@ -192,8 +192,6 @@ class MarcheFieldsFilterApiView(APIView):
                 anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
                 obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
 
-            if isinstance(field_instance.lookup_expr, list):
-                obj['lookup_expr']=field_instance.lookup_expr
 
             field_info.append(obj)
 
@@ -205,29 +203,46 @@ class MarcheFieldsStateApiView(APIView):
         serializer = MarcheSerializer()
         fields = serializer.get_fields()
         field_info = []
-        for field_name, field_instance in fields.items():
-            default_value = ''
-            if (field_name not in ['id', ]):
-                if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
-                    default_value= ''
-                if str(field_instance.__class__.__name__) == 'BooleanField':
-                    default_value= True
+        marche_pk = request.query_params.get(Marche._meta.pk.name, None)
+        if marche_pk:
+            marche = Marche.objects.get(pk=marche_pk)
+        else:
+            marche = None
+        if(marche == None):
 
-                if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
-                                                              'IntegerField',]:
-                    default_value = 0
+            for field_name, field_instance in fields.items():
+                if (field_name not in ['id', 'ht', 'ttc']):
+                    default_value = ''
+                    if str(field_instance.__class__.__name__) == 'BooleanField':
+                        default_value= False
+                    if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
+                                                                  'IntegerField',]:
+                        default_value = 0
 
-                field_info.append({
-                    field_name:default_value ,
+                    field_info.append({
+                        field_name:default_value ,
 
-                })
+                    })
+                    state = {}
 
+                    for d in field_info:
+                        state.update(d)
+        else:
+            update_marche=MarcheSerializer(marche).data
+            for field_name, field_instance in fields.items():
 
-                state = {}
+                    default_value = update_marche[field_name]
+                    field_info.append({
+                        field_name:default_value ,
 
-            for d in field_info:
-                state.update(d)
+                    })
+                    state = {}
+
+                    for d in field_info:
+                        state.update(d)
+
         return Response({'state': state}, status=status.HTTP_200_OK)
+
 
 class MarcheFieldsApiView(APIView):
     def get(self, request):
@@ -242,18 +257,24 @@ class MarcheFieldsApiView(APIView):
 
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if(field_name not in ['id',]):
+                    if(field_name not in ['id','ht','ttc']):
+
+                        if (field_name in ['nt','code_site','code_contrat',"libelle"]):
+                            readOnly = True
+                        else:
+                            readOnly = False
+
                         obj={
                             'name':field_name,
                             'type': str(field_instance.__class__.__name__),
                             'label': field_instance.label or field_name,
-                            'source':field_instance.source
+                            'source':field_instance.source,
+                            'readOnly': readOnly
                         }
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
                             obj['queryset']=anySerilizer(field_instance.queryset, many=True).data
-
 
                         field_info.append(obj)
 
@@ -928,7 +949,7 @@ class ODSFieldsApiView(APIView):
 
             model_class = serializer.Meta.model
             model_name = model_class.__name__
-            print(fields.items())
+
             if (flag == 'f'):  # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
