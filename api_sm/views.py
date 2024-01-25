@@ -221,17 +221,13 @@ class ImportDQEAPIView(ImportMixin,  APIView):
         filtered_dataset = Dataset()
         filtered_dataset.headers = imported_data.headers
         filtered_dataset.extend([row.values() for row in filtered_rows])
+
         result = resource.import_data(filtered_dataset, dry_run=True)
-
-        try:
+        if not result.has_errors():
             resource.import_data(filtered_dataset, dry_run=False)
-            return Response({'message': 'Import successful'}, status=200)
-        except Exception as e:
-            print(e)
-            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
+            return Response({'message': 'Fichier importé'}, status=200)
+        else:
+            return Response({'message': 'Impossible d\'importer le fichier '}, status=400)
 
 
 class GetNTView(generics.ListAPIView):
