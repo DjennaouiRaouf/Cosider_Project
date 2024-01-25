@@ -527,7 +527,7 @@ class AddCautions(generics.CreateAPIView):
 
 
 class GetODS(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,ViewODSPermission]
     queryset = Ordre_De_Service.objects.all()
     serializer_class = Ordre_De_ServiceSerializer
     filter_backends = [DjangoFilterBackend]
