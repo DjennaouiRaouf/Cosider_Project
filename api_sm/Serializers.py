@@ -397,6 +397,22 @@ class CautionSerializer(serializers.ModelSerializer):
 
         return representation
 
+class TypeCautionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=TypeCaution
+        fields='__all__'
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('deleted', None)
+        fields.pop('deleted_by_cascade', None)
+
+
+        return fields
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return representation
 
 
 class Ordre_De_ServiceSerializer(serializers.ModelSerializer):

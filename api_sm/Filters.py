@@ -89,10 +89,16 @@ class Ordre_De_ServiceFilter(django_filters.FilterSet):
 
     class Meta:
         model = Ordre_De_Service
-        fields=['marche',]
+        fields=['marche','date_interruption','date_reprise']
 
 
 class TypeAvanceFilter(django_filters.FilterSet):
     class Meta:
         model = TypeAvance
+        fields=['id',]
+
+
+class TypeCautionFilter(django_filters.FilterSet):
+    class Meta:
+        model = TypeCaution
         fields=['id',]

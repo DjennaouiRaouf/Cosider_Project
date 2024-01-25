@@ -436,6 +436,13 @@ class LibAV(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = TypeAvanceFilter
 
+class LibCaut(generics.ListAPIView):
+    queryset = TypeCaution.objects.all()
+    serializer_class = TypeCautionSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TypeCautionFilter
+
+
 class AddAvanceApiView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated,AddAvancePermission]
     queryset = Avance.objects.all()
@@ -469,7 +476,7 @@ class AddAvanceApiView(generics.CreateAPIView):
 
 class GetCautions(generics.ListAPIView):
     queryset = Cautions.objects.all()
-    serializer_class = TypeAvanceSerializer
+    serializer_class = CautionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = CautionFilter
 

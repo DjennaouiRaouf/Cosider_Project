@@ -160,10 +160,11 @@ class DQEFieldsApiView(APIView):
                         'field': field_name,
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
+                        'cellRenderer': 'InfoRenderer'
                     }
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField") and field_name not in ['marche']:
                         obj['related'] = str(field_instance.queryset.model.__name__)
-                        obj['cellRenderer']= 'InfoRenderer'
+
                     field_info.append(obj)
 
 
@@ -622,11 +623,11 @@ class EncaissementFieldsApiView(APIView):
                         'field': field_name,
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
+                        'cellRenderer': 'InfoRenderer'
                     }
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         obj['related'] = str(field_instance.queryset.model.__name__)
-                        if(field_name=="mode_paiement"):
-                            obj['cellRenderer'] = 'InfoRenderer'
+
                     field_info.append(obj)
 
 
@@ -844,7 +845,8 @@ class CautionFieldsApiView(APIView):
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
                             'label': field_instance.label or field_name,
-                            "required":field_instance.required
+                            "required":field_instance.required,
+
                         }
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
@@ -867,6 +869,7 @@ class CautionFieldsApiView(APIView):
                             'field': field_name,
                             'headerName': field_instance.label or field_name,
                             'info': str(field_instance.__class__.__name__),
+                            'cellRenderer': 'InfoRenderer'
                         })
 
 
@@ -952,11 +955,12 @@ class ODSFieldsApiView(APIView):
                         'field': field_name,
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
+                        'cellRenderer' : 'InfoRenderer'
                     }
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         obj['related'] = str(field_instance.queryset.model.__name__)
-                        if(field_name=="mode_paiement"):
-                            obj['cellRenderer'] = 'InfoRenderer'
+
+
                     field_info.append(obj)
 
 
@@ -973,8 +977,8 @@ class ODSFieldsApiView(APIView):
 class OdsFieldsFilterApiView(APIView):
     def get(self,request):
         filter_fields = list(Ordre_De_ServiceFilter.base_filters.keys())
-        
-        serializer = DetailFactureSerializer()
+
+        serializer = Ordre_De_ServiceSerializer()
         fields = serializer.get_fields()
         field_info = []
         for field_name, field_instance in fields.items():

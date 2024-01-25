@@ -54,6 +54,8 @@ urlpatterns = [
 
     path("getlibav/",LibAV.as_view()),
 
+    path("getlibcaut/", LibCaut.as_view()),
+
     path('getavance/',GetAvance.as_view()),
     path('addavance/',AddAvanceApiView.as_view()),
 
