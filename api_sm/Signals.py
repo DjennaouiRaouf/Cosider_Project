@@ -97,13 +97,13 @@ def pre_save_attachements(sender, instance, **kwargs):
         instance.qte_precedente = previous.qte_cumule
         instance.qte_cumule = instance.qte_precedente + instance.qte_mois
         instance.montant_precedent = round(previous.montant_cumule,2)
-        instance.montant_mois = round(instance.qte_mois * prix_u,2)
+        #instance.montant_mois = round(instance.qte_mois * prix_u,2)
         instance.montant_cumule = round(instance.montant_precedent+instance.montant_mois,2)
     else:  # debut
         instance.qte_precedente = 0
         instance.qte_cumule = instance.qte_mois
         instance.montant_precedent = 0
-        instance.montant_mois = instance.qte_mois * prix_u
+        #instance.montant_mois = instance.qte_mois * prix_u
         instance.montant_cumule = round(instance.montant_precedent+instance.montant_mois,2)
 
 

@@ -572,3 +572,21 @@ class AddODS(generics.CreateAPIView):
             return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+
+
+class AddAttachementApiView(generics.CreateAPIView):
+    queryset = Attachements.objects.all()
+    serializer_class = AttachementsSerializer
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        self.perform_create(serializer)
+        custom_response = {
+            'status': 'success',
+            'message': 'Attachement ajoutée',
+            'data': serializer.data,
+        }
+
+        return Response(custom_response, status=status.HTTP_201_CREATED)

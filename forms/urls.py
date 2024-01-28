@@ -45,6 +45,9 @@ urlpatterns = [
     path('cautionfieldsstate/',CautionFieldsStateApiView.as_view()),
     path('flashfields/',FlashFieldsApiView.as_view()),
 
+    path('attfields/',AttachementsFieldsApiView.as_view()),
+    path('attstate/',AttFieldsStateApiView.as_view()),
+
     path('odsfields/',ODSFieldsApiView.as_view()),
     path('odsfieldsstate/',OdsFieldsStateApiView.as_view()),
     path('odsfilterfields/',OdsFieldsFilterApiView.as_view()),

@@ -443,20 +443,19 @@ class Attachements(SafeDeleteModel):
     dqe = models.ForeignKey(DQE, on_delete=models.DO_NOTHING)# item + quantité marche + prix unitaire
 
     qte_precedente = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         editable=False)
-    qte_mois = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0)
+                                         editable=False,verbose_name='Quantite precedent')
+    qte_mois = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantite Mois')
     qte_cumule= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                    editable=False)
+                                    editable=False,verbose_name='Quantite cumule')
 
     prix_u = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                     editable=False)
+                                     editable=False,verbose_name='Prix unitaire')
     montant_precedent=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                          editable=False)
-    montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                      editable=False)
+                                          editable=False,verbose_name='Montant precedent')
+    montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Montant Mois')
     montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         editable=False)
-    date=models.DateField(null=False)
+                                         editable=False,verbose_name='Montant cumule')
+    date=models.DateField(null=False,verbose_name='Date')
     heure=models.TimeField(auto_now=True,editable=False)
 
     objects = DeletedModelManager()

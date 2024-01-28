@@ -30,6 +30,8 @@ urlpatterns = [
     path('getmarche/',GetMarcheView.as_view()),
     path('updatemarche/<str:pk>/',UpdateMarcheView.as_view()),
 
+    path('addatt/', AddAttachementApiView.as_view()),
+
 
 
     path('getdqe/', GetDQEView.as_view()),
