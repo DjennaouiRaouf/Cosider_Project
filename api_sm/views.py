@@ -19,7 +19,7 @@ from .Resources import DQEResource
 from .Serializers import *
 from .models import *
 from .tools import *
-import  numpy as np
+
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -570,3 +570,5 @@ class AddODS(generics.CreateAPIView):
             }
 
             return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
+
+

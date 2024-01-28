@@ -109,7 +109,10 @@ DATABASES = {
         "HOST": "localhost",
         "PORT":"1433",
         "OPTIONS": {"driver": "ODBC Driver 13 for SQL Server",
+                    'MARS_Connection': 'True',  # Enable Multiple Active Result Sets
+                    'host_is_server': 'True',  # Optimize connection settings
         },
+        'CONN_MAX_AGE': 600,
 
     },
     'ca_ch': {
@@ -120,12 +123,15 @@ DATABASES = {
         "HOST": "localhost",
         "PORT": "1433",
         "OPTIONS": {"driver": "ODBC Driver 13 for SQL Server",
+                    'MARS_Connection': 'True',  # Enable Multiple Active Result Sets
+                    'host_is_server': 'True',  # Optimize connection settings
                     },
+                'CONN_MAX_AGE': 600,
 
     },
 
 }
-
+DATABASE_ROUTERS = ['api_sm.routers.AppRouter']
 
 
 AUTH_PASSWORD_VALIDATORS = [

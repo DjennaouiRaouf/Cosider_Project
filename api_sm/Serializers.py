@@ -1,5 +1,6 @@
 from num2words import num2words
 from rest_framework import serializers
+
 from api_sm.models import *
 
 
@@ -136,9 +137,6 @@ class DQESerializer(serializers.ModelSerializer):
         fields.pop('deleted_by_cascade', None)
 
         return fields
-
-
-
 
 
 

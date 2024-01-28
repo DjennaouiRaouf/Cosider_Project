@@ -10,6 +10,7 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('sm/',include('api_sm.urls')),
+    path('sch/', include('api_sch.urls')),
     path('forms/',include('forms.urls')),
 
 ]

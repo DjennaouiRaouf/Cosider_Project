@@ -102,3 +102,4 @@ class TypeCautionFilter(django_filters.FilterSet):
     class Meta:
         model = TypeCaution
         fields=['id',]
+
