@@ -4,15 +4,10 @@ from django.db.models.functions import ExtractMonth, ExtractYear
 
 from api_sch.models import *
 class ProdFilter(django_filters.FilterSet):
-    mm = django_filters.NumberFilter(method='filter_by_month',label='Mois')
-    aa = django_filters.NumberFilter(method='filter_by_year',label='Année')
+    mm = django_filters.NumberFilter(field_name='mmaa__month', label='Mois')
+    aa = django_filters.NumberFilter(field_name='mmaa__year', label='Année')
 
     class Meta:
         model = TabProduction
-        fields = ['mm', 'aa','code_site','nt']
+        fields = ['code_site','prevu_realiser','nt','code_type_production']
 
-    def filter_by_month(self, queryset, name, value):
-        return queryset.annotate(month=ExtractMonth('mmaa')).filter(month=value)
-
-    def filter_by_year(self, queryset, name, value):
-        return queryset.annotate(year=ExtractYear('mmaa')).filter(year=value)

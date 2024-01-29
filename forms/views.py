@@ -1070,17 +1070,45 @@ class FlashFieldsApiView(APIView):
 
             if(flag=='l'): #data grid list (react ag-grid)
                 field_info = []
+                obj1 = {
+                    "headerName": 'Contractuel',
+                    "children": []
+                }
+                obj2 = {
+                    "headerName": 'Supplementaire',
+                    "children": []
+                }
+                obj3 = {
+                    "headerName": 'Complementaire',
+                    "children": []
+                }
+
                 for field_name, field_instance in fields.items():
                     if(field_name not in ['prevu_realiser','est_cloturer','user_id','date_modification']):
+
                         obj={
-                            'field': field_name,
-                            'headerName': field_instance.label or field_name,
-                            'info': str(field_instance.__class__.__name__),
+                                'field': field_name,
+                                'headerName': field_instance.label or field_name,
+                                'info': str(field_instance.__class__.__name__),
                         }
                         if (str(field_name).startswith('valeur') or str(field_name).startswith('quantite')):
                             obj['cellRenderer'] = 'InfoRenderer'
 
-                        field_info.append(obj)
+                        if (field_name  in ['quantite_1', 'valeur_1']):
+                            obj1['children'].append(obj)
+                        if (field_name  in ['quantite_2', 'valeur_2']):
+                            obj2['children'].append(obj)
+                        if (field_name  in ['quantite_3', 'valeur_3']):
+                            obj3['children'].append(obj)
+
+                        if(field_name not in ['quantite_1', 'valeur_1','quantite_2', 'valeur_2','quantite_3', 'valeur_3']):
+                            field_info.append(obj)
+
+
+
+                field_info.append(obj1)
+                field_info.append(obj2)
+                field_info.append(obj3)
 
             return Response({'fields':field_info,'models':model_name,'pk':Marche._meta.pk.name},status=status.HTTP_200_OK)
         else:

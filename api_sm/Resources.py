@@ -121,7 +121,7 @@ class DQEResource(resources.ModelResource):
             setattr(obj, 'annule', '0')
     def skip_row(self, instance, original, row, import_validation_errors=None):
         if(row.get('annule') == 1):
-            DQE.objects.get(id=row.get('id')).delete()
+            DQE.objects.get(marche_id=row.get('marche'),code_tache=row.get('code_tache')).delete()
             return True
         if(row.get('annule') == None):
                 return  False
@@ -138,7 +138,7 @@ class DQEResource(resources.ModelResource):
             return None
 
     def before_import_row(self, row, **kwargs):
-        fields=['prix_u','annule','id','marche','code_tache','libelle','unite','est_tache_composite',
+        fields=['prix_u','annule','marche','code_tache','libelle','unite','est_tache_composite',
                 'est_tache_complementaire','quantite',]
         for field in fields:
             if  row.get(field) == None :
@@ -212,33 +212,9 @@ class TypeCautionResource(resources.ModelResource):
         model = TypeCaution
         exclude = ('deleted', 'deleted_by_cascade')
 
-class BanqueResource(resources.ModelResource):
-    def get_instance(self, instance_loader, row):
-        try:
-            params = {}
-            for key in instance_loader.resource.get_import_id_fields():
-                field = instance_loader.resource.fields[key]
-                params[field.attribute] = field.clean(row)
-            return self.get_queryset().get(**params)
-        except Exception:
-            return None
-    class Meta:
-        model = Banque
-        exclude = ('deleted', 'deleted_by_cascade')
 
-class AgenceResource(resources.ModelResource):
-    def get_instance(self, instance_loader, row):
-        try:
-            params = {}
-            for key in instance_loader.resource.get_import_id_fields():
-                field = instance_loader.resource.fields[key]
-                params[field.attribute] = field.clean(row)
-            return self.get_queryset().get(**params)
-        except Exception:
-            return None
-    class Meta:
-        model = Agence
-        exclude = ('deleted', 'deleted_by_cascade')
+
+
 
 class CautionResource(resources.ModelResource):
     def get_instance(self, instance_loader, row):

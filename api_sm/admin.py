@@ -432,31 +432,6 @@ class  TypeCautionAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin)
  
 
 
-@admin.register(Agence)
-class AgenceAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
-    save_as = True
-    list_per_page = lp
-    resource_class = AgenceResource
-    list_display = ( "id","compte_comptable","banque","libelle")
-    list_filter = (SafeDeleteAdminFilter,)
-
-    def get_import_formats(self):
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_import()]
-
-    def get_export_formats(self):
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_export()]
-
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
-
 
 
 @admin.register(Remboursement)
@@ -484,30 +459,6 @@ class RembAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
 
 
 
-@admin.register(Banque)
-class BanqueAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
-    save_as = True
-    resource_class = BanqueResource
-    list_per_page = lp
-    list_display = ( "id","acronyme","libelle")
-    list_filter = (SafeDeleteAdminFilter,)
-
-    def get_import_formats(self):
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_import()]
-
-    def get_export_formats(self):
-        formats = (
-            base_formats.XLSX,
-        )
-        return [f for f in formats if f().can_export()]
-
-    def has_change_permission(self, request, obj=None):
-        if obj and obj.deleted:
-            return False
-        return super().has_change_permission(request, obj)
 
  
 
@@ -516,7 +467,7 @@ class BanqueAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admi
 
 @admin.register(Cautions)
 class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
-    resource_class = BanqueResource
+
     list_display = ("marche", "Type_Caution","montant_caution",'taux_caution', "date_soumission", "est_recupere")
     list_filter = (SafeDeleteAdminFilter,)
 
