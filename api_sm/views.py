@@ -69,6 +69,10 @@ class LogoutView(APIView):
 
 
 
+
+
+
+
 class WhoamiView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
@@ -339,17 +343,27 @@ class AddFactureApiView(generics.CreateAPIView):
 
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
 
-        self.perform_create(serializer)
-        custom_response = {
-            'status': 'success',
-            'message': 'Facture ajoutée',
-            'data': serializer.data,
-        }
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-        return Response(custom_response, status=status.HTTP_201_CREATED)
+            self.perform_create(serializer)
+            custom_response = {
+                'status': 'success',
+                'message': 'Facture ajouté',
+                'data': serializer.data,
+            }
+
+            return Response(custom_response, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            custom_response = {
+                'status': 'error',
+                'message': str(e),
+                'data': None,
+            }
+
+            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AddEncaissement(generics.CreateAPIView):
@@ -357,17 +371,27 @@ class AddEncaissement(generics.CreateAPIView):
     serializer_class = EncaissementSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
 
-        self.perform_create(serializer)
-        custom_response = {
-            'status': 'success',
-            'message': "L'Encaissement c'est deroulé avec succé",
-            'data': serializer.data,
-        }
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-        return Response(custom_response, status=status.HTTP_201_CREATED)
+            self.perform_create(serializer)
+            custom_response = {
+                'status': 'success',
+                'message': "L'Encaissement c'est deroulé avec succé",
+                'data': serializer.data,
+            }
+
+            return Response(custom_response, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            custom_response = {
+                'status': 'error',
+                'message': str(e),
+                'data': None,
+            }
+
+            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OptionImpressionApiView(generics.ListAPIView):
@@ -590,3 +614,11 @@ class AddAttachementApiView(generics.CreateAPIView):
         }
 
         return Response(custom_response, status=status.HTTP_201_CREATED)
+
+
+
+class GetAttachements(generics.ListAPIView):
+    queryset = Attachements.objects.all()
+    serializer_class = AttachementsSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = AttachementsFilter

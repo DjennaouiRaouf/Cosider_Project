@@ -103,3 +103,14 @@ class TypeCautionFilter(django_filters.FilterSet):
         model = TypeCaution
         fields=['id',]
 
+
+
+class AttachementsFilter(django_filters.FilterSet):
+    marche = django_filters.CharFilter(field_name='dqe__marche', label="Marche")
+    code_tache = django_filters.CharFilter(field_name='dqe__code_tache', label="Code Tache")
+    mm = django_filters.NumberFilter(field_name='date__month', label='Mois')
+    aa = django_filters.NumberFilter(field_name='date__year', label='Année')
+
+    class Meta:
+        model = Attachements
+        fields=['marche',]

@@ -20,6 +20,7 @@ class UserFieldsApiView(APIView):
             obj = {
                     'name': field_name,
                         'type': str(field_instance.__class__.__name__),
+                        "required": field_instance.required,
                         'label': field_instance.label or field_name,
                 }
             field_info.append(obj)
@@ -62,9 +63,10 @@ class DQEFieldsFilterApiView(APIView):
             if field_name in filter_fields:
 
                 obj = {
-                       'name': field_name,
-                       'type': str(field_instance.__class__.__name__),
-                    'label': field_instance.label or field_name,
+                        'name': field_name,
+                        'type': str(field_instance.__class__.__name__),
+
+                        'label': field_instance.label or field_name,
                 }
                 if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                      anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
@@ -145,6 +147,7 @@ class DQEFieldsApiView(APIView):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
+                            "required": field_instance.required,
                             'label': field_instance.label or field_name,
                             'readOnly': readOnly
                         }
@@ -272,6 +275,7 @@ class MarcheFieldsApiView(APIView):
                         obj={
                             'name':field_name,
                             'type': str(field_instance.__class__.__name__),
+                            "required": field_instance.required,
                             'label': field_instance.label or field_name,
                             'source':field_instance.source,
                             'readOnly': readOnly
@@ -311,6 +315,7 @@ class ClientFieldsFilterApiView(APIView):
                 field_info.append({
                     'name': field_name,
                     'type': str(field_instance.__class__.__name__),
+
                     'label': field_instance.label or field_name,
                 })
 
@@ -354,6 +359,7 @@ class ClientFieldsApiView(APIView):
                         field_info.append({
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
+                            "required": field_instance.required,
                             'label': field_instance.label or field_name,
                         })
                 if (flag == 'l'):  # data grid list (react ag-grid)
@@ -410,6 +416,7 @@ class SiteFieldsFilterApiView(APIView):
                 field_info.append({
                     'name': field_name,
                     'type': str(field_instance.__class__.__name__),
+
                     'label': field_instance.label or field_name,
                 })
 
@@ -426,6 +433,7 @@ class SiteFieldsApiView(APIView):
                     field_info.append({
                         'name': field_name,
                         'type': str(field_instance.__class__.__name__),
+                        "required": field_instance.required,
                         'label': field_instance.label or field_name,
                     })
 
@@ -457,6 +465,7 @@ class NTFieldsFilterApiView(APIView):
                 obj = {
                     'name': field_name,
                     'type': str(field_instance.__class__.__name__),
+
                     'label': field_instance.label or field_name,
                 }
                 if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
@@ -481,7 +490,9 @@ class NTFieldsApiView(APIView):
                     obj = {
                         'name': field_name,
                         'type': str(field_instance.__class__.__name__),
+                        "required": field_instance.required,
                         'label': field_instance.label or field_name,
+                        
                     }
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
@@ -530,7 +541,9 @@ class FactureFieldsApiView(APIView):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
+                            "required": field_instance.required,
                             'label': field_instance.label or field_name,
+                            
                         }
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
@@ -602,6 +615,7 @@ class FactureFieldsFilterApiView(APIView):
                     obj = {
                         'name': field_name,
                         'type': str(field_instance.__class__.__name__),
+
                         'label': field_instance.label or field_name,
                     }
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
@@ -633,7 +647,9 @@ class EncaissementFieldsApiView(APIView):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
+                            "required": field_instance.required,
                             'label': field_instance.label or field_name,
+                            
                         }
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
@@ -709,6 +725,7 @@ class EncaissementFieldsFilterApiView(APIView):
                     obj = {
                         'name': field_name,
                         'type': str(field_instance.__class__.__name__),
+
                         'label': field_instance.label or field_name,
                     }
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
@@ -756,6 +773,7 @@ class DetailFactureFieldsFilterApiView(APIView):
                     obj = {
                         'name': field_name,
                         'type': str(field_instance.__class__.__name__),
+
                         'label': field_instance.label or field_name,
                     }
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
@@ -790,7 +808,9 @@ class AvanceFieldsApiView(APIView):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
+                            "required": field_instance.required,
                             'label': field_instance.label or field_name,
+                            
 
                         }
 
@@ -871,8 +891,9 @@ class CautionFieldsApiView(APIView):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
+                            "required": field_instance.required,
                             'label': field_instance.label or field_name,
-                            "required":field_instance.required,
+                            
 
                         }
 
@@ -964,6 +985,7 @@ class ODSFieldsApiView(APIView):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
+                            "required": field_instance.required,
                             'label': field_instance.label or field_name,
                         }
                         if(str(field_instance.style.get("base_template")).find('textarea')!=-1):
@@ -1015,6 +1037,7 @@ class OdsFieldsFilterApiView(APIView):
                     obj = {
                         'name': field_name,
                         'type': str(field_instance.__class__.__name__),
+
                         'label': field_instance.label or field_name,
                     }
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
@@ -1061,7 +1084,7 @@ class OdsFieldsStateApiView(APIView):
 class FlashFieldsApiView(APIView):
     def get(self, request):
         flag = request.query_params.get('flag',None)
-        if flag=='l' or flag =='f':
+        if flag=='l':
             serializer = ProductionSerializer()
             fields = serializer.get_fields()
             model_class = serializer.Meta.model
@@ -1121,6 +1144,68 @@ class FlashFieldsApiView(APIView):
 
 
 
+class FlashFieldsApiView(APIView):
+    def get(self, request):
+        flag = request.query_params.get('flag',None)
+        if flag=='l':
+            serializer = ProductionSerializer()
+            fields = serializer.get_fields()
+            model_class = serializer.Meta.model
+            model_name = model_class.__name__
+
+
+            if(flag=='l'): #data grid list (react ag-grid)
+                field_info = []
+                field_info2 = []
+                obj1 = {
+                    "headerName": 'Contractuel',
+                    "children": []
+                }
+                obj2 = {
+                    "headerName": 'Supplementaire',
+                    "children": []
+                }
+                obj3 = {
+                    "headerName": 'Complementaire',
+                    "children": []
+                }
+
+                for field_name, field_instance in fields.items():
+                    if(field_name not in ['prevu_realiser','est_cloturer','user_id','date_modification']):
+
+                        obj={
+                                'field': field_name,
+                                'headerName': field_instance.label or field_name,
+                                'info': str(field_instance.__class__.__name__),
+                        }
+                        if (str(field_name).startswith('valeur') or str(field_name).startswith('quantite')):
+                            obj['cellRenderer'] = 'InfoRenderer'
+
+                        if (field_name  in ['quantite_1', 'valeur_1']):
+                            obj1['children'].append(obj)
+                        if (field_name  in ['quantite_2', 'valeur_2']):
+                            obj2['children'].append(obj)
+                        if (field_name  in ['quantite_3', 'valeur_3']):
+                            obj3['children'].append(obj)
+
+                        field_info2.append(obj)
+                        if(field_name not in ['quantite_1', 'valeur_1','quantite_2', 'valeur_2','quantite_3', 'valeur_3']):
+                            field_info.append(obj)
+
+
+
+                field_info.append(obj1)
+                field_info.append(obj2)
+                field_info.append(obj3)
+
+            return Response({'fields':field_info,"fields2":field_info2,'models':model_name,'pk':Marche._meta.pk.name},status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
 class AttachementsFieldsApiView(APIView):
     def get(self, request):
         flag = request.query_params.get('flag', None)
@@ -1139,6 +1224,7 @@ class AttachementsFieldsApiView(APIView):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
+                            "required": field_instance.required,
                             'label': field_instance.label or field_name,
                         }
 
@@ -1147,25 +1233,42 @@ class AttachementsFieldsApiView(APIView):
                             obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
 
                         field_info.append(obj)
-
+                return Response({'fields': field_info,
+                             'models': model_name, 'pk': Ordre_De_Service._meta.pk.name}, status=status.HTTP_200_OK)
 
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
+                field_info2 = []
+                obj1 = {
+                    "headerName": 'Qauntite',
+                    "children": []
+                }
+                obj2 = {
+                    "headerName": 'Montant',
+                    "children": []
+                }
                 for field_name, field_instance in fields.items():
                     obj = {
                         'field': field_name,
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
-                        'cellRenderer' : 'InfoRenderer'
+
                     }
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         obj['related'] = str(field_instance.queryset.model.__name__)
+                    field_info2.append(obj)
+                    if (field_name in ['qte_precedente','qte_mois','qte_cumule']):
+                        obj1['children'].append(obj)
+                    if (field_name in ['montant_precedent','montant_mois','montant_cumule']):
+                        obj2['children'].append(obj)
+                    if (field_name not in ['montant_precedent', 'montant_mois', 'montant_cumule','qte_precedente','qte_mois','qte_cumule']):
+                        field_info.append(obj)
+
+                field_info.append(obj1)
+                field_info.append(obj2)
 
 
-                    field_info.append(obj)
-
-
-            return Response({'fields': field_info,
+            return Response({'fields': field_info,"fields2":field_info2,
             'models': model_name, 'pk': Ordre_De_Service._meta.pk.name}, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)

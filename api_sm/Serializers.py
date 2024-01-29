@@ -208,7 +208,6 @@ class FactureSerializer(serializers.ModelSerializer):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
         fields.pop('deleted_by_cascade', None)
-        fields.pop('deleted_by_cascade', None)
 
         return fields
 
@@ -450,5 +449,36 @@ class AttachementsSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
 
         return representation
+
+
+
+
+
+class AttachementsSerializer(serializers.ModelSerializer):
+    code_tache = serializers.CharField(source='dqe.code_tache', read_only=True, label="Code Tache")
+    libelle_tache = serializers.CharField(source='dqe.libelle', read_only=True, label="Designation")
+    unite = serializers.CharField(source='dqe.unite.libelle', read_only=True, label="Unite")
+
+
+    class Meta:
+        model=Attachements
+        fields='__all__'
+
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('deleted', None)
+        fields.pop('deleted_by_cascade', None)
+        fields.pop('id', None)
+        fields.pop('heure', None)
+
+        return fields
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        return representation
+
 
 

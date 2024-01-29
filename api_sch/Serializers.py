@@ -18,3 +18,15 @@ class ProductionSerializer(serializers.ModelSerializer):
 
         return fields
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['valeur_1'] = round(instance.valeur_1,2)
+        representation['quantite_1'] = round(instance.quantite_1,2)
+        representation['valeur_2'] = round(instance.valeur_2,2)
+        representation['quantite_2'] = round(instance.quantite_2,2)
+        representation['valeur_3'] = round(instance.valeur_3,2)
+        representation['quantite_3'] = round(instance.quantite_3,2)
+
+        return representation
+
+

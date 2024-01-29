@@ -6,7 +6,6 @@ urlpatterns = [
     path('adduser/',CreateUserView.as_view()),
     path('login/', LoginView.as_view()),
     path('logout/', LogoutView.as_view()),
-
     path('whoami/', WhoamiView.as_view()),
     path('ic_images/', GetICImages.as_view()),
 
@@ -18,6 +17,7 @@ urlpatterns = [
     path('addsite/',AjoutSiteApiView.as_view()),
     path('addnt/',AjoutNTApiView.as_view()),
 
+    path('getatt/',GetAttachements.as_view()),
 
     path('importdqe/',ImportDQEAPIView.as_view()),
     path('optionimpression/',OptionImpressionApiView.as_view()),

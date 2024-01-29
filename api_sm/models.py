@@ -210,7 +210,7 @@ class Marche(SafeDeleteModel):
                            , verbose_name='Numero Travail',to_field="id")
 
 
-    libelle = models.CharField(null=False, blank=True, max_length=500
+    libelle = models.CharField(null=False, max_length=500
                                , verbose_name='Libelle')
     ods_depart = models.DateField(null=False, blank=True
                                   , verbose_name='ODS de départ')
@@ -233,7 +233,7 @@ class Marche(SafeDeleteModel):
     rg = models.DecimalField(default=0, max_digits=38, decimal_places=2,
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
                                               , verbose_name='Retenue de garantie')
-    code_contrat = models.CharField(null=False, blank=True, max_length=20, verbose_name='Code du contrat')
+    code_contrat = models.CharField(null=False, blank=False, max_length=20, verbose_name='Code du contrat')
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
    
     objects = DeletedModelManager()
@@ -306,7 +306,7 @@ class DQE(SafeDeleteModel): # le prix final
 
 
     def __str__(self):
-        return (str(self.marche) + " " + self.code_tache)
+        return (str(self.id))
 
 
 
@@ -422,7 +422,7 @@ class Attachements(SafeDeleteModel):
     dqe = models.ForeignKey(DQE, on_delete=models.DO_NOTHING)# item + quantité marche + prix unitaire
 
     qte_precedente = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         editable=False,verbose_name='Quantite precedent')
+                                         editable=False,verbose_name='precedent')
     qte_mois = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantite Mois')
     qte_cumule= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                     editable=False,verbose_name='Quantite cumule')
@@ -430,10 +430,10 @@ class Attachements(SafeDeleteModel):
     prix_u = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                      editable=False,verbose_name='Prix unitaire')
     montant_precedent=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                          editable=False,verbose_name='Montant precedent')
-    montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Montant Mois')
+                                          editable=False,verbose_name='Montant précedent')
+    montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois')
     montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         editable=False,verbose_name='Montant cumule')
+                                         editable=False,verbose_name='Montant cumulé')
     date=models.DateField(null=False,verbose_name='Date')
     heure=models.TimeField(auto_now=True,editable=False)
 
