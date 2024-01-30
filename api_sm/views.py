@@ -294,26 +294,27 @@ class GetFactureRG(generics.ListAPIView):
     serializer_class = FactureSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = FactureFilter
-
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        total = queryset.aggregate(montant_rg=models.Sum('montant_rg'))['montant_rg']
+        # Apply filtering
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Call the parent class's list method to get the default response
         response_data = super().list(request, *args, **kwargs).data
-        return Response({'factures':response_data,
-                         'extra':{
+        total = queryset.aggregate(montant_rg=models.Sum('montant_rg'))['montant_rg']
+        return Response({'factures': response_data,
+                         'extra': {
                              'total_rg': total,
-                             'total_rgl':num2words(total, to='currency', lang='fr_DZ').upper(),
-                              'code_contrat':queryset[0].marche.code_contrat,
+                             'total_rgl': num2words(total, to='currency', lang='fr_DZ').upper(),
+                             'code_contrat': queryset[0].marche.code_contrat,
                              'signature': queryset[0].marche.date_signature,
                              'projet': queryset[0].marche.libelle,
-                             'montant_marche':queryset[0].marche.ht,
+                             'montant_marche': queryset[0].marche.ht,
                              'client': queryset[0].marche.nt.code_client.id,
                              'nt': queryset[0].marche.nt.nt,
                              'lib_nt': queryset[0].marche.nt.libelle,
-                            'pole':queryset[0].marche.nt.code_site.id,
+                             'pole': queryset[0].marche.nt.code_site.id,
 
-                         }},status=status.HTTP_200_OK)
-
+                         }}, status=status.HTTP_200_OK)
 
 class DelDQEByID(generics.DestroyAPIView,DestroyModelMixin):
     permission_classes = [IsAuthenticated,DeleteDQEPermission]
@@ -601,19 +602,29 @@ class AddODS(generics.CreateAPIView):
 class AddAttachementApiView(generics.CreateAPIView):
     queryset = Attachements.objects.all()
     serializer_class = AttachementsSerializer
+
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
 
-        self.perform_create(serializer)
-        custom_response = {
-            'status': 'success',
-            'message': 'Attachement ajoutée',
-            'data': serializer.data,
-        }
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-        return Response(custom_response, status=status.HTTP_201_CREATED)
+            self.perform_create(serializer)
+            custom_response = {
+                'status': 'success',
+                'message': 'Attachement ajouté',
+                'data': serializer.data,
+            }
 
+            return Response(custom_response, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            custom_response = {
+                'status': 'error',
+                'message': str(e),
+                'data': None,
+            }
+
+            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetAttachements(generics.ListAPIView):
@@ -621,3 +632,26 @@ class GetAttachements(generics.ListAPIView):
     serializer_class = AttachementsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = AttachementsFilter
+
+    def list(self, request, *args, **kwargs):
+        # Apply filtering
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Call the parent class's list method to get the default response
+        response_data = super().list(request, *args, **kwargs).data
+        smontant_precedent = queryset.aggregate(montant_precedent=models.Sum('montant_precedent'))['montant_precedent']
+        smontant_mois = queryset.aggregate(montant_mois=models.Sum('montant_mois'))['montant_mois']
+        smontant_cumule = queryset.aggregate(montant_cumule=models.Sum('montant_cumule'))['montant_cumule']
+        if( response_data):
+            return Response({'attachement': response_data,
+                             'extra': {
+                                 'smontant_precedent ': smontant_precedent ,
+                                 'smontant_mois':smontant_mois,
+                                 'smontant_cumule':smontant_cumule,
+                                 'mm': num2words(smontant_mois, to='currency', lang='fr_DZ').upper(),
+
+
+                             }
+                             }, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': "La rechercher n'a pas pu aboutir à un resultat"},status=status.HTTP_404_NOT_FOUND)

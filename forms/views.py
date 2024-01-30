@@ -1261,7 +1261,7 @@ class AttachementsFieldsApiView(APIView):
                         obj1['children'].append(obj)
                     if (field_name in ['montant_precedent','montant_mois','montant_cumule']):
                         obj2['children'].append(obj)
-                    if (field_name not in ['montant_precedent', 'montant_mois', 'montant_cumule','qte_precedente','qte_mois','qte_cumule']):
+                    if (field_name not in ['montant_precedent', 'montant_mois', 'montant_cumule','qte_precedente','qte_mois','qte_cumule','marche']):
                         field_info.append(obj)
 
                 field_info.append(obj1)

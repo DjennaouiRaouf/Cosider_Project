@@ -419,6 +419,7 @@ class Avance(SafeDeleteModel):
 
 class Attachements(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
+
     dqe = models.ForeignKey(DQE, on_delete=models.DO_NOTHING)# item + quantité marche + prix unitaire
 
     qte_precedente = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
