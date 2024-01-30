@@ -422,10 +422,10 @@ class Attachements(SafeDeleteModel):
     dqe = models.ForeignKey(DQE, on_delete=models.DO_NOTHING)# item + quantité marche + prix unitaire
 
     qte_precedente = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         editable=False,verbose_name='precedent')
-    qte_mois = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantite Mois')
+                                         editable=False,verbose_name='Quantité precedent')
+    qte_mois = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantité Mois')
     qte_cumule= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                    editable=False,verbose_name='Quantite cumule')
+                                    editable=False,verbose_name='Quantité cumule')
 
     prix_u = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                      editable=False,verbose_name='Prix unitaire')
