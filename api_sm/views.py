@@ -341,13 +341,12 @@ class AddFactureApiView(generics.CreateAPIView):
     queryset = Factures.objects.all()
     serializer_class = FactureSerializer
 
-
     def create(self, request, *args, **kwargs):
         try:
 
+
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-
             self.perform_create(serializer)
             custom_response = {
                 'status': 'success',

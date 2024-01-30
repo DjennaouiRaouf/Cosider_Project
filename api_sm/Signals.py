@@ -155,6 +155,7 @@ def post_save_facture(sender, instance, created, **kwargs):
                 detail=d
             ).save()
         instance.num_situation = Factures.objects.filter(marche=instance.marche).count()
+        """
         avances=Avance.objects.filter(Q(marche=instance.marche) & Q(client=instance.marche.nt.code_client) & Q(date__range=[instance.du,instance.au]))
 
         for avance in avances:
@@ -170,7 +171,7 @@ def post_save_facture(sender, instance, created, **kwargs):
             print(avance.type.libelle)
             print(avance.type.taux_reduction_facture)
             print(mm,mc,mar,instance.montant_rb)
-
+        """
         instance.save()
 
 
