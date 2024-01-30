@@ -650,7 +650,6 @@ class GetAttachements(generics.ListAPIView):
                                  'smontant_cumule':smontant_cumule,
                                  'mm': num2words(smontant_mois, to='currency', lang='fr_DZ').upper(),
 
-
                              }
                              }, status=status.HTTP_200_OK)
         else:
