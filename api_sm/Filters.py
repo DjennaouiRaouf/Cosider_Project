@@ -114,3 +114,10 @@ class AttachementsFilter(django_filters.FilterSet):
     class Meta:
         model = Attachements
         fields=['marche',]
+
+
+
+class OpImpFilter(django_filters.FilterSet):
+    class Meta:
+        model = OptionImpression
+        fields=['type']

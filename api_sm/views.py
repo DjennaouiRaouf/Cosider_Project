@@ -395,19 +395,11 @@ class AddEncaissement(generics.CreateAPIView):
 
 
 class OptionImpressionApiView(generics.ListAPIView):
+    queryset = OptionImpression.objects.all()
     serializer_class = OptionImpressionSerializer
-    def get_queryset(self):
-        option = self.request.query_params.get('option', None)
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = OpImpFilter
 
-        if option in ["1","0"]:
-            if(option == "1"):
-                return OptionImpression.objects.filter(type__in=['H', 'F'])
-
-            if(option == "0"):
-                return OptionImpression.objects.filter(type__in=['EH', 'EF'])
-
-        else:
-            Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class UpdateMarcheView(generics.UpdateAPIView):
@@ -642,6 +634,8 @@ class GetAttachements(generics.ListAPIView):
         smontant_precedent = queryset.aggregate(montant_precedent=models.Sum('montant_precedent'))['montant_precedent']
         smontant_mois = queryset.aggregate(montant_mois=models.Sum('montant_mois'))['montant_mois']
         smontant_cumule = queryset.aggregate(montant_cumule=models.Sum('montant_cumule'))['montant_cumule']
+        marche=Marche.objects.get(id=self.request.query_params.get('marche', None))
+        filiale=TabFiliale.objects.first()
         if( response_data):
             return Response({'attachement': response_data,
                              'extra': {
@@ -649,6 +643,13 @@ class GetAttachements(generics.ListAPIView):
                                  'smontant_mois':smontant_mois,
                                  'smontant_cumule':smontant_cumule,
                                  'mm': num2words(smontant_mois, to='currency', lang='fr_DZ').upper(),
+                                 'client':str(marche.nt.code_client.libelle),
+                                 'objet': marche.nt.libelle,
+                                 'projet': marche.libelle,
+                                 'contrat':marche.code_contrat,
+                                 'du':marche.date_signature,
+                                 'nt':marche.nt.nt,
+                                 'filiale':'Cosider '+filiale.libelle_filiale
 
                              }
                              }, status=status.HTTP_200_OK)

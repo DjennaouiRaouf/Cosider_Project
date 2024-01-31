@@ -7,7 +7,7 @@ from safedelete.managers import SafeDeleteManager
 from safedelete.models import SafeDeleteModel
 from simple_history.models import HistoricalRecords
 
-from api_sch.models import TabAgence
+from api_sch.models import TabAgence, TabFiliale
 
 
 class DeletedModelManager(SafeDeleteManager):
@@ -31,6 +31,8 @@ class OptionImpression(SafeDeleteModel):
     Types = [
         ('H', 'Header'),
         ('F', 'Footer'),
+        ('L', 'Logo'),
+
     ]
     _safedelete_policy = SOFT_DELETE_CASCADE
     key = models.BigAutoField(primary_key=True)

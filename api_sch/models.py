@@ -37,13 +37,13 @@ class TabProduction(models.Model):
 
 
 class TabAgence(models.Model):
-    code_agence = models.CharField(db_column='Code_Agence', primary_key=True, max_length=15)  # Field name made lowercase.
-    code_banque = models.ForeignKey('TabBanque', models.DO_NOTHING, db_column='Code_banque')  # Field name made lowercase.
-    libelle= models.CharField(db_column='Libelle_Agence', max_length=50)  # Field name made lowercase.
-    compte_comptable = models.CharField(db_column='Compte_Comptable', max_length=10, blank=True, null=True)  # Field name made lowercase.
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  # Field name made lowercase.
-    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  # Field name made lowercase.
-    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  # Field name made lowercase.
+    code_agence = models.CharField(db_column='Code_Agence', primary_key=True, max_length=15)  
+    code_banque = models.ForeignKey('TabBanque', models.DO_NOTHING, db_column='Code_banque')  
+    libelle= models.CharField(db_column='Libelle_Agence', max_length=50)  
+    compte_comptable = models.CharField(db_column='Compte_Comptable', max_length=10, blank=True, null=True)  
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  
+    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  
+    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  
 
     class Meta:
         managed = False
@@ -52,14 +52,29 @@ class TabAgence(models.Model):
 
 
 class TabBanque(models.Model):
-    code_banque = models.CharField(db_column='Code_Banque', primary_key=True, max_length=15)  # Field name made lowercase.
-    libelle = models.CharField(db_column='Libelle_Banque', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    acronyme = models.CharField(db_column='Acronyme', max_length=20, blank=True, null=True)  # Field name made lowercase.
-    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  # Field name made lowercase.
-    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  # Field name made lowercase.
-    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  # Field name made lowercase.
+    code_banque = models.CharField(db_column='Code_Banque', primary_key=True, max_length=15)  
+    libelle = models.CharField(db_column='Libelle_Banque', max_length=50, blank=True, null=True)  
+    acronyme = models.CharField(db_column='Acronyme', max_length=20, blank=True, null=True)  
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  
+    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  
+    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  
 
     class Meta:
         managed = False
         db_table = 'tab_banque'
+        app_label = 'api_sch'
+
+
+
+class TabFiliale(models.Model):
+    code_filiale = models.CharField(db_column='Code_Filiale', primary_key=True, max_length=5)  
+    code_entreprise=models.CharField(max_length=2,null=False, db_column='Code_Entreprise')
+    libelle_filiale = models.CharField(db_column='Libelle_Filiale', max_length=50, blank=True, null=True)  
+    est_bloquer = models.BooleanField(db_column='Est_Bloquer', blank=True, null=True)  
+    user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  
+    date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  
+
+    class Meta:
+        managed = False
+        db_table = 'Tab_filiale'
         app_label = 'api_sch'

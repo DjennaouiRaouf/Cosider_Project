@@ -38,6 +38,8 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 
+
+
 @admin.register(OptionImpression)
 class OptionImpressionAdmin(SafeDeleteAdmin,admin.ModelAdmin):
     list_per_page = lp
@@ -561,7 +563,6 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
 
     def designation(self, obj):
         return obj.dqe.designation
-
 
 
 
