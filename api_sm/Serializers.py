@@ -335,7 +335,6 @@ class AvanceSerializer(serializers.ModelSerializer):
         fields.pop('deleted', None)
         fields.pop('deleted_by_cascade', None)
         return fields
-
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['type']=instance.type.libelle
