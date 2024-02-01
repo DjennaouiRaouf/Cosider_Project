@@ -217,6 +217,8 @@ def pre_save_avance(sender, instance, **kwargs):
         raise ValidationError(
             f'Vous avez une avance de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
 
+    if(instance.type.libelle =='Appros'):
+        instance.num_avance = Avance.objects.filter(marche=instance.marche,type__libelle="Appros").count()
     instance.montant= round((instance.marche.ttc)*instance.taux_avance/100,2)
 
 @receiver(post_save, sender=Avance)

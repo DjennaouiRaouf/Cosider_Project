@@ -289,6 +289,35 @@ class GetEncaissement(generics.ListAPIView):
     filterset_class = EncaissementFilter
 
 
+
+class getDetFacture(generics.ListAPIView):
+    queryset = DetailFacture.objects.all()
+    serializer_class = DetailFactureSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = DetailFactureFilter
+
+    def list(self, request, *args, **kwargs):
+        # Apply filtering
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Call the parent class's list method to get the default response
+        response_data = super().list(request, *args, **kwargs).data
+
+        return Response({'detail': response_data,
+                         'extra': {
+
+                             'code_contrat': queryset[0].facture.marche.code_contrat,
+                             'signature': queryset[0].facture.marche.date_signature,
+                             'projet': queryset[0].facture.marche.libelle,
+                             'montant_marche': queryset[0].facture.marche.ht,
+                             'client': queryset[0].facture.marche.nt.code_client.id,
+                             'nt': queryset[0].facture.marche.nt.nt,
+                             'lib_nt': queryset[0].facture.marche.nt.libelle,
+                             'pole': queryset[0].facture.marche.nt.code_site.id,
+
+                         }}, status=status.HTTP_200_OK)
+
+
 class GetFactureRG(generics.ListAPIView):
     queryset = Factures.objects.all()
     serializer_class = FactureSerializer
@@ -655,3 +684,34 @@ class GetAttachements(generics.ListAPIView):
                              }, status=status.HTTP_200_OK)
         else:
             return Response({'message': "La rechercher n'a pas pu aboutir à un resultat"},status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+
+class GetECF(generics.ListAPIView):
+    queryset = Factures.objects.all()
+    serializer_class = FactureSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = FactureFilter
+    def list(self, request, *args, **kwargs):
+        # Apply filtering
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Call the parent class's list method to get the default response
+        response_data = super().list(request, *args, **kwargs).data
+        avance = Avance.objects.filter(marche_id=self.request.query_params.get('marche', None))
+
+        return Response({'factures': response_data,
+                         'extra': {
+                             'projet': queryset[0].marche.libelle,
+                             'valeur':queryset[0].marche.ht,
+                             'pole': queryset[0].marche.nt.code_site.id,
+                             'tva': queryset[0].marche.tva,
+                             'rabais': queryset[0].marche.rabais,
+                             'rg': queryset[0].marche.rg,
+                             'avance':AvanceSerializer(avance,many=True).data
+
+
+
+                         }}, status=status.HTTP_200_OK)

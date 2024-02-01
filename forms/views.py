@@ -830,7 +830,7 @@ class AvanceFieldsApiView(APIView):
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if (field_name not in ['heure','marche','id']):
+                    if (field_name not in ["id"]):
                         field_info.append({
                             'field': field_name,
                             'headerName': field_instance.label or field_name,

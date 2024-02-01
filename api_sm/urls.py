@@ -47,6 +47,7 @@ urlpatterns = [
     path('addfacture/',AddFactureApiView.as_view()),
     path('getfacture/',GetFacture.as_view()),
     path('getfacturerg/',GetFactureRG.as_view()),
+    path('ecf/',GetECF.as_view()),
 
     path('encaisser/',AddEncaissement.as_view()),
     path('encaissements/',GetEncaissement.as_view()),
@@ -56,6 +57,8 @@ urlpatterns = [
 
 
     path('detail/',getDetailFacture.as_view()),
+
+    path('det/',getDetFacture.as_view()),
 
     path("getlibav/",LibAV.as_view()),
 
