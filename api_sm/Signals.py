@@ -125,10 +125,11 @@ def pre_save_factures(sender, instance, **kwargs):
         mm=sum["montant_mois__sum"]
         mp=sum["montant_precedent__sum"]
         mc=sum["montant_cumule__sum"]
+
         instance.montant_precedent = mp
         instance.montant_mois = mm
         instance.montant_cumule = mc
-
+        instance.montant_rg = mm * (instance.marche.rg / 100)
         instance.montant_rb = mm * (instance.marche.rabais / 100)
 
 

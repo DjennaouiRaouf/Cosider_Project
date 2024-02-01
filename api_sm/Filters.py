@@ -118,6 +118,7 @@ class AttachementsFilter(django_filters.FilterSet):
 
 
 class OpImpFilter(django_filters.FilterSet):
+
     class Meta:
         model = OptionImpression
         fields=['type']
