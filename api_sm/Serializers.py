@@ -326,7 +326,6 @@ class DetailFactureSerializer(serializers.ModelSerializer):
 
 
 class AvanceSerializer(serializers.ModelSerializer):
-
     class Meta:
             model=Avance
             fields='__all__'
