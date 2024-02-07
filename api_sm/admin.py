@@ -288,7 +288,7 @@ class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,Simp
     save_as = True
     list_per_page = lp
     resource_class = MarcheResource
-    history_list_display = ('nt','libelle' ,'ods_depart' ,'delais','pht' ,'pttc' ,'revisable','rg' ,'rabais'
+    history_list_display = ("history_id",'nt','libelle' ,'ods_depart' ,'delais','pht' ,'pttc' ,'revisable','rg' ,'rabais'
     ,'tva','date_signature')
     list_display = ('id','nt_link','libelle' ,'ods_depart' ,'delais','pht' ,'pttc' ,'revisable','rg' ,'rabais'
     ,'tva','date_signature')
@@ -364,7 +364,7 @@ class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
 @admin.register(Avance)
 class  AvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource=AvanceResource
-    list_display = ("marche", "type","montant_avance",'taux' )
+    list_display = ("marche","num_avance", "type","montant_avance",'taux' )
     list_filter = (SafeDeleteAdminFilter,)
     save_as = True
 
@@ -440,9 +440,18 @@ class  TypeCautionAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin)
 class RembAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     list_per_page = lp
-    list_display = ("facture","montant_mois","montant_cumule","rst_remb")
+    list_display = ("facture","type_avance","remb_mois","remb_cumule","reste_a_remb")
     list_filter = (SafeDeleteAdminFilter,)
 
+    def type_avance(self,obj):
+        return obj.avance.type.libelle
+    def reste_a_remb(self, obj):
+        return humanize.intcomma(obj.rst_remb)
+    def remb_mois(self, obj):
+        return humanize.intcomma(obj.montant_mois)
+
+    def remb_cumule(self, obj):
+        return humanize.intcomma(obj.montant_cumule)
     def get_import_formats(self):
         formats = (
             base_formats.XLSX,
@@ -513,8 +522,10 @@ class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
 @admin.register(Attachements)
 class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
-    list_display=("dqe",'qte_contr',"qte_precedente","qte_mois","qte_cumule","prix_u","montant_prec",'montant_m','montant_c','date','heure')
+    resource_class = AttachementsResource
+    list_display=("dqe",'qte_contr',"qte_precedente","qte_mois","qte_cumule","prix_u","montant_prec",'montant_m','montant_c','date','avancement')
     list_filter = (SafeDeleteAdminFilter,)
+
 
     def prix_u(self,obj):
         return humanize.intcomma(obj.dqe.prix_u)
@@ -556,7 +567,7 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
             <progress value="{0}" max="100"></progress>
             <span style="font-weight:bold">{0}%</span>
             ''',
-            obj.taux
+            obj.taux_realiser
         )
     def dqe(self,obj):
         return obj.dqe
@@ -569,15 +580,25 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
 
 @admin.register(Factures)
 class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
-    list_display = ('numero_facture','num_situation','du','au',"montant_prec",'montant_m','montant_c','date',"heure",
-                    'etat')
+    list_display = ('numero_facture','num_situation','du','au',"montant_prec",'montant_m','montant_c','montant_global_ht',
+                    'montant_avf','montant_ava','etat')
     list_filter = (SafeDeleteAdminFilter,)
+
+    def montant_avf(self,obj):
+        return humanize.intcomma(obj.montant_avf_remb)
+
+    def montant_ava(self, obj):
+        return humanize.intcomma(obj.montant_ava_remb)
+
     def montant_prec(self,obj):
         return humanize.intcomma(obj.montant_precedent)
     def montant_m(self,obj):
         return humanize.intcomma(obj.montant_mois)
     def montant_c(self,obj):
         return humanize.intcomma(obj.montant_cumule)
+
+    def montant_global_ht(self,obj):
+        return humanize.intcomma(obj.montant_factureHT)
     def get_import_formats(self):
 
         formats = (

@@ -139,7 +139,7 @@ class DQEFieldsApiView(APIView):
 
                 for field_name, field_instance in fields.items():
 
-                    if (not field_name in ['prix_q']):
+                    if (not field_name in ['prix_q','id']):
                         if( field_name in ['prix_u','quantite']):
                             readOnly=False
                         else:
@@ -265,9 +265,9 @@ class MarcheFieldsApiView(APIView):
 
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if(field_name not in ['id','ht','ttc']):
+                    if(field_name not in ['ht','ttc']):
 
-                        if (field_name in ['nt','code_site','code_contrat',"libelle"]):
+                        if (field_name in ['id','nt','code_site',"libelle"]):
                             readOnly = True
                         else:
                             readOnly = False
@@ -291,12 +291,16 @@ class MarcheFieldsApiView(APIView):
                 field_info = []
                 for field_name, field_instance in fields.items():
 
-                    field_info.append({
+                    obj={
                         'field': field_name,
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
-                    })
+                    }
 
+                    if (field_name in ['rg','rabais', 'ttc', 'ht']):
+                        obj['cellRenderer'] = 'InfoRenderer'
+
+                    field_info.append(obj)
             return Response({'fields':field_info,'models':model_name,'pk':Marche._meta.pk.name},status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -533,7 +537,7 @@ class FactureFieldsApiView(APIView):
                 field_info = []
                 for field_name, field_instance in fields.items():
                     if( not field_name in ['paye','montant_mois','montant_precedent','montant_cumule','date','heure',"marche",
-                                           'projet','code_contrat','client','pole','num_travail','lib_nt',
+                                           'projet',"code_contrat",'client','pole','num_travail','lib_nt',
                                            'somme','montant_rg','montant_taxe','montant_rb','signature',
                                            'montant_marche','num_situation','tva','rabais',
                                            'retenue_garantie',"montant_factureHT",'montant_factureTTC'] ):
@@ -545,6 +549,7 @@ class FactureFieldsApiView(APIView):
                             'label': field_instance.label or field_name,
                             
                         }
+
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
@@ -563,9 +568,10 @@ class FactureFieldsApiView(APIView):
 
                     }
                     if(field_name in ['client','signature','montant_marche','pole','lib_nt','projet','somme','marche','heure',
-                                      'num_travail','code_contrat']):
+                                      'num_travail',]):
                         obj['hide']= True
-
+                    if (field_name in ['montant_cumule','montant_mois','montant_precedent','montant_rg','montant_taxe','montant_rb',"montant_factureHT",'montant_factureTTC']):
+                        obj['cellRenderer'] = 'InfoRenderer'
                     field_info.append(obj)
 
 
@@ -1247,25 +1253,34 @@ class AttachementsFieldsApiView(APIView):
                 field_info2 = []
                 obj1 = {
                     "headerName": 'Qauntite',
-                    "children": []
+                    "children": [],
+                    'cellRenderer': 'InfoRenderer'
+
                 }
                 obj2 = {
                     "headerName": 'Montant',
-                    "children": []
+                    "children": [],
+                    'cellRenderer': 'InfoRenderer'
                 }
                 for field_name, field_instance in fields.items():
+
                     obj = {
                         'field': field_name,
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
 
                     }
+                    if(field_name in ['prix_u']):
+                        obj['cellRenderer'] = 'InfoRenderer'
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         obj['related'] = str(field_instance.queryset.model.__name__)
                     field_info2.append(obj)
                     if (field_name in ['qte_precedente','qte_mois','qte_cumule']):
+                        obj['cellRenderer'] = 'InfoRenderer'
                         obj1['children'].append(obj)
+
                     if (field_name in ['montant_precedent','montant_mois','montant_cumule']):
+                        obj['cellRenderer'] = 'InfoRenderer'
                         obj2['children'].append(obj)
                     if (field_name not in ['montant_precedent', 'montant_mois', 'montant_cumule','qte_precedente','qte_mois','qte_cumule','marche']):
                         field_info.append(obj)

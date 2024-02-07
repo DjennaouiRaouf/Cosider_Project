@@ -30,6 +30,7 @@ class TabProduction(models.Model):
     date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)
 
     class Meta:
+        managed = False
         db_table = 'Tab_Production'
         app_label = 'api_sch'
 

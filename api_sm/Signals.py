@@ -2,6 +2,7 @@
 import sys
 from datetime import datetime
 
+from django.db import IntegrityError
 from django.db.models import Q, Count
 from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
 from django.dispatch import *
@@ -41,7 +42,7 @@ def post_save_nt(sender, instance, created, **kwargs):
 @receiver(pre_save, sender=DQE)
 def pre_save_dqe(sender, instance, **kwargs):
     if not instance.pk:
-        instance.id = instance.marche.id + "-" + instance.code_tache
+        instance.id = str(instance.code_tache)+"_"+str(instance.marche.id)
 
     instance.libelle = instance.libelle.lower()
 
@@ -59,7 +60,8 @@ def pre_save_dqe(sender, instance, **kwargs):
 @receiver(post_save, sender=DQE)
 def post_save_dqe(sender, instance, created, **kwargs):
     if created:
-        instance.id = instance.marche.id + "-" + instance.code_tache
+        instance.id =  str(instance.code_tache)+"_"+str(instance.marche.id)
+
         total = DQE.objects.filter(marche=instance.marche).aggregate(models.Sum('prix_q'))[
             "prix_q__sum"]
         if not total:
@@ -80,32 +82,63 @@ def post_save_dqe(sender, instance, created, **kwargs):
         instance.marche.save()
 
 # marche
-@receiver(pre_save, sender=Marche)
-def pre_save_marche(sender, instance, **kwargs):
-    instance.id = str(instance.nt.id)
 
 
-# attechements (décompte provisoir)
+@receiver(post_save, sender=Marche)
+def post_save_marche(sender, instance, created, **kwargs):
+
+    total = DQE.objects.filter(marche=instance).aggregate(models.Sum('prix_q'))[
+            "prix_q__sum"]
+    if not total:
+        total = 0
+
+    Marche.objects.filter(id=instance.pk).update(
+        ht=round(total, 2),
+        ttc= round(total + (total * instance.tva / 100), 2)   )
+
+
+"""
+@receiver(pre_create_historical_record,sender=Marche)
+def pre_create_historical_record_callback(sender, **kwargs):
+    instance = kwargs['instance']
+    sender_model_name = sender.__name__
+    if(sender_model_name == "HistoricalMarche"):
+        try:
+            latest_history_record = instance.history.latest()
+            print(latest_history_record.date_signature,instance.date_signature)
+            if latest_history_record.date_signature == instance.date_signature:
+                raise IntegrityError("Data is already present in the historical records.")
+            else:
+                print(instance.history.num_avenant)
+        except Marche.history.model.DoesNotExist:
+            pass
+    else:
+        pass
+"""
 
 @receiver(pre_save, sender=Attachements)
 def pre_save_attachements(sender, instance, **kwargs):
+    if not instance.pk:
+        attachements = Attachements.objects.filter(~Q(pk=instance.pk) & Q(dqe=instance.dqe))
+        instance.prix_u = instance.dqe.prix_u
+        prix_u=instance.dqe.prix_u
+        if (attachements):  # courant
+            previous = attachements.latest('date','id')
+            instance.qte_precedente = previous.qte_cumule
+            instance.qte_cumule = instance.qte_precedente + instance.qte_mois
+            instance.montant_precedent = round(previous.montant_cumule,2)
+            instance.montant_mois = round(instance.qte_mois * prix_u,2)
+            instance.montant_cumule = round(instance.montant_precedent+instance.montant_mois,2)
+            instance.taux_realiser=round((instance.qte_cumule/instance.dqe.quantite),2)
+        else:  # debut
+            instance.qte_precedente = 0
+            instance.qte_cumule = instance.qte_mois
+            instance.montant_precedent = 0
+            instance.montant_mois = instance.qte_mois * prix_u
+            instance.montant_cumule = round(instance.montant_precedent+instance.montant_mois,2)
+            instance.taux_realiser=round((instance.qte_cumule/instance.dqe.quantite),2)
 
-    attachements = Attachements.objects.filter(~Q(pk=instance.pk) & Q(dqe=instance.dqe))
-    instance.prix_u = instance.dqe.prix_u
-    prix_u=instance.dqe.prix_u
-    if (attachements):  # courant
-        previous = attachements.latest('date','heure')
-        instance.qte_precedente = previous.qte_cumule
-        instance.qte_cumule = instance.qte_precedente + instance.qte_mois
-        instance.montant_precedent = round(previous.montant_cumule,2)
-        #instance.montant_mois = round(instance.qte_mois * prix_u,2)
-        instance.montant_cumule = round(instance.montant_precedent+instance.montant_mois,2)
-    else:  # debut
-        instance.qte_precedente = 0
-        instance.qte_cumule = instance.qte_mois
-        instance.montant_precedent = 0
-        #instance.montant_mois = instance.qte_mois * prix_u
-        instance.montant_cumule = round(instance.montant_precedent+instance.montant_mois,2)
+
 
 
 
@@ -129,8 +162,76 @@ def pre_save_factures(sender, instance, **kwargs):
         instance.montant_precedent = mp
         instance.montant_mois = mm
         instance.montant_cumule = mc
-        instance.montant_rg = mm * (instance.marche.rg / 100)
         instance.montant_rb = mm * (instance.marche.rabais / 100)
+        instance.montant_rg =round((mm-instance.montant_rb) * (instance.marche.rg / 100),2)
+        instance.montant_factureHT= round(instance.montant_mois-instance.montant_rb-instance.montant_rg,2)
+        instance.montant_factureTTC=round(instance.montant_factureHT+(instance.montant_factureHT*instance.marche.tva/100),2)
+
+
+
+
+
+
+
+
+@receiver(pre_save, sender=Remboursement)
+def pre_save_remboursement(sender, instance,  **kwargs):
+
+    if not instance.pk:
+        if(instance.avance.remboursee):
+            raise ValidationError('Cette avance sont remboursée')
+
+        else:
+            remb= Remboursement.objects.filter(Q(facture=instance.facture) & Q(avance__type=instance.avance.type.id) & Q(avance__remboursee=False))
+            if (remb):  # courant
+                previous = remb.latest('id')
+                mm = (instance.facture.montant_mois - instance.facture.montant_rb - instance.facture.montant_rg) * (instance.avance.remb / 100)
+                cumule = mm+ previous.montant_cumule
+                rar = instance.avance.montant - cumule
+                if (rar < 0):
+                    instance.montant_mois = previous.rst_remb
+                    instance.montant_cumule = instance.montant_mois+previous.montant_cumule
+                    instance.rst_remb = instance.avance.montant - instance.montant_cumule
+
+                else:
+                    instance.montant_mois = mm
+                    instance.montant_cumule = cumule
+                    instance.rst_remb = rar
+
+                if instance.avance.type.id==1:
+                    instance.facture.montant_avf_remb = round(instance.montant_mois,2)
+
+                if instance.avance.type.id == 2:
+                    instance.facture.montant_ava_remb = round(instance.montant_mois, 2)
+
+                instance.facture.save()
+
+                if(instance.rst_remb == 0):
+                    instance.avance.remboursee=True
+                    instance.avance.save()
+
+            else: # debut pas de precedent
+                mm=(instance.facture.montant_mois-instance.facture.montant_rb-instance.facture.montant_rg)*(instance.avance.remb/100)
+                cumule=mm
+                rar=instance.avance.montant-cumule
+                if(rar < 0):
+                    instance.montant_mois=instance.avance.montant
+                    instance.montant_cumule=instance.montant_mois
+                    instance.rst_remb=instance.avance.montant-instance.montant_cumule
+                else:
+                    instance.montant_mois = mm
+                    instance.montant_cumule = cumule
+                    instance.rst_remb = rar
+
+                if instance.avance.type.id == 1:
+                    instance.facture.montant_avf_remb = round(instance.montant_mois, 2)
+                if instance.avance.type.id == 2:
+                    instance.facture.montant_ava_remb = round(instance.montant_mois, 2)
+
+                instance.facture.save()
+
+
+
 
 
 
@@ -157,7 +258,7 @@ def post_save_facture(sender, instance, created, **kwargs):
             ).save()
         instance.num_situation = Factures.objects.filter(marche=instance.marche).count()
         """
-        avances=Avance.objects.filter(Q(marche=instance.marche) & Q(client=instance.marche.nt.code_client) & Q(date__range=[instance.du,instance.au]))
+       
 
         for avance in avances:
             prec=0
@@ -173,21 +274,10 @@ def post_save_facture(sender, instance, created, **kwargs):
             print(avance.type.taux_reduction_facture)
             print(mm,mc,mar,instance.montant_rb)
         """
-        instance.save()
 
 
 
-@receiver(pre_save, sender=Remboursement)
-def pre_save_remboursement(sender, instance, **kwargs):
-    pass
 
-
-
-@receiver(post_save, sender=Remboursement)
-def post_save_remboursement(sender, instance, created, **kwargs):
-
-
-    pass
 
 @receiver(post_softdelete, sender=Factures)
 def update_on_softdelete(sender, instance, **kwargs):
@@ -209,31 +299,48 @@ def pre_save_detail_facture(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=Avance)
 def pre_save_avance(sender, instance, **kwargs):
-    if(instance.type.id == 3 and  instance.taux_avance != instance.type.taux_max):
+    if(instance.type.id == 1 and  instance.taux_avance != instance.type.taux_max):
         raise ValidationError(
             f'L\'avance de type {instance.type.libelle} doit etre égale  {instance.type.taux_max}%')
 
-    if (instance.type.id != 3 and instance.taux_avance > instance.type.taux_max):
+    if (instance.type.id != 1 and instance.taux_avance > instance.type.taux_max):
         raise ValidationError(
             f'Vous avez une avance de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
 
-    if(instance.type.libelle =='Appros'):
+    if(instance.type ==2):
         instance.num_avance = Avance.objects.filter(marche=instance.marche,type__libelle="Appros").count()
     instance.montant= round((instance.marche.ttc)*instance.taux_avance/100,2)
+
+    if not instance.pk:
+        instance.num_avance = Avance.objects.filter(marche=instance.marche).count()
+
+    """
+    sq = DQE.objects.filter(marche=instance.marche).aggregate(models.Sum('quantite'))[
+        "quantite__sum"]
+    sqr = Attachements.objects.filter(dqe__marche=instance.marche).aggregate(models.Sum('qte_mois'))["qte_mois__sum"]
+    taux_realise = round((sqr / sq) * 100, 2)
+
+    instance.debut = taux_realise
+    instance.fin = 80
+    
+    """
+
 
 @receiver(post_save, sender=Avance)
 def post_save_avance(sender, instance, created, **kwargs):
     if(not instance.deleted):
         sum = Avance.objects.filter(marche=instance.marche, type=instance.type).aggregate(models.Sum('taux_avance'))[
             "taux_avance__sum"]
-        print(sum)
-        if (instance.type.id != 3 and sum > instance.type.taux_max):
+
+        if (instance.type.id != 1 and sum > instance.type.taux_max):
             raise ValidationError(
                 f'Vous avez plusieurs avances de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
 
-        if(instance.type.id == 3 and  (instance.taux_avance != instance.type.taux_max or sum > instance.type.taux_max )):
+        if(instance.type.id == 1 and  (instance.taux_avance != instance.type.taux_max or sum > instance.type.taux_max )):
             raise ValidationError(
                 f'L\'avance de type {instance.type.libelle} doit etre égale  {instance.type.taux_max}%')
+
+
 
 
 

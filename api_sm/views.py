@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth import authenticate
+from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
 from import_export.admin import ImportMixin, ExportMixin
 from import_export.results import RowResult
@@ -157,7 +158,7 @@ class AjoutMarcheApiView(generics.CreateAPIView):
 
 
 class AjoutDQEApiView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated, AddDQEPermission]
+    #permission_classes = [IsAuthenticated, AddDQEPermission]
     queryset = Sites.objects.all()
     serializer_class = DQESerializer
 
@@ -664,18 +665,24 @@ class GetAttachements(generics.ListAPIView):
         smontant_mois = queryset.aggregate(montant_mois=models.Sum('montant_mois'))['montant_mois']
         smontant_cumule = queryset.aggregate(montant_cumule=models.Sum('montant_cumule'))['montant_cumule']
         marche=Marche.objects.get(id=self.request.query_params.get('marche', None))
+        mm=self.request.query_params.get('mm', None)
+        aa=self.request.query_params.get('aa', None)
+        num_situation = Factures.objects.filter(marche=marche,du__month=mm,du__year=aa,au__month=mm,au__year=aa).count()
+
+    
         filiale=TabFiliale.objects.first()
         if( response_data):
             return Response({'attachement': response_data,
                              'extra': {
-                                 'smontant_precedent ': smontant_precedent ,
+                                 'num_situation':num_situation+1,
+                                 'smontant_precedent': smontant_precedent ,
                                  'smontant_mois':smontant_mois,
                                  'smontant_cumule':smontant_cumule,
                                  'mm': num2words(smontant_mois, to='currency', lang='fr_DZ').upper(),
                                  'client':str(marche.nt.code_client.libelle),
                                  'objet': marche.nt.libelle,
                                  'projet': marche.libelle,
-                                 'contrat':marche.code_contrat,
+                                 'contrat':marche.id,
                                  'du':marche.date_signature,
                                  'nt':marche.nt.nt,
                                  'filiale':'Cosider '+filiale.libelle_filiale

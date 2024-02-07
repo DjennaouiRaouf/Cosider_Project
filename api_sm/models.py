@@ -2,10 +2,12 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.dispatch import receiver
 from safedelete import SOFT_DELETE_CASCADE, DELETED_VISIBLE_BY_PK, SOFT_DELETE, HARD_DELETE
 from safedelete.managers import SafeDeleteManager
 from safedelete.models import SafeDeleteModel
 from simple_history.models import HistoricalRecords
+from simple_history.signals import pre_create_historical_record
 
 from api_sch.models import TabAgence, TabFiliale
 
@@ -207,9 +209,11 @@ class NT(SafeDeleteModel):
 class Marche(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
 
-    id=models.CharField(max_length=500,primary_key=True,editable=False,verbose_name='Code du marché')
+    id=models.CharField(max_length=500,primary_key=True,verbose_name='Code du Contrat')
     nt = models.ForeignKey(NT, on_delete=models.DO_NOTHING, db_column='nt', null=False
                            , verbose_name='Numero Travail',to_field="id")
+
+
 
 
     libelle = models.CharField(null=False, max_length=500
@@ -235,10 +239,11 @@ class Marche(SafeDeleteModel):
     rg = models.DecimalField(default=0, max_digits=38, decimal_places=2,
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
                                               , verbose_name='Retenue de garantie')
-    code_contrat = models.CharField(null=False, blank=False, max_length=20, verbose_name='Code du contrat')
+
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
    
     objects = DeletedModelManager()
+    #history = HistoricalRecords()
 
     def __str__(self):
         return self.id
@@ -258,6 +263,7 @@ class Marche(SafeDeleteModel):
         finally:
             del self.skip_history_when_saving
         return ret
+
 
 
 class Meta:
@@ -398,6 +404,18 @@ class Avance(SafeDeleteModel):
 
     montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,editable=False)
 
+    debut=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Debut",
+                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    fin=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Fin",
+                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+
+    remb=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Remboursement",
+                        validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+
+
+
+
+
 
     date=models.DateField(null=False,verbose_name="Date d'avance")
     heure = models.TimeField(auto_now=True,null=False,editable=False)
@@ -434,12 +452,12 @@ class Attachements(SafeDeleteModel):
                                      editable=False,verbose_name='Prix unitaire')
     montant_precedent=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                           editable=False,verbose_name='Montant précedent')
-    montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois')
+    montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois',editable=False)
     montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                          editable=False,verbose_name='Montant cumulé')
+    taux_realiser = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Taux Realiser",editable=False,
+                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     date=models.DateField(null=False,verbose_name='Date')
-    heure=models.TimeField(auto_now=True,editable=False)
-
     objects = DeletedModelManager()
 
 
@@ -464,8 +482,7 @@ class Factures(SafeDeleteModel):
     du = models.DateField(null=False,verbose_name='Du')
     au = models.DateField(null=False,verbose_name='Au')
     paye = models.BooleanField(default=False, null=False,editable=False)
-    date = models.DateField(auto_now=True, editable=False)
-    heure = models.TimeField(auto_now=True, editable=False)
+    date = models.DateTimeField(auto_now=True, editable=False)
     montant_precedent=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                           verbose_name="Montant Precedent"
                                           ,editable=False)
@@ -485,13 +502,19 @@ class Factures(SafeDeleteModel):
                                          verbose_name="Montant Retenue de garantie"
                                          ,editable=False) #retenue de garantie le montant du mois
 
+    montant_avf_remb=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                         verbose_name="Montant d'avance forfaitaire remboursé"
+                                         ,editable=False)
+    montant_ava_remb = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                          verbose_name="Montant d'avance appros remboursé"
+                                          , editable=False)
 
     montant_factureHT=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         verbose_name="Montant de la facture"
+                                         verbose_name="Montant de la facture HT"
                                          ,editable=False)
 
     montant_factureTTC=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         verbose_name="Net à Payer"
+                                         verbose_name="Montant de la facture TTC"
                                          ,editable=False)
 
 
@@ -519,8 +542,7 @@ class Remboursement(SafeDeleteModel):
                                          verbose_name="Reste à rembourser"
                                          ,editable=False)
 
-    date=models.DateField(auto_now=True,null=False,editable=False)
-    heure=models.TimeField(auto_now=True,null=False,editable=False)
+
 
     objects = DeletedModelManager()
 

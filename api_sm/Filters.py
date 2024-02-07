@@ -24,7 +24,7 @@ class NTFilter(django_filters.FilterSet):
 class MarcheFilter(django_filters.FilterSet):
     code_site = django_filters.ModelChoiceFilter(field_name='nt__code_site', label='Code du site',
                                                  queryset=Sites.objects.all(),)
-    code_contrat = django_filters.CharFilter(field_name='code_contrat', label='Code du contrat')
+    code_contrat = django_filters.CharFilter(field_name='id', label='Code du contrat')
     date_signature=django_filters.DateFilter(field_name="date_signature",label='Date de signature')
     nt = django_filters.CharFilter(field_name='nt__nt', label='Numero du travail')
     rabais=django_filters.NumberFilter(field_name='rabais', label='Rabais')
