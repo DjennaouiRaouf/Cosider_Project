@@ -56,6 +56,13 @@ def pre_save_dqe(sender, instance, **kwargs):
 
     instance.prix_q = round(instance.quantite * instance.prix_u, 2)
 
+    total = DQE.objects.filter(marche=instance.marche).aggregate(models.Sum('quantite'))[
+        "quantite__sum"]
+    if (total):
+        attachements = Attachements.objects.filter(dqe__marche=instance.marche)
+        for attachement in attachements:
+            attachement.taux_realiser = round((attachement.qte_cumule / total) * 100, 2)
+            attachement.save()
 
 @receiver(post_save, sender=DQE)
 def post_save_dqe(sender, instance, created, **kwargs):
@@ -80,6 +87,15 @@ def post_save_dqe(sender, instance, created, **kwargs):
         instance.marche.ht = round(total, 2)
         instance.marche.ttc = round(total + (total * instance.marche.tva / 100), 2)
         instance.marche.save()
+
+    total = DQE.objects.filter(marche=instance.marche).aggregate(models.Sum('quantite'))[
+        "quantite__sum"]
+    if(total):
+        attachements = Attachements.objects.filter(dqe__marche=instance.marche)
+        for attachement in attachements:
+            attachement.taux_realiser = round((attachement.qte_cumule / total) * 100, 2)
+            attachement.save()
+
 
 # marche
 
