@@ -5,6 +5,8 @@ from django.contrib.humanize.templatetags import humanize
 from django.db import transaction
 from import_export import resources, fields
 from import_export.widgets import Widget
+
+from api_sm import Signals
 from api_sm.models import *
 
 
@@ -229,7 +231,7 @@ class CautionResource(resources.ModelResource):
             return None
     class Meta:
         model = Cautions
-        exclude = ('deleted', 'deleted_by_cascade')
+        exclude = ('deleted', 'deleted_by_cascade',)
 
 
 class AttachementsResource(resources.ModelResource):
@@ -244,4 +246,6 @@ class AttachementsResource(resources.ModelResource):
             return None
     class Meta:
         model = Attachements
-        exclude = ('deleted', 'deleted_by_cascade')
+        exclude = ('deleted', 'deleted_by_cascade','qte_precedente', 'qte_cumule','prix_u','montant_precedent','montant_mois',
+                               'montant_cumule','taux_realiser','id','remboursee')
+

@@ -440,9 +440,13 @@ class  TypeCautionAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin)
 class RembAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     list_per_page = lp
-    list_display = ("facture","type_avance","remb_mois","remb_cumule","reste_a_remb")
+    list_display = ("facture","type_avance","numero_avance","remb_mois","remb_cumule","reste_a_remb","realise")
     list_filter = (SafeDeleteAdminFilter,)
 
+    def realise(self,obj):
+        return str(obj.taux_realise)+"%"
+    def numero_avance(self,obj):
+        return obj.avance.num_avance
     def type_avance(self,obj):
         return obj.avance.type.libelle
     def reste_a_remb(self, obj):
@@ -523,7 +527,7 @@ class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
 class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     resource_class = AttachementsResource
-    list_display=("dqe",'qte_contr',"qte_precedente","qte_mois","qte_cumule","prix_u","montant_prec",'montant_m','montant_c','date','avancement')
+    list_display=("id","dqe",'qte_contr',"qte_precedente","qte_mois","qte_cumule","prix_u","montant_prec",'montant_m','montant_c','date','avancement')
     list_filter = (SafeDeleteAdminFilter,)
 
 

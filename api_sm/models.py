@@ -370,8 +370,6 @@ class Ordre_De_Service(SafeDeleteModel):
 class TypeAvance(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     libelle = models.CharField(max_length=500, null=False, unique=True)
-    taux_reduction_facture=models.DecimalField(default=0, max_digits=38, decimal_places=2,
-                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     taux_max = models.DecimalField(default=0, max_digits=38, decimal_places=2,
                                                  validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
@@ -404,9 +402,10 @@ class Avance(SafeDeleteModel):
 
     montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,editable=False)
 
+    situation=models.PositiveIntegerField(default=0,null=False,blank=True,editable=True,verbose_name='De la Situation N°')
     debut=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Debut",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    fin=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Fin",
+    fin=models.DecimalField(default=80, max_digits=38, decimal_places=2, verbose_name="Fin",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
     remb=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Remboursement",
@@ -470,6 +469,7 @@ class Attachements(SafeDeleteModel):
     class Meta:
         verbose_name = 'Attachements'
         verbose_name_plural = 'Attachements'
+        unique_together=(('dqe','date'),)
         app_label = 'api_sm'
         
 
@@ -542,6 +542,9 @@ class Remboursement(SafeDeleteModel):
                                          verbose_name="Reste à rembourser"
                                          ,editable=False)
 
+    taux_realise=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+                                         verbose_name="Taux Réalisé"
+                                         ,editable=False)
 
 
     objects = DeletedModelManager()
@@ -663,7 +666,7 @@ class Cautions(SafeDeleteModel):
         validators=[MinValueValidator(0)], default=0,
         editable=False
     )
-    est_recupere = models.BooleanField(default=True, null=False, editable=False)
+    est_recupere = models.BooleanField(default=False, null=False,verbose_name='Est Recuperée')
 
     objects = DeletedModelManager()
 

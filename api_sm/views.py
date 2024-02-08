@@ -722,3 +722,10 @@ class GetECF(generics.ListAPIView):
 
 
                          }}, status=status.HTTP_200_OK)
+
+
+
+
+class UpdateCautionApiVew(generics.UpdateAPIView):
+    queryset = Cautions.objects.all()
+    serializer_class = CautionSerializer

@@ -32,6 +32,8 @@ urlpatterns = [
 
     path('addatt/', AddAttachementApiView.as_view()),
 
+    path('recupcaution/<str:pk>/',UpdateCautionApiVew.as_view()),
+
 
 
     path('getdqe/', GetDQEView.as_view()),

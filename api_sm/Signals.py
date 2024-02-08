@@ -129,14 +129,16 @@ def pre_save_attachements(sender, instance, **kwargs):
             instance.montant_precedent = round(previous.montant_cumule,2)
             instance.montant_mois = round(instance.qte_mois * prix_u,2)
             instance.montant_cumule = round(instance.montant_precedent+instance.montant_mois,2)
-            instance.taux_realiser=round((instance.qte_cumule/instance.dqe.quantite),2)
+            instance.taux_realiser=round((((instance.qte_precedente + instance.qte_mois)/instance.dqe.quantite)*100),2)
         else:  # debut
             instance.qte_precedente = 0
             instance.qte_cumule = instance.qte_mois
             instance.montant_precedent = 0
             instance.montant_mois = instance.qte_mois * prix_u
             instance.montant_cumule = round(instance.montant_precedent+instance.montant_mois,2)
-            instance.taux_realiser=round((instance.qte_cumule/instance.dqe.quantite),2)
+            instance.taux_realiser=round((((instance.qte_precedente + instance.qte_mois)/instance.dqe.quantite)*100),2)
+
+
 
 
 
@@ -180,8 +182,16 @@ def pre_save_remboursement(sender, instance,  **kwargs):
     if not instance.pk:
         if(instance.avance.remboursee):
             raise ValidationError('Cette avance sont remboursée')
-
+        if(instance.facture.num_situation > instance.avance.situation ):
+            raise ValidationError(f'Le remboursement doit s\'effectuer à partir de la situation N° {instance.avance.situation} ')
         else:
+            debut = instance.facture.du
+            fin = instance.facture.au
+            sq = DQE.objects.filter(marche=instance.facture.marche).aggregate(models.Sum('quantite'))[
+                "quantite__sum"]
+            sqr = Attachements.objects.filter(dqe__marche=instance.facture.marche,date__lte=fin, date__gte=debut).aggregate(models.Sum('qte_cumule'))[
+                "qte_cumule__sum"]
+
             remb= Remboursement.objects.filter(Q(facture=instance.facture) & Q(avance__type=instance.avance.type.id) & Q(avance__remboursee=False))
             if (remb):  # courant
                 previous = remb.latest('id')
@@ -209,7 +219,7 @@ def pre_save_remboursement(sender, instance,  **kwargs):
                 if(instance.rst_remb == 0):
                     instance.avance.remboursee=True
                     instance.avance.save()
-
+                instance.taux_realise = round((sqr / sq) * 100, 2)
             else: # debut pas de precedent
                 mm=(instance.facture.montant_mois-instance.facture.montant_rb-instance.facture.montant_rg)*(instance.avance.remb/100)
                 cumule=mm
@@ -229,7 +239,7 @@ def pre_save_remboursement(sender, instance,  **kwargs):
                     instance.facture.montant_ava_remb = round(instance.montant_mois, 2)
 
                 instance.facture.save()
-
+                instance.taux_realise = round((sqr / sq) * 100, 2)
 
 
 
@@ -313,17 +323,18 @@ def pre_save_avance(sender, instance, **kwargs):
     if not instance.pk:
         instance.num_avance = Avance.objects.filter(marche=instance.marche).count()
 
-    """
+
     sq = DQE.objects.filter(marche=instance.marche).aggregate(models.Sum('quantite'))[
         "quantite__sum"]
-    sqr = Attachements.objects.filter(dqe__marche=instance.marche).aggregate(models.Sum('qte_mois'))["qte_mois__sum"]
+    sqr = Attachements.objects.filter(dqe__marche=instance.marche).aggregate(models.Sum('qte_cumule'))["qte_cumule__sum"]
+    if not  sqr:
+        sqr=0
     taux_realise = round((sqr / sq) * 100, 2)
-
-    instance.debut = taux_realise
-    instance.fin = 80
-    
-    """
-
+    instance.debut=taux_realise
+    if( instance.fin > instance.debut ):
+        instance.remb=round((instance.taux_avance/(instance.fin-instance.debut))*100,2)
+    else:
+        raise ValidationError(f' Erreur  taux de debut doit etre supperieur au taux de fin')
 
 @receiver(post_save, sender=Avance)
 def post_save_avance(sender, instance, created, **kwargs):

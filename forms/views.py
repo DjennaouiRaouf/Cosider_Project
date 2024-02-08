@@ -539,7 +539,7 @@ class FactureFieldsApiView(APIView):
                     if( not field_name in ['paye','montant_mois','montant_precedent','montant_cumule','date','heure',"marche",
                                            'projet',"code_contrat",'client','pole','num_travail','lib_nt',
                                            'somme','montant_rg','montant_taxe','montant_rb','signature',
-                                           'montant_marche','num_situation','tva','rabais',
+                                           'montant_marche','num_situation','tva','rabais',"montant_ava_remb","montant_avf_remb"
                                            'retenue_garantie',"montant_factureHT",'montant_factureTTC'] ):
 
                         obj = {
@@ -899,7 +899,7 @@ class CautionFieldsApiView(APIView):
                 field_info = []
                 for field_name, field_instance in fields.items():
 
-                    if( not field_name in ['est_recupere','marche','montant'] ):
+                    if( not field_name in ['est_recupere','marche','montant','id'] ):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -925,12 +925,16 @@ class CautionFieldsApiView(APIView):
                 field_info = []
                 for field_name, field_instance in fields.items():
                     if (field_name not in ['heure','marche']):
-                        field_info.append({
+                        obj={
                             'field': field_name,
                             'headerName': field_instance.label or field_name,
                             'info': str(field_instance.__class__.__name__),
-                            'cellRenderer': 'InfoRenderer'
-                        })
+
+                        }
+                        if(str(field_instance.__class__.__name__) != 'BooleanField' ):
+                            obj['cellRenderer']='InfoRenderer'
+
+                        field_info.append(obj)
 
 
 
