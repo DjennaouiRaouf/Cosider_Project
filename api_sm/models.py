@@ -477,7 +477,6 @@ class Attachements(SafeDeleteModel):
 class Factures(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     numero_facture=models.CharField(max_length=800,primary_key=True,verbose_name='Numero de facture')
-    num_situation=models.PositiveIntegerField(default=0,null=False,blank=True,editable=False,verbose_name='Numero de situation')
     marche=models.ForeignKey(Marche,on_delete=models.DO_NOTHING,null=False,verbose_name='Marche',to_field="id")
     du = models.DateField(null=False,verbose_name='Du')
     au = models.DateField(null=False,verbose_name='Au')

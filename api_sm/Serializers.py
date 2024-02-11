@@ -214,6 +214,7 @@ class FactureSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        representation['num_situation'] = Factures.objects.filter(marche=instance.marche).count()
         representation['montant_precedent'] = instance.montant_precedent
         representation['montant_mois'] = instance.montant_mois
         representation['montant_cumule'] = instance.montant_cumule

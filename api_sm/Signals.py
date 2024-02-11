@@ -198,7 +198,7 @@ def pre_save_remboursement(sender, instance,  **kwargs):
     if not instance.pk:
         if(instance.avance.remboursee):
             raise ValidationError('Cette avance sont remboursée')
-        if(instance.facture.num_situation > instance.avance.situation ):
+        if(Factures.objects.filter(marche=instance.marche).count() > instance.avance.situation ):
             raise ValidationError(f'Le remboursement doit s\'effectuer à partir de la situation N° {instance.avance.situation} ')
         else:
             debut = instance.facture.du
@@ -281,24 +281,7 @@ def post_save_facture(sender, instance, created, **kwargs):
                 facture=instance,
                 detail=d
             ).save()
-        instance.num_situation = Factures.objects.filter(marche=instance.marche).count()
-        """
-       
 
-        for avance in avances:
-            prec=0
-            facture=Factures.objects.get(Q(marche=instance.marche) & Q(num_situation=instance.num_situation-1))
-            Remboursement(
-                facture=instance,
-                avance=avance,
-            )
-            mm = round((instance.montant_mois-instance.montant_rb) * (avance.type.taux_reduction_facture / 100), 2)
-            mc= round(mm + prec, 2)
-            mar = round(avance.montant-mc, 2)
-            print(avance.type.libelle)
-            print(avance.type.taux_reduction_facture)
-            print(mm,mc,mar,instance.montant_rb)
-        """
 
 
 
