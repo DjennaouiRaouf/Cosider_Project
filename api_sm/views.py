@@ -387,6 +387,7 @@ class AddFactureApiView(generics.CreateAPIView):
             print(request.data['fremb'])
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
+            flag=False
             if(request.data['fremb']=='true'):
                 f=Factures.objects.get(Q(numero_facture=request.data["numero_facture"]) & Q(num_situation=request.data["num_situation"]))
                 print(f.marche)
@@ -395,30 +396,41 @@ class AddFactureApiView(generics.CreateAPIView):
 
                     if(avanceF):
                         Remboursement.objects.create(facture=f,avance=avanceF)
+                        flag=True
                 except Exception as e:
+                    flag=False
                     custom_response = {
                         'status': 'error',
                         'message': 'Cette avance n\'existe pas dans ce marché ',
                         'data': None,
                     }
+
                 try:
                     avanceA = Avance.objects.filter(
                         Q(marche=request.data['marche']) & Q(type=2) & Q(remboursee=False)).order_by("num_avance").first()
                     if (avanceA):
                         Remboursement.objects.create(facture=f, avance=avanceF)
+                        flag = True
                 except Exception as e:
+                    flag = False
                     custom_response = {
                         'status': 'error',
                         'message': 'Cette avance n\'existe pas dans ce marché ',
                         'data': None,
                     }
 
-
-            custom_response = {
-                'status': 'success',
-                'message': 'Facture ajouté',
-                'data': serializer.data,
-            }
+            if(flag==True):
+                custom_response = {
+                    'status': 'success',
+                    'message': 'Facture ajouté Avec remboursement des avances',
+                    'data': serializer.data,
+                }
+            else:
+                custom_response = {
+                    'status': 'success',
+                    'message': 'Facture ajouté Sans remboursement des avances',
+                    'data': serializer.data,
+                }
 
             return Response(custom_response, status=status.HTTP_201_CREATED)
         except Exception as e:
