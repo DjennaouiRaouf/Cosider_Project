@@ -564,7 +564,7 @@ class FactureFieldsApiView(APIView):
 
                     }
                     if(field_name in ['client','signature','montant_marche','pole','lib_nt','projet','somme','marche','heure',
-                                      'num_travail',]):
+                                      'num_travail','']):
                         obj['hide']= True
                     if (field_name in ['montant_cumule','montant_mois','montant_precedent','montant_rg','montant_taxe','montant_rb',"montant_factureHT",'montant_factureTTC']):
                         obj['cellRenderer'] = 'InfoRenderer'

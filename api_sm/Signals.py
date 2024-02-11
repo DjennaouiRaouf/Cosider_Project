@@ -198,7 +198,7 @@ def pre_save_remboursement(sender, instance,  **kwargs):
     if not instance.pk:
         if(instance.avance.remboursee):
             raise ValidationError('Cette avance sont remboursée')
-        if(Factures.objects.filter(marche=instance.marche).count() > instance.avance.situation ):
+        if(instance.facture.num_situation > instance.avance.situation ):
             raise ValidationError(f'Le remboursement doit s\'effectuer à partir de la situation N° {instance.avance.situation} ')
         else:
             debut = instance.facture.du
@@ -281,7 +281,24 @@ def post_save_facture(sender, instance, created, **kwargs):
                 facture=instance,
                 detail=d
             ).save()
+        instance.num_situation = Factures.objects.filter(marche=instance.marche).count()
+        """
+       
 
+        for avance in avances:
+            prec=0
+            facture=Factures.objects.get(Q(marche=instance.marche) & Q(num_situation=instance.num_situation-1))
+            Remboursement(
+                facture=instance,
+                avance=avance,
+            )
+            mm = round((instance.montant_mois-instance.montant_rb) * (avance.type.taux_reduction_facture / 100), 2)
+            mc= round(mm + prec, 2)
+            mar = round(avance.montant-mc, 2)
+            print(avance.type.libelle)
+            print(avance.type.taux_reduction_facture)
+            print(mm,mc,mar,instance.montant_rb)
+        """
 
 
 
@@ -289,16 +306,14 @@ def post_save_facture(sender, instance, created, **kwargs):
 
 @receiver(post_softdelete, sender=Factures)
 def update_on_softdelete(sender, instance, **kwargs):
-    count=Factures.objects.filter(numero_facture=f'C-{instance.pk}').count()
-    if(count==None):
-        count=0
-
+    count=Factures.deleted_objects.filter(numero_facture__startswith=f'C-{instance.pk}').count()
+    print(count)
     num_f='C-'+instance.pk+'-'+str(count)
+    num_sit=(-1)*(instance.num_situation)
     DetailFacture.objects.filter(facture=instance.pk).update(facture=None)
-    Factures.objects.filter(numero_facture=instance.pk).update(numero_facture=num_f)
+    Factures.objects.filter(numero_facture=instance.pk).update(numero_facture=num_f,num_situation=num_sit)
     DetailFacture.objects.filter(facture=None).update(facture=num_f)
     DetailFacture.objects.filter(facture=num_f).delete()
-
 
 @receiver(pre_save, sender=DetailFacture)
 def pre_save_detail_facture(sender, instance, **kwargs):

@@ -584,7 +584,7 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
 
 @admin.register(Factures)
 class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
-    list_display = ('numero_facture','du','au',"montant_prec",'montant_m','montant_c','montant_global_ht',
+    list_display = ('numero_facture','num_situation','du','au',"montant_prec",'montant_m','montant_c','montant_global_ht',
                     'montant_avf','montant_ava','etat')
     list_filter = (SafeDeleteAdminFilter,)
 

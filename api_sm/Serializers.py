@@ -185,10 +185,10 @@ class MarcheSerializer(serializers.ModelSerializer):
 
 class FactureSerializer(serializers.ModelSerializer):
     projet=serializers.CharField(source='marche.libelle',read_only=True,label="Projet")
-    code_contrat=serializers.CharField(source='marche.code_contrat',read_only=True,label="Contrat N°")
+    code_contrat=serializers.CharField(source='marche.id',read_only=True,label="Contrat N°")
     signature=serializers.CharField(source='marche.date_signature',read_only=True,label="Signature")
     montant_marche = serializers.CharField(source='marche.ht', read_only=True, label="Montant du Marche")
-
+    num_situation=serializers.SerializerMethodField(label="Situation N°")
     client = serializers.CharField(source='marche.nt.code_client.id', read_only=True, label="Client")
     pole = serializers.CharField(source='marche.nt.code_site.id', read_only=True, label="Pole")
     num_travail=serializers.CharField(source='marche.nt.nt', read_only=True, label="Numero du travail")
@@ -202,6 +202,9 @@ class FactureSerializer(serializers.ModelSerializer):
         model=Factures
         fields='__all__'
 
+
+
+
     def get_somme(self, obj):
         return num2words(obj.montant_factureTTC, to='currency', lang='fr_DZ').upper()
     def get_fields(self, *args, **kwargs):
@@ -214,13 +217,12 @@ class FactureSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['num_situation'] = Factures.objects.filter(marche=instance.marche).count()
         representation['montant_precedent'] = instance.montant_precedent
         representation['montant_mois'] = instance.montant_mois
         representation['montant_cumule'] = instance.montant_cumule
         representation['montant_rg']=instance.montant_rg
         representation['montant_rb']=instance.montant_rb
-        representation['date'] = instance.date
+
 
         return representation
 
