@@ -170,7 +170,7 @@ class MarcheSerializer(serializers.ModelSerializer):
         return fields
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['ht'] = instance.ttc
+        representation['ht'] = instance.ht
         representation['ttc'] = instance.ttc
         representation['code_site'] = instance.nt.code_site.id
         representation['nt'] = instance.nt.nt
@@ -219,6 +219,7 @@ class FactureSerializer(serializers.ModelSerializer):
         representation['montant_cumule'] = instance.montant_cumule
         representation['montant_rg']=instance.montant_rg
         representation['montant_rb']=instance.montant_rb
+        representation['date'] = instance.date
 
         return representation
 

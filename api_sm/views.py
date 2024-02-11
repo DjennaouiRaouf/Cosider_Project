@@ -726,6 +726,21 @@ class GetECF(generics.ListAPIView):
 
 
 
-class UpdateCautionApiVew(generics.UpdateAPIView):
+class UpdateCautionApiView(generics.UpdateAPIView):
     queryset = Cautions.objects.all()
     serializer_class = CautionSerializer
+
+
+
+class DeleteInvoiceApiView(generics.DestroyAPIView):
+    queryset = Factures.objects.all()
+    serializer_class = FactureSerializer
+
+    def delete(self, request, *args, **kwargs):
+        pk_list = request.data.get(Factures._meta.pk.name)
+        if pk_list:
+            queryset = self.filter_queryset(self.get_queryset())
+            queryset = queryset.filter(pk__in=pk_list)
+            self.perform_destroy(queryset)
+
+        return Response({'Message': pk_list}, status=status.HTTP_200_OK)

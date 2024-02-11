@@ -536,11 +536,7 @@ class FactureFieldsApiView(APIView):
             if (flag == 'f'):  # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if( not field_name in ['paye','montant_mois','montant_precedent','montant_cumule','date','heure',"marche",
-                                           'projet',"code_contrat",'client','pole','num_travail','lib_nt',
-                                           'somme','montant_rg','montant_taxe','montant_rb','signature',
-                                           'montant_marche','num_situation','tva','rabais',"montant_ava_remb","montant_avf_remb"
-                                           'retenue_garantie',"montant_factureHT",'montant_factureTTC'] ):
+                    if( field_name in ['numero_facture','du','au'] ):
 
                         obj = {
                             'name': field_name,

@@ -402,7 +402,7 @@ class Avance(SafeDeleteModel):
 
     montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,editable=False)
 
-    situation=models.PositiveIntegerField(default=0,null=False,blank=True,editable=True,verbose_name='De la Situation N°')
+    situation=models.PositiveIntegerField(default=0,null=False,blank=True,editable=True,verbose_name='Rembourser à partir de la situation n°')
     debut=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Debut",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     fin=models.DecimalField(default=80, max_digits=38, decimal_places=2, verbose_name="Fin",

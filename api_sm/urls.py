@@ -32,7 +32,7 @@ urlpatterns = [
 
     path('addatt/', AddAttachementApiView.as_view()),
 
-    path('recupcaution/<str:pk>/',UpdateCautionApiVew.as_view()),
+    path('recupcaution/<str:pk>/',UpdateCautionApiView.as_view()),
 
 
 
@@ -72,9 +72,11 @@ urlpatterns = [
 
     path('permission/',PermissionApiView.as_view()),
 
+
     path('getcautions/',GetCautions.as_view()),
     path('addcautions/',AddCautions.as_view()),
 
+    path('annulefacture/',DeleteInvoiceApiView.as_view()),
 
 
     path('ods/',GetODS.as_view()),
