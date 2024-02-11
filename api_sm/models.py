@@ -403,9 +403,9 @@ class Avance(SafeDeleteModel):
     montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,editable=False)
 
     situation=models.PositiveIntegerField(default=0,null=False,blank=True,editable=True,verbose_name='Rembourser à partir de la situation n°')
-    debut=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Debut",
+    debut=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="% Debut",editable=False,
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    fin=models.DecimalField(default=80, max_digits=38, decimal_places=2, verbose_name="Fin",
+    fin=models.DecimalField(default=80, max_digits=38, decimal_places=2, verbose_name="% Fin",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
     remb=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Remboursement",
@@ -477,7 +477,7 @@ class Attachements(SafeDeleteModel):
 class Factures(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
     numero_facture=models.CharField(max_length=800,primary_key=True,verbose_name='Numero de facture')
-    num_situation=models.IntegerField(default=0,null=False,blank=True,verbose_name='Numero de situation')
+    num_situation=models.IntegerField(null=False,verbose_name='Numero de situation')
     marche=models.ForeignKey(Marche,on_delete=models.DO_NOTHING,null=False,verbose_name='Marche',to_field="id")
     du = models.DateField(null=False,verbose_name='Du')
     au = models.DateField(null=False,verbose_name='Au')
@@ -529,7 +529,7 @@ class Factures(SafeDeleteModel):
         
 class Remboursement(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    facture = models.ForeignKey(Factures, on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
+    facture = models.ForeignKey(Factures,unique=True, on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
     avance=models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
 
     montant_mois =models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,

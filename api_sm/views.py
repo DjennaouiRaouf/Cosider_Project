@@ -283,6 +283,13 @@ class GetFacture(generics.ListAPIView):
     filterset_class = FactureFilter
 
 
+class DeletedFacture(generics.ListAPIView):
+    queryset = Factures.all_objects.deleted_only()
+    serializer_class = FactureSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = FactureFilter
+
+
 class GetEncaissement(generics.ListAPIView):
     queryset = Encaissement.objects.all().order_by('-date_encaissement')
     serializer_class = EncaissementSerializer

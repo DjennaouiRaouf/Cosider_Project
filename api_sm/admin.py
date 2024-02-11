@@ -364,7 +364,7 @@ class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
 @admin.register(Avance)
 class  AvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource=AvanceResource
-    list_display = ("marche","num_avance", "type","montant_avance",'taux' )
+    list_display = ("marche","num_avance", "type","montant_avance",'taux','debut','fin','situation' )
     list_filter = (SafeDeleteAdminFilter,)
     save_as = True
 

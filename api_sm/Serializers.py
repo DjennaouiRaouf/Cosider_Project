@@ -184,11 +184,11 @@ class MarcheSerializer(serializers.ModelSerializer):
 
 
 class FactureSerializer(serializers.ModelSerializer):
+    num_situation = serializers.IntegerField(label='Numero de la situation')
     projet=serializers.CharField(source='marche.libelle',read_only=True,label="Projet")
     code_contrat=serializers.CharField(source='marche.id',read_only=True,label="Contrat N°")
     signature=serializers.CharField(source='marche.date_signature',read_only=True,label="Signature")
     montant_marche = serializers.CharField(source='marche.ht', read_only=True, label="Montant du Marche")
-    num_situation=serializers.SerializerMethodField(label="Situation N°")
     client = serializers.CharField(source='marche.nt.code_client.id', read_only=True, label="Client")
     pole = serializers.CharField(source='marche.nt.code_site.id', read_only=True, label="Pole")
     num_travail=serializers.CharField(source='marche.nt.nt', read_only=True, label="Numero du travail")

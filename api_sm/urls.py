@@ -58,6 +58,8 @@ urlpatterns = [
     path('getlibmp/',LibMP.as_view()),
 
 
+    path('delfacture/',DeletedFacture.as_view()),
+
     path('detail/',getDetailFacture.as_view()),
 
     path('det/',getDetFacture.as_view()),
