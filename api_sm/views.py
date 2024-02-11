@@ -384,8 +384,36 @@ class AddFactureApiView(generics.CreateAPIView):
 
 
             serializer = self.get_serializer(data=request.data)
+            print(request.data['fremb'])
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
+            if(request.data['fremb']=='true'):
+                f=Factures.objects.get(Q(numero_facture=request.data["numero_facture"]) & Q(num_situation=request.data["num_situation"]))
+                print(f.marche)
+                try:
+                    avanceF=Avance.objects.get(Q(marche=f.marche) & Q(type=1) & Q(remboursee=False) )
+
+                    if(avanceF):
+                        Remboursement.objects.create(facture=f,avance=avanceF)
+                except Exception as e:
+                    custom_response = {
+                        'status': 'error',
+                        'message': 'Cette avance n\'existe pas dans ce marché ',
+                        'data': None,
+                    }
+                try:
+                    avanceA = Avance.objects.filter(
+                        Q(marche=request.data['marche']) & Q(type=2) & Q(remboursee=False)).order_by("num_avance").first()
+                    if (avanceA):
+                        Remboursement.objects.create(facture=f, avance=avanceF)
+                except Exception as e:
+                    custom_response = {
+                        'status': 'error',
+                        'message': 'Cette avance n\'existe pas dans ce marché ',
+                        'data': None,
+                    }
+
+
             custom_response = {
                 'status': 'success',
                 'message': 'Facture ajouté',
