@@ -314,7 +314,7 @@ class getDetFacture(generics.ListAPIView):
         return Response({'detail': response_data,
                          'extra': {
 
-                             'code_contrat': queryset[0].facture.marche.code_contrat,
+                             'code_contrat': queryset[0].facture.marche.id,
                              'signature': queryset[0].facture.marche.date_signature,
                              'projet': queryset[0].facture.marche.libelle,
                              'montant_marche': queryset[0].facture.marche.ht,
@@ -334,15 +334,17 @@ class GetFactureRG(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         # Apply filtering
         queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.order_by("num_situation")
+
 
         # Call the parent class's list method to get the default response
         response_data = super().list(request, *args, **kwargs).data
         total = queryset.aggregate(montant_rg=models.Sum('montant_rg'))['montant_rg']
-        return Response({'factures': response_data,
+        return Response({'factures': FactureSerializer(queryset,many=True).data,
                          'extra': {
                              'total_rg': total,
                              'total_rgl': num2words(total, to='currency', lang='fr_DZ').upper(),
-                             'code_contrat': queryset[0].marche.code_contrat,
+                             'code_contrat': queryset[0].marche.id,
                              'signature': queryset[0].marche.date_signature,
                              'projet': queryset[0].marche.libelle,
                              'montant_marche': queryset[0].marche.ht,
@@ -751,12 +753,12 @@ class GetECF(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         # Apply filtering
         queryset = self.filter_queryset(self.get_queryset())
-
+        queryset = queryset.order_by("num_situation")
         # Call the parent class's list method to get the default response
         response_data = super().list(request, *args, **kwargs).data
         avance = Avance.objects.filter(marche_id=self.request.query_params.get('marche', None))
 
-        return Response({'factures': response_data,
+        return Response({'factures': FactureSerializer(queryset,many=True).data,
                          'extra': {
                              'projet': queryset[0].marche.libelle,
                              'valeur':queryset[0].marche.ht,

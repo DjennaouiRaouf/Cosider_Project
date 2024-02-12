@@ -529,7 +529,7 @@ class Factures(SafeDeleteModel):
         
 class Remboursement(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    facture = models.ForeignKey(Factures,unique=True, on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
+    facture = models.OneToOneField(Factures,unique=True, on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
     avance=models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
 
     montant_mois =models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
