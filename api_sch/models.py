@@ -38,7 +38,7 @@ class TabProduction(models.Model):
 
 
 class TabAgence(models.Model):
-    code_agence = models.CharField(db_column='Code_Agence', primary_key=True, max_length=15)  
+    id = models.CharField(db_column='Code_Agence', primary_key=True, max_length=15)
     code_banque = models.ForeignKey('TabBanque', models.DO_NOTHING, db_column='Code_banque')  
     libelle= models.CharField(db_column='Libelle_Agence', max_length=50)  
     compte_comptable = models.CharField(db_column='Compte_Comptable', max_length=10, blank=True, null=True)  

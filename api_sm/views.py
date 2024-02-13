@@ -79,10 +79,7 @@ class WhoamiView(APIView):
     def get(self, request):
         return Response({'whoami':request.user.username}, status=status.HTTP_200_OK)
 
-class GetICImages(generics.ListAPIView):
-    permission_classes = []
-    queryset = Images.objects.filter()
-    serializer_class = ICSerializer
+
 
 
 
@@ -277,7 +274,7 @@ class GetDQEbyId(generics.ListAPIView):
     lookup_field = 'marche'
 
 class GetFacture(generics.ListAPIView):
-    queryset = Factures.objects.all()
+    queryset = Factures.objects.all().order_by('num_situation')
     serializer_class = FactureSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = FactureFilter
@@ -386,53 +383,14 @@ class AddFactureApiView(generics.CreateAPIView):
 
 
             serializer = self.get_serializer(data=request.data)
-            print(request.data['fremb'])
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
-            flag=False
-            if(request.data['fremb']=='true'):
-                f=Factures.objects.get(Q(numero_facture=request.data["numero_facture"]) & Q(num_situation=request.data["num_situation"]))
-                print(f.marche)
-                try:
-                    avanceF=Avance.objects.get(Q(marche=f.marche) & Q(type=1) & Q(remboursee=False) )
 
-                    if(avanceF):
-                        Remboursement.objects.create(facture=f,avance=avanceF)
-                        flag=True
-                except Exception as e:
-                    flag=False
-                    custom_response = {
-                        'status': 'error',
-                        'message': 'Cette avance n\'existe pas dans ce marché ',
-                        'data': None,
-                    }
-
-                try:
-                    avanceA = Avance.objects.filter(
-                        Q(marche=request.data['marche']) & Q(type=2) & Q(remboursee=False)).order_by("num_avance").first()
-                    if (avanceA):
-                        Remboursement.objects.create(facture=f, avance=avanceF)
-                        flag = True
-                except Exception as e:
-                    flag = False
-                    custom_response = {
-                        'status': 'error',
-                        'message': 'Cette avance n\'existe pas dans ce marché ',
-                        'data': None,
-                    }
-
-            if(flag==True):
-                custom_response = {
+            custom_response = {
                     'status': 'success',
-                    'message': 'Facture ajouté Avec remboursement des avances',
+                    'message': 'Facture ajouté',
                     'data': serializer.data,
-                }
-            else:
-                custom_response = {
-                    'status': 'success',
-                    'message': 'Facture ajouté Sans remboursement des avances',
-                    'data': serializer.data,
-                }
+            }
 
             return Response(custom_response, status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -478,6 +436,20 @@ class OptionImpressionApiView(generics.ListAPIView):
     serializer_class = OptionImpressionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = OpImpFilter
+
+class GetICImages(generics.ListAPIView):
+    permission_classes = []
+    queryset = Images.objects.all()
+    serializer_class = ICSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ImageFilter
+
+
+class GetTimeLine(generics.ListAPIView):
+    permission_classes = []
+    queryset = TimeLine.objects.all()
+    serializer_class = TimeLineSerializer
+
 
 
 
@@ -793,3 +765,44 @@ class DeleteInvoiceApiView(generics.DestroyAPIView):
             self.perform_destroy(queryset)
 
         return Response({'Message': pk_list}, status=status.HTTP_200_OK)
+
+
+
+
+class AddRemb(generics.CreateAPIView):
+    queryset = Remboursement.objects.all()
+    serializer_class = RemboursementSerializer
+    def create(self, request, *args, **kwargs):
+        try:
+            pkList= [int(pk) for pk in request.data[Factures._meta.pk.name]]
+            pkList.sort(reverse=False)
+
+            factures = Factures.objects.filter(Q(numero_facture__in=pkList) & Q(is_remb=False))
+            for f in factures:
+                avances = Avance.objects.filter(Q(marche=f.marche) & Q(debut__lte=f.taux_realise) & Q(remboursee=False))
+                for a in avances:
+                    Remboursement(facture=f, avance=a).save()
+
+            '''
+            for pk in pkList:
+                facture=Factures.objects.get(Q(numero_facture=1) & Q(is_remb=False))
+                print(facture)
+                avance=Avance.objects.filter(Q(marche=facture.marche) & Q(debut__lte=facture.taux_realise))
+                #for a in avance:
+                #    Remboursement(facture=facture,avance=a).save()
+            
+            '''
+            custom_response = {
+                'status': 'success',
+                'message': 'Remboursement ajouté',
+            }
+
+            return Response(custom_response, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print(e)
+            custom_response = {
+                'status': 'error',
+                'message': str(e),
+            }
+
+            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)

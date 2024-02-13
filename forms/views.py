@@ -588,7 +588,7 @@ class FactureFieldsStateApiView(APIView):
         field_info = []
         for field_name, field_instance in fields.items():
             default_value = ''
-            if (field_name not in  ['paye','montant_mois','montant_precedent','montant_cumule','date','heure',"marche"]):
+            if (field_name in ['numero_facture','du','au','num_situation']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                     default_value= ''
                 if str(field_instance.__class__.__name__) == 'BooleanField':

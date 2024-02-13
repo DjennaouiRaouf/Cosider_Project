@@ -57,11 +57,12 @@ urlpatterns = [
     path('getlibum/',LibUM.as_view()),
     path('getlibmp/',LibMP.as_view()),
 
+    path('timeline/',GetTimeLine.as_view()),
 
     path('delfacture/',DeletedFacture.as_view()),
 
     path('detail/',getDetailFacture.as_view()),
-
+    path('remb/',AddRemb.as_view()),
     path('det/',getDetFacture.as_view()),
 
     path("getlibav/",LibAV.as_view()),

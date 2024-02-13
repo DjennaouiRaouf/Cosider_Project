@@ -46,7 +46,7 @@ class DQEFilter(django_filters.FilterSet):
 class FactureFilter(django_filters.FilterSet):
     class Meta:
         model = Factures
-        fields=['marche','numero_facture','paye']
+        fields=['marche','numero_facture','paye',"is_remb"]
 
 class EncaissementFilter(django_filters.FilterSet):
     class Meta:
@@ -121,4 +121,10 @@ class OpImpFilter(django_filters.FilterSet):
 
     class Meta:
         model = OptionImpression
+        fields=['type']
+
+class ImageFilter(django_filters.FilterSet):
+
+    class Meta:
+        model = Images
         fields=['type']

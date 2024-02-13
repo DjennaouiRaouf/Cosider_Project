@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -19,14 +21,34 @@ class DeletedModelManager(SafeDeleteManager):
 # Create your models here.
 class Images(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
+    Types = [
+        ('H', 'Home'),
+        ('L', 'Login'),
+
+    ]
     key = models.BigAutoField(primary_key=True)
-    src = models.ImageField(upload_to="Images/Login", null=False, blank=True, default='default.png')
+    src = models.ImageField(upload_to="Images/Images", null=False, blank=True, default='default.png')
+    type=models.CharField(max_length=100,null=False,blank=True,choices=Types)
     objects = DeletedModelManager()
     class Meta:
         verbose_name = 'Images'
         verbose_name_plural = 'Images'
         app_label = 'api_sm'
-        
+
+
+class TimeLine(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+
+    key = models.BigAutoField(primary_key=True)
+    year = models.PositiveIntegerField(default=datetime.now().year,null=False,blank=True)
+    title = models.CharField(max_length=100, null=False, blank=True)
+    description=models.TextField(max_length=300,null=False, blank=True,)
+    objects = DeletedModelManager()
+
+    class Meta:
+        verbose_name = 'TimeLine'
+        verbose_name_plural = 'TimeLine'
+        app_label = 'api_sm'
 
 
 class OptionImpression(SafeDeleteModel):
@@ -402,13 +424,12 @@ class Avance(SafeDeleteModel):
 
     montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,editable=False)
 
-    situation=models.PositiveIntegerField(default=0,null=False,blank=True,editable=True,verbose_name='Rembourser à partir de la situation n°')
     debut=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="% Debut",editable=False,
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     fin=models.DecimalField(default=80, max_digits=38, decimal_places=2, verbose_name="% Fin",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
-    remb=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Remboursement",
+    remb=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Remboursement",editable=False,
                         validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
 
@@ -416,8 +437,8 @@ class Avance(SafeDeleteModel):
 
 
 
+
     date=models.DateField(null=False,verbose_name="Date d'avance")
-    heure = models.TimeField(auto_now=True,null=False,editable=False)
     remboursee = models.BooleanField(default=False, null=False,verbose_name='Est Remboursée')
 
 
@@ -454,8 +475,7 @@ class Attachements(SafeDeleteModel):
     montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois',editable=False)
     montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                          editable=False,verbose_name='Montant cumulé')
-    taux_realiser = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Taux Realiser",editable=False,
-                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+
     date=models.DateField(null=False,verbose_name='Date')
     objects = DeletedModelManager()
 
@@ -517,6 +537,11 @@ class Factures(SafeDeleteModel):
                                          verbose_name="Montant de la facture TTC"
                                          ,editable=False)
 
+    taux_realise=models.DecimalField(max_digits=38,decimal_places=2,validators=[MinValueValidator(0),MinValueValidator(100)], default=0,
+                                         verbose_name="Taux Realisé"
+                                         ,editable=False)
+
+    is_remb=models.BooleanField(default=False,null=False,editable=False,verbose_name='Remboursement Effectué')
 
     objects = DeletedModelManager()
 
@@ -529,7 +554,7 @@ class Factures(SafeDeleteModel):
         
 class Remboursement(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    facture = models.OneToOneField(Factures,unique=True, on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
+    facture = models.ForeignKey(Factures, on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
     avance=models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
 
     montant_mois =models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
@@ -542,9 +567,7 @@ class Remboursement(SafeDeleteModel):
                                          verbose_name="Reste à rembourser"
                                          ,editable=False)
 
-    taux_realise=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         verbose_name="Taux Réalisé"
-                                         ,editable=False)
+
 
 
     objects = DeletedModelManager()
@@ -555,6 +578,7 @@ class Remboursement(SafeDeleteModel):
         verbose_name = 'Remboursement'
         verbose_name_plural = 'Remboursements'
         app_label = 'api_sm'
+        unique_together=(('facture','avance'),)
 
 
 
@@ -660,7 +684,7 @@ class Cautions(SafeDeleteModel):
     date_soumission = models.DateField(null=False,verbose_name="Date dépot")
     taux = models.DecimalField(default=0,max_digits=38, decimal_places=2,
                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    agence =models.CharField(db_column='Code_Agence', null=False, max_length=15)
+    agence =models.CharField(db_column='Code_Agence', null=False, max_length=500)
     montant = models.DecimalField(
         max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0,

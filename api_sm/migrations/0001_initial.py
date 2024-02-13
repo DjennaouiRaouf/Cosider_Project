@@ -104,7 +104,7 @@ class Migration(migrations.Migration):
                 ('deleted', models.DateTimeField(db_index=True, editable=False, null=True)),
                 ('deleted_by_cascade', models.BooleanField(default=False, editable=False)),
                 ('key', models.BigAutoField(primary_key=True, serialize=False)),
-                ('src', models.ImageField(blank=True, default='default.png', upload_to='Images/Login')),
+                ('src', models.ImageField(blank=True, default='default.png', upload_to='Images/Images')),
             ],
             options={
                 'verbose_name': 'Images',

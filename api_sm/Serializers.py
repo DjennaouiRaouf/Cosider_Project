@@ -228,7 +228,16 @@ class FactureSerializer(serializers.ModelSerializer):
 
 
 
+class TimeLineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TimeLine
+        fields = '__all__'
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('deleted', None)
+        fields.pop('deleted_by_cascade', None)
 
+        return fields
 
 
 class ModePaiementSerializer(serializers.ModelSerializer):
@@ -370,6 +379,7 @@ class TypeAvanceSerializer(serializers.ModelSerializer):
 
 
 class CautionSerializer(serializers.ModelSerializer):
+    agence = serializers.PrimaryKeyRelatedField(queryset=TabAgence.objects.all(), write_only=True, label='Agence')
     class Meta:
             model=Cautions
             fields='__all__'
@@ -479,4 +489,18 @@ class AttachementsSerializer(serializers.ModelSerializer):
         return representation
 
 
+
+class RemboursementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Remboursement
+        fields = '__all__'
+
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        fields.pop('deleted', None)
+        fields.pop('deleted_by_cascade', None)
+        fields.pop('id', None)
+
+
+        return fields
 
