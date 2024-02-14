@@ -566,7 +566,8 @@ class FactureFieldsApiView(APIView):
                     if(field_name in ['client','signature','montant_marche','pole','lib_nt','projet','somme','marche','heure',
                                       'num_travail','']):
                         obj['hide']= True
-                    if (field_name in ['montant_cumule','montant_mois','montant_precedent','montant_rg','montant_taxe','montant_rb',"montant_factureHT",'montant_factureTTC']):
+                    if (field_name in ['montant_cumule','montant_mois','montant_precedent','montant_rg','montant_taxe','montant_rb',"montant_factureHT",'montant_factureTTC',
+                                       "montant_avf_remb","montant_ava_remb"]):
                         obj['cellRenderer'] = 'InfoRenderer'
                     field_info.append(obj)
 
@@ -920,7 +921,7 @@ class CautionFieldsApiView(APIView):
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if (field_name not in ['heure','marche']):
+                    if (field_name not in ['heure']):
                         obj={
                             'field': field_name,
                             'headerName': field_instance.label or field_name,

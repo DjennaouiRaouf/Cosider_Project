@@ -777,24 +777,25 @@ class AddRemb(generics.CreateAPIView):
             pkList= [int(pk) for pk in request.data[Factures._meta.pk.name]]
             pkList.sort(reverse=False)
 
-            factures = Factures.objects.filter(Q(numero_facture__in=pkList) & Q(is_remb=False))
+            factures = Factures.objects.filter(Q(numero_facture__in=pkList))
             for f in factures:
-                avances = Avance.objects.filter(Q(marche=f.marche) & Q(debut__lte=f.taux_realise) & Q(remboursee=False))
-                for a in avances:
+                #forfaitaire
+                af=Avance.objects.get(Q(marche=f.marche) & Q(debut__lte=f.taux_realise) & Q(remboursee=False) & Q(type=1))
+                Remboursement(facture=f, avance=af).save()
+                # appros
+                aa = Avance.objects.filter(Q(marche=f.marche) & Q(debut__lte=f.taux_realise) & Q(remboursee=False)& Q(type=2)).order_by("num_avance")
+                if(aa):
+                    a=aa.first()
                     Remboursement(facture=f, avance=a).save()
+                    r = Remboursement.objects.get(facture=f, avance=a)
+                    if(r.rst_remb == 0):
+                        print("not yet")
 
-            '''
-            for pk in pkList:
-                facture=Factures.objects.get(Q(numero_facture=1) & Q(is_remb=False))
-                print(facture)
-                avance=Avance.objects.filter(Q(marche=facture.marche) & Q(debut__lte=facture.taux_realise))
-                #for a in avance:
-                #    Remboursement(facture=facture,avance=a).save()
-            
-            '''
+
+
             custom_response = {
                 'status': 'success',
-                'message': 'Remboursement ajouté',
+                'message': 'Remboursement effectué',
             }
 
             return Response(custom_response, status=status.HTTP_201_CREATED)

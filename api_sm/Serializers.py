@@ -193,7 +193,9 @@ class FactureSerializer(serializers.ModelSerializer):
     pole = serializers.CharField(source='marche.nt.code_site.id', read_only=True, label="Pole")
     num_travail=serializers.CharField(source='marche.nt.nt', read_only=True, label="Numero du travail")
     lib_nt = serializers.CharField(source='marche.nt.libelle', read_only=True, label="Libelle du travail")
+
     somme=serializers.SerializerMethodField(label="Arretée la présenta facture à la somme de")
+
     tva=serializers.CharField(source='marche.tva', read_only=True, label="TVA")
     rabais=serializers.CharField(source='marche.rabais', read_only=True, label="Rabais")
     retenue_garantie = serializers.CharField(source='marche.rg', read_only=True, label="Retenue de Garantie")
@@ -396,7 +398,7 @@ class CautionSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-
+        representation['agence']=instance.agence
         return representation
 
 class TypeCautionSerializer(serializers.ModelSerializer):

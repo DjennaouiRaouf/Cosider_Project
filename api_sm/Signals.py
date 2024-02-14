@@ -149,7 +149,6 @@ def pre_save_factures(sender, instance, **kwargs):
     if (instance.du > instance.au):
         raise ValidationError('Date de debut doit etre inferieur à la date de fin')
     else:
-
         debut = instance.du
         fin = instance.au
         if( not Attachements.objects.filter(dqe__marche=instance.marche, date__lte=fin, date__gte=debut)):
@@ -167,21 +166,21 @@ def pre_save_factures(sender, instance, **kwargs):
         instance.montant_precedent = mp
         instance.montant_mois = mm
         instance.montant_cumule = mc
-
         instance.montant_rb = mm * (instance.marche.rabais / 100)
         instance.montant_rg = round((mm - instance.montant_rb) * (instance.marche.rg / 100), 2)
         instance.montant_factureHT = round(instance.montant_mois - instance.montant_rb - instance.montant_rg, 2)
         instance.montant_factureTTC = round(
         instance.montant_factureHT + (instance.montant_factureHT * instance.marche.tva / 100), 2)
         qte_real = Attachements.objects.filter(Q(dqe__marche=instance.marche) & Q(date__lte=fin)).aggregate(
-            models.Sum('qte_mois'))["qte_mois__sum"]
+                models.Sum('qte_mois'))["qte_mois__sum"]
         qte_dqe = DQE.objects.filter(Q(marche=instance.marche)).aggregate(
-            models.Sum('quantite'))["quantite__sum"]
+                models.Sum('quantite'))["quantite__sum"]
         instance.taux_realise = round((qte_real / qte_dqe) * 100, 2)
 
-
-
-
+    if instance.pk:
+        instance.montant_factureHT=round(instance.montant_factureHT-instance.montant_avf_remb-instance.montant_ava_remb,2)
+        instance.montant_factureTTC = round(
+            instance.montant_factureHT + (instance.montant_factureHT * instance.marche.tva / 100), 2)
 
 
 @receiver(pre_save, sender=Remboursement)
@@ -223,12 +222,10 @@ def pre_save_remboursement(sender, instance, **kwargs):
 
                 if instance.avance.type.id == 2:
                     instance.facture.montant_ava_remb = round(instance.montant_mois, 2)
-
-                instance.facture.is_remb=True
                 instance.facture.save()
 
                 if (instance.rst_remb == 0):
-                    instance.avance.remboursee = True
+                    instance.avance.remboursee=True
                     instance.avance.save()
 
             else:  # debut pas de precedent
@@ -249,12 +246,10 @@ def pre_save_remboursement(sender, instance, **kwargs):
                     instance.facture.montant_avf_remb = round(instance.montant_mois, 2)
                 if instance.avance.type.id == 2:
                     instance.facture.montant_ava_remb = round(instance.montant_mois, 2)
-
-
-                instance.facture.is_remb=True
                 instance.facture.save()
-
-
+                if (instance.rst_remb == 0):
+                    instance.avance.remboursee = True
+                    instance.avance.save()
 
 
 @receiver(pre_save, sender=ModePaiement)
