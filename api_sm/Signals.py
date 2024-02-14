@@ -195,7 +195,8 @@ def pre_save_remboursement(sender, instance, **kwargs):
 
         else:
             remb = Remboursement.objects.filter(
-                Q(facture__num_situation__lt=instance.facture.num_situation) & Q(avance__type=instance.avance.type.id) & Q(avance__num_avance=instance.avance.num_avance))
+                Q(facture__num_situation__lt=instance.facture.num_situation) & Q(avance__type=instance.avance.type.id) & Q(avance__num_avance=instance.avance.num_avance)
+            & Q(avance__remboursee=False))
             print(remb)
             if (remb):  # courant
                 previous = remb.last()
