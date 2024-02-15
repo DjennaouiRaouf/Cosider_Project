@@ -2,7 +2,6 @@ import json
 
 from django.contrib.auth import authenticate
 from django.db.models import Count
-from django.db.models.functions import TruncMonth
 from django_filters.rest_framework import DjangoFilterBackend
 from import_export.admin import ImportMixin, ExportMixin
 from import_export.results import RowResult
@@ -689,16 +688,16 @@ class GetAttachements(generics.ListAPIView):
         marche=Marche.objects.get(id=self.request.query_params.get('marche', None))
         mm=self.request.query_params.get('mm', None)
         aa=self.request.query_params.get('aa', None)
-        num_situation =0
-        distinct_count = len(
-            Attachements.objects.values('date__month', 'date__year').distinct().annotate(count=Count('id')))
-        print()
+
+        num_situation = len(
+            Attachements.objects.values('date__month', 'date__year').distinct().annotate(count=Count('id')).filter(Q(dqe__marche=marche)&Q(date__year__lte=aa) & Q(date__month__lte=mm)) )
+
     
         filiale=TabFiliale.objects.first()
         if( response_data):
             return Response({'attachement': response_data,
                              'extra': {
-                                 'num_situation':0,
+                                 'num_situation':num_situation,
                                  'smontant_precedent': smontant_precedent ,
                                  'smontant_mois':smontant_mois,
                                  'smontant_cumule':smontant_cumule,
