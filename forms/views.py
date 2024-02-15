@@ -138,7 +138,6 @@ class DQEFieldsApiView(APIView):
                 field_info = []
 
                 for field_name, field_instance in fields.items():
-
                     if (not field_name in ['prix_q','id','marche']):
                         if( field_name in ['prix_u','quantite']):
                             readOnly=False
