@@ -834,11 +834,16 @@ class AvanceFieldsApiView(APIView):
                 field_info = []
                 for field_name, field_instance in fields.items():
                     if (field_name not in ["id"]):
-                        field_info.append({
+                        obj={
                             'field': field_name,
                             'headerName': field_instance.label or field_name,
                             'info': str(field_instance.__class__.__name__),
-                        })
+                        }
+                        if(field_name in ['taux_avance','montant','debut','fin','remb']):
+                            obj['cellRenderer']='InfoRenderer'
+
+                        field_info.append(obj)
+
 
 
 
