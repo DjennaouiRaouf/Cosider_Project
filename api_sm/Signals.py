@@ -58,7 +58,6 @@ def pre_save_dqe(sender, instance, **kwargs):
     instance.prix_q = round(instance.quantite * instance.prix_u, 2)
 
 
-
 @receiver(post_save, sender=DQE)
 def post_save_dqe(sender, instance, created, **kwargs):
     if created:
@@ -83,8 +82,19 @@ def post_save_dqe(sender, instance, created, **kwargs):
         instance.marche.ttc = round(total + (total * instance.marche.tva / 100), 2)
         instance.marche.save()
 
+    qte_dqe = DQE.objects.filter(Q(marche=instance.marche)).aggregate(
+        models.Sum('quantite'))["quantite__sum"]
 
+    try:
+        factures = Factures.objects.filter(marche=instance.marche)
+        for facture in factures:
+            qte_real = Attachements.objects.filter(Q(dqe__marche=instance.marche) & Q(date__lte=facture.au)).aggregate(
+                models.Sum('qte_mois'))["qte_mois__sum"]
+            facture.taux_realise = round((qte_real / qte_dqe) * 100, 2)
+            facture.save()
 
+    except Factures.DoesNotExist :
+        pass
 
 # marche
 
