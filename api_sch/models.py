@@ -46,10 +46,14 @@ class TabAgence(models.Model):
     user_id = models.CharField(db_column='User_ID', max_length=15, blank=True, null=True)  
     date_modification = models.DateTimeField(db_column='Date_Modification', blank=True, null=True)  
 
+
     class Meta:
         managed = False
         db_table = 'Tab_agence'
         app_label = 'api_sch'
+
+    def __str__(self):
+        return self.id + " - " + self.libelle
 
 
 class TabBanque(models.Model):

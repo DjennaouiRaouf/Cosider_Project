@@ -381,7 +381,7 @@ class TypeAvanceSerializer(serializers.ModelSerializer):
 
 
 class CautionSerializer(serializers.ModelSerializer):
-    agence = serializers.PrimaryKeyRelatedField(queryset=TabAgence.objects.all(), write_only=True, label='Agence')
+
     class Meta:
             model=Cautions
             fields='__all__'
@@ -391,14 +391,11 @@ class CautionSerializer(serializers.ModelSerializer):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
         fields.pop('deleted_by_cascade', None)
-
-
         return fields
 
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['agence']=instance.agence
         return representation
 
 class TypeCautionSerializer(serializers.ModelSerializer):

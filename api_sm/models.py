@@ -684,7 +684,7 @@ class Cautions(SafeDeleteModel):
     date_soumission = models.DateField(null=False,verbose_name="Date dépot")
     taux = models.DecimalField(default=0,max_digits=38, decimal_places=2,
                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    agence =models.CharField(db_column='Code_Agence', null=False, max_length=500)
+    agence = models.ForeignKey(TabAgence,db_column='Code_Agence', db_constraint=False,on_delete=models.DO_NOTHING)
     montant = models.DecimalField(
         max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0,
