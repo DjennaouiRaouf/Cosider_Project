@@ -76,7 +76,7 @@ class AvanceFilter(django_filters.FilterSet):
 
     class Meta:
         model = Avance
-        fields=['marche',]
+        fields=['marche','remboursee']
 
 
 class CautionFilter(django_filters.FilterSet):

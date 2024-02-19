@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import check_password
 from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
 from import_export.admin import ImportMixin, ExportMixin
@@ -489,7 +490,7 @@ class getDetailFacture(generics.ListAPIView):
 
 
 class GetAvance(generics.ListAPIView):
-    permission_classes = [IsAuthenticated,ViewAvancePermission]
+    #permission_classes = [IsAuthenticated,ViewAvancePermission]
     queryset = Avance.objects.all()
     serializer_class = AvanceSerializer
     filter_backends = [DjangoFilterBackend]
@@ -776,31 +777,23 @@ class AddRemb(generics.CreateAPIView):
     serializer_class = RemboursementSerializer
     def create(self, request, *args, **kwargs):
         try:
-            pkList= [int(pk) for pk in request.data[Factures._meta.pk.name]]
-            pkList.sort(reverse=False)
-
-            factures = Factures.objects.filter(Q(numero_facture__in=pkList))
-            for f in factures:
-                #forfaitaire
-                af=Avance.objects.get(Q(marche=f.marche) & Q(debut__lte=f.taux_realise) & Q(remboursee=False) & Q(type=1))
-                Remboursement(facture=f, avance=af).save()
-                # appros
-                aa = Avance.objects.filter(Q(marche=f.marche) & Q(debut__lte=f.taux_realise) & Q(remboursee=False)& Q(type=2)).order_by("num_avance")
-                if(aa):
-                    a=aa.first()
-                    Remboursement(facture=f, avance=a).save()
-                    r = Remboursement.objects.get(facture=f, avance=a)
-                    if(r.rst_remb == 0):
-                        print("not yet")
-
-
+            factures = [int(pk) for pk in request.data[0][Factures._meta.pk.name]]
+            factures.sort(reverse=False)
+            avances = [int(pk) for pk in request.data[1]]
+            avances.sort(reverse=False)
+            if(avances and factures):
+                for f in factures :
+                    for a in avances :
+                        facture=Factures.objects.get(numero_facture=f)
+                        avance=Avance.objects.get(id=a)
+                        Remboursement(facture=facture, avance=avance).save()
 
             custom_response = {
                 'status': 'success',
                 'message': 'Remboursement effectué',
             }
 
-            return Response(custom_response, status=status.HTTP_201_CREATED)
+            return Response( status=status.HTTP_201_CREATED)
         except Exception as e:
             print(e)
             custom_response = {
@@ -808,4 +801,61 @@ class AddRemb(generics.CreateAPIView):
                 'message': str(e),
             }
 
-            return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserProfile(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        uid=request.user.id
+        try:
+            user=User.objects.get(id=uid)
+            return Response({
+                "full_name":user.get_full_name(),
+                "username":user.username,
+                "email":user.email,
+                "joined":user.date_joined,
+                "login":user.last_login,
+                "current_password":'',
+                "new_password": '',
+                "confirm_new_password": '',
+
+            }, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"message":"Erreur ... !"}, status=status.HTTP_400_BAD_REQUEST)
+
+class EditUserProfile(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        username = request.data.get('username')
+        email = request.data.get('email')
+        current_password = request.data.get('current_password')
+        new_password=request.data.get('new_password')
+        confirm_new_password=request.data.get('confirm_new_password')
+
+        uid = request.user.id
+        user = User.objects.get(id=uid)
+        try:
+            if(username):
+                user.username=username
+
+            if (email):
+                user.email = email
+
+            if(current_password and new_password and confirm_new_password):
+                if(check_password(current_password,user.password)):
+                    if(new_password!=confirm_new_password):
+                        return Response({"message": "Vous n'avez pas confirmé votre mot de passe"}, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+
+                        user.set_password(new_password)
+                else:
+                    return Response({"message": "Mot de pass incorrect"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+            user.save()
+            return Response({"message": "Votre profile est mis à jour"}, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            return Response({"message": "Erreur ... !"}, status=status.HTTP_400_BAD_REQUEST)

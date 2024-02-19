@@ -811,7 +811,7 @@ class AvanceFieldsApiView(APIView):
 
                 for field_name, field_instance in fields.items():
 
-                    if( not field_name in ['montant','heure','marche','id','num_avance','remboursee'] ):
+                    if( not field_name in ['taux_avance','remb','heure','marche','id','num_avance','remboursee'] ):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -831,7 +831,7 @@ class AvanceFieldsApiView(APIView):
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if (field_name not in ["id"]):
+                    if (field_name not in [""]):
                         obj={
                             'field': field_name,
                             'headerName': field_instance.label or field_name,

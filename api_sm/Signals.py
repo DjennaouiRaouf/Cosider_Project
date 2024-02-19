@@ -193,26 +193,28 @@ def pre_save_factures(sender, instance, **kwargs):
             instance.montant_factureHT + (instance.montant_factureHT * instance.marche.tva / 100), 2)
 
 
+
 @receiver(pre_save, sender=Remboursement)
 def pre_save_remboursement(sender, instance, **kwargs):
 
     if not instance.pk:
         if (instance.avance.remboursee):
             raise ValidationError('Cette avance est remboursée')
-        elif (Decimal(instance.avance.debut) > Decimal(instance.facture.taux_realise)):
+
+        elif (Decimal(instance.avance.fin) < Decimal(instance.facture.taux_realise)):
             raise ValidationError('Cette avance peut pas etre emboursé dans cette situation')
 
         else:
             remb = Remboursement.objects.filter(
                 Q(facture__num_situation__lt=instance.facture.num_situation) & Q(avance__type=instance.avance.type.id) & Q(avance__num_avance=instance.avance.num_avance)
             & Q(avance__remboursee=False))
-            print(remb)
+
             if (remb):  # courant
                 previous = remb.last()
                 print(previous)
-
+                tremb=round((instance.avance.taux_avance/(instance.avance.fin-instance.facture.taux_realise))*100,2)
                 mm = (instance.facture.montant_mois - instance.facture.montant_rb - instance.facture.montant_rg-instance.facture.montant_avf_remb-instance.facture.montant_ava_remb) * (
-                        instance.avance.remb / 100)
+                        tremb / 100)
 
                 cumule = mm + previous.montant_cumule
                 rar = instance.avance.montant - cumule
@@ -239,8 +241,10 @@ def pre_save_remboursement(sender, instance, **kwargs):
                     instance.avance.save()
 
             else:  # debut pas de precedent
+                tremb = round(
+                    (instance.avance.taux_avance / (instance.avance.fin - instance.facture.taux_realise)) * 100, 2)
                 mm = (instance.facture.montant_mois - instance.facture.montant_rb - instance.facture.montant_rg-instance.facture.montant_avf_remb-instance.facture.montant_ava_remb) * (
-                        instance.avance.remb / 100)
+                        tremb / 100)
                 cumule = mm
                 rar = instance.avance.montant - cumule
                 if (rar < 0):
@@ -306,30 +310,19 @@ def pre_save_detail_facture(sender, instance, **kwargs):
 @receiver(pre_save, sender=Avance)
 def pre_save_avance(sender, instance, **kwargs):
     if not instance.pk:
-        if (instance.type.id == 1 and instance.taux_avance != instance.type.taux_max):
+        instance.taux_avance = round((instance.montant / instance.marche.ttc)*100, 2)
+        print(instance.taux_avance)
+        if (instance.type.id == 1 and instance.taux_avance > instance.type.taux_max):
             raise ValidationError(
-                f'L\'avance de type {instance.type.libelle} doit etre égale  {instance.type.taux_max}%')
+                f'L\'avance de type {instance.type.libelle} ne doit pas dépassé le taux   {instance.type.taux_max}%')
 
         if (instance.type.id != 1 and instance.taux_avance > instance.type.taux_max):
             raise ValidationError(
                 f'Vous avez une avance de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
 
-        if (instance.type == 2):
-            instance.num_avance = Avance.objects.filter(marche=instance.marche, type__libelle="Appros").count()
-        instance.montant = round((instance.marche.ttc) * instance.taux_avance / 100, 2)
 
-        if not instance.pk:
-            instance.num_avance = Avance.objects.filter(marche=instance.marche).count()
+        instance.num_avance = Avance.objects.filter(marche=instance.marche).count()
 
-        try:
-            facture = Factures.objects.get(
-                Q(marche=instance.marche) & Q(au__gte=instance.date) & Q(du__lte=instance.date))
-            taux_realise =facture.taux_realise
-        except Factures.DoesNotExist:
-            taux_realise = 0
-        instance.debut = taux_realise
-        if (instance.fin > instance.debut):
-            instance.remb = round((instance.taux_avance / (instance.fin - instance.debut)) * 100, 2)
 
 
 
@@ -345,7 +338,7 @@ def post_save_avance(sender, instance, created, **kwargs):
                 raise ValidationError(
                     f'Vous avez plusieurs avances de type Avance {instance.type.libelle} la somme des taux ne doit pas dépasser {instance.type.taux_max}%')
 
-            if (instance.type.id == 1 and (instance.taux_avance != instance.type.taux_max or sum > instance.type.taux_max)):
+            if (instance.type.id == 1 and (instance.taux_avance  >  instance.type.taux_max or sum > instance.type.taux_max)):
                 raise ValidationError(
                     f'L\'avance de type {instance.type.libelle} doit etre égale  {instance.type.taux_max}%')
 

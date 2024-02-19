@@ -369,13 +369,12 @@ class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
 @admin.register(Avance)
 class  AvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource=AvanceResource
-    list_display = ("marche","num_avance", "type","montant_avance",'taux','debut','fin',"remboursement")
+    list_display = ("marche","num_avance", "type","montant_avance",'taux','fin')
     list_filter = (SafeDeleteAdminFilter,)
     save_as = True
 
 
-    def remboursement(self,obj):
-        return str(obj.remb)+'%'
+
     def taux(self,obj):
         return str(obj.taux_avance)+'%'
     def montant_avance(self,obj):

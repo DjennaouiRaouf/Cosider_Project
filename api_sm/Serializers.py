@@ -353,7 +353,7 @@ class AvanceSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['type']=instance.type.libelle
-        del representation['id']
+
         return representation
 
 

@@ -419,18 +419,16 @@ class Avance(SafeDeleteModel):
                                                 verbose_name="Numero d'avance")
     marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=False, related_name="Avance_Marche",to_field='id')
 
-    taux_avance = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Taux d'avance",
+    taux_avance = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Taux d'avance", editable=False,
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
-    montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,editable=False)
 
-    debut=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="% Debut",editable=False,
-                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,null=False,verbose_name='Montant')
+
     fin=models.DecimalField(default=80, max_digits=38, decimal_places=2, verbose_name="% Fin",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
-    remb=models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name="Remboursement",editable=False,
-                        validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+
 
 
 

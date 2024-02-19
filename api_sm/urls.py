@@ -33,7 +33,8 @@ urlpatterns = [
     path('addatt/', AddAttachementApiView.as_view()),
 
     path('recupcaution/<str:pk>/',UpdateCautionApiView.as_view()),
-
+    path('userprofile/',UserProfile.as_view()),
+    path('editusr/',EditUserProfile.as_view()),
 
 
     path('getdqe/', GetDQEView.as_view()),
