@@ -270,6 +270,8 @@ class MarcheFieldsApiView(APIView):
                         else:
                             readOnly = False
 
+
+
                         obj={
                             'name':field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -278,6 +280,8 @@ class MarcheFieldsApiView(APIView):
                             'source':field_instance.source,
                             'readOnly': readOnly
                         }
+
+
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
@@ -294,6 +298,8 @@ class MarcheFieldsApiView(APIView):
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
                     }
+                    if (field_name in ['id']):
+                        obj['pinned'] = 'left'
 
                     if (field_name in ['rg','rabais', 'ttc', 'ht']):
                         obj['cellRenderer'] = 'InfoRenderer'
@@ -472,7 +478,16 @@ class NTFieldsFilterApiView(APIView):
                 }
                 if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                     anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                    obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                    serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                    filtered_data = []
+                    for item in serialized_data:
+                        filtered_item = {
+                            'value': item['id'],
+                            'label': item['libelle']
+                        }
+                        filtered_data.append(filtered_item)
+
+                    obj['queryset'] = filtered_data
 
                 field_info.append(obj)
 
@@ -498,7 +513,16 @@ class NTFieldsApiView(APIView):
                     }
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                        obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                        serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                        filtered_data = []
+                        for item in serialized_data:
+                            filtered_item = {
+                                'value': item['id'],
+                                'label': item['libelle']
+                            }
+                            filtered_data.append(filtered_item)
+
+                        obj['queryset'] = filtered_data
 
                     field_info.append(obj)
 

@@ -242,7 +242,7 @@ class GetNTView(generics.ListAPIView):
 
 
 class AjoutNTApiView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated, AddNTPermission]
+    #permission_classes = [IsAuthenticated, AddNTPermission]
     queryset = NT.objects.all()
     serializer_class = NTSerializer
 

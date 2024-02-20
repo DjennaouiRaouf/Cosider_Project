@@ -6,6 +6,7 @@ from api_sm.models import *
 
 def create_dynamic_serializer(model_class):
     class DynamicModelSerializer(serializers.ModelSerializer):
+
         class Meta:
             model = model_class
             fields = '__all__'
