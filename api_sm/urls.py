@@ -18,6 +18,7 @@ urlpatterns = [
     path('addnt/',AjoutNTApiView.as_view()),
 
     path('getatt/',GetAttachements.as_view()),
+    path('workstate/', WorkState.as_view()),
 
     path('importdqe/',ImportDQEAPIView.as_view()),
     path('optionimpression/',OptionImpressionApiView.as_view()),

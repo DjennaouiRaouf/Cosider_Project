@@ -298,8 +298,7 @@ class MarcheFieldsApiView(APIView):
                         'headerName': field_instance.label or field_name,
                         'info': str(field_instance.__class__.__name__),
                     }
-                    if (field_name in ['id']):
-                        obj['pinned'] = 'left'
+
 
                     if (field_name in ['rg','rabais', 'ttc', 'ht']):
                         obj['cellRenderer'] = 'InfoRenderer'

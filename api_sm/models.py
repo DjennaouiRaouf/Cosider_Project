@@ -243,24 +243,24 @@ class Marche(SafeDeleteModel):
     ods_depart = models.DateField(null=False, blank=True
                                   , verbose_name='ODS de départ')
     delais = models.PositiveIntegerField(default=0, null=False
-                                         , verbose_name='Delai des traveaux')
+                                         , verbose_name='Délai des travaux')
     revisable = models.BooleanField(default=True, null=False
                                     , verbose_name='Est-il révisable ?')
     delai_paiement_f=models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
                                          null=True
-                                                 , verbose_name='Delai de paiement')
+                                                 , verbose_name='Délai de paiement')
     rabais =  models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='Rabais',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    ht=models.DecimalField(default=0, max_digits=38, decimal_places=2,  verbose_name='Prix Hors taxe',
+    ht=models.DecimalField(default=0, max_digits=38, decimal_places=2,  verbose_name='Montant Hors taxe',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False,editable=False)
-    ttc = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='Prix avec taxe',
+    ttc = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='Montant avec taxe',
                                   validators=[MinValueValidator(0), MaxValueValidator(100)], null=False, editable=False)
 
     tva = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='TVA',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
     rg = models.DecimalField(default=0, max_digits=38, decimal_places=2,
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
-                                              , verbose_name='Retenue de garantie')
+                                              , verbose_name='Taux de retenue de garantie')
 
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
    

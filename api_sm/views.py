@@ -2,7 +2,7 @@ import json
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django_filters.rest_framework import DjangoFilterBackend
 from import_export.admin import ImportMixin, ExportMixin
 from import_export.results import RowResult
@@ -21,6 +21,8 @@ from .Resources import DQEResource
 from .Serializers import *
 from .models import *
 from .tools import *
+from django.db.models import F, Value, CharField
+from django.db.models.functions import Concat, Cast
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -859,3 +861,35 @@ class EditUserProfile(APIView):
 
         except User.DoesNotExist:
             return Response({"message": "Erreur ... !"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class WorkState(generics.ListAPIView):
+    #permission_classes = [IsAuthenticated]
+    queryset = Attachements.objects.all()
+    serializer_class = AttachementsSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = WorkStateFilter
+
+    def list(self, request, *args, **kwargs):
+        # Apply filtering
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Call the parent class's list method to get the default response
+        response_data = super().list(request, *args, **kwargs).data
+
+        qs=queryset.values('date__month', 'date__year').distinct().annotate(
+            month_year=Concat(
+                Cast('date__month', output_field=CharField()),
+                Value('-'),
+                Cast('date__year', output_field=CharField()),
+                output_field=CharField()
+            ),
+            count=Count('id'),amount=Sum('qte_cumule')).order_by('date__year', 'date__month').values('month_year', 'amount')
+
+
+        if (response_data):
+            return Response({"x":qs.values_list('month_year',flat=True),"y":qs.values_list('amount',flat=True)}, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': "La rechercher n'a pas pu aboutir à un resultat"},
+                            status=status.HTTP_404_NOT_FOUND)
