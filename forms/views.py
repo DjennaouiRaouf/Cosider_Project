@@ -151,27 +151,36 @@ class DQEFieldsApiView(APIView):
                         }
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                            obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                            serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                            filtered_data = []
+                            for item in serialized_data:
+                                filtered_item = {
+                                    'value': item['id'],
+                                    'label': item['libelle']
+                                }
+                                filtered_data.append(filtered_item)
+
+                            obj['queryset'] = filtered_data
 
                         field_info.append(obj)
 
             if(flag=='l'): #data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
+                    if(field_name not in ["marche"]):
+                        obj = {
+                            'field': field_name,
+                            'headerName': field_instance.label or field_name,
+                            'info': str(field_instance.__class__.__name__),
 
-                    obj = {
-                        'field': field_name,
-                        'headerName': field_instance.label or field_name,
-                        'info': str(field_instance.__class__.__name__),
-
-                    }
-                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField") and field_name not in ['marche']:
-                        obj['related'] = str(field_instance.queryset.model.__name__)
-                    if(field_name in ['prix_u','prix_q','quantite']):
-                        obj['cellRenderer']='InfoRenderer'
-                    if (field_name in ['unite']):
-                        obj['hide']=True
-                    field_info.append(obj)
+                        }
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField") and field_name not in ['marche']:
+                            obj['related'] = str(field_instance.queryset.model.__name__)
+                        if(field_name in ['prix_u','prix_q','quantite']):
+                            obj['cellRenderer']='InfoRenderer'
+                        if (field_name in ['unite']):
+                            obj['hide']=True
+                        field_info.append(obj)
 
 
             return Response({'fields':field_info,'models':model_name,'pk':DQE._meta.pk.name},status=status.HTTP_200_OK)
@@ -612,7 +621,7 @@ class FactureFieldsStateApiView(APIView):
             default_value = ''
             if (field_name in ['numero_facture','du','au','num_situation']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
-                    default_value= ''
+                    default_value = []
                 if str(field_instance.__class__.__name__) == 'BooleanField':
                     default_value= True
 
@@ -664,7 +673,7 @@ class FactureFieldsFilterApiView(APIView):
 class EncaissementFieldsApiView(APIView):
     def get(self, request):
         flag = request.query_params.get('flag', None)
-        if flag == 'l' or flag == 'f' or flag == 'p': 
+        if flag == 'l' or flag == 'f' or flag == 'p':
             serializer = EncaissementSerializer()
             fields = serializer.get_fields()
 
@@ -679,7 +688,7 @@ class EncaissementFieldsApiView(APIView):
                             'type': str(field_instance.__class__.__name__),
                             "required": field_instance.required,
                             'label': field_instance.label or field_name,
-                            
+
                         }
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
@@ -721,7 +730,7 @@ class EncaissementFieldsStateApiView(APIView):
             default_value = ''
             if (field_name not in  ['montant_creance','facture']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
-                    default_value= ''
+                    default_value = []
                 if str(field_instance.__class__.__name__) == 'BooleanField':
                     default_value= True
 
@@ -823,7 +832,7 @@ class DetailFactureFieldsFilterApiView(APIView):
 class AvanceFieldsApiView(APIView):
     def get(self, request):
         flag = request.query_params.get('flag', None)
-        if flag == 'l' or flag == 'f' : 
+        if flag == 'l' or flag == 'f' :
             serializer = AvanceSerializer()
             fields = serializer.get_fields()
 
@@ -840,13 +849,22 @@ class AvanceFieldsApiView(APIView):
                             'type': str(field_instance.__class__.__name__),
                             "required": field_instance.required,
                             'label': field_instance.label or field_name,
-                            
+
 
                         }
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                            obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                            serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                            filtered_data = []
+                            for item in serialized_data:
+                                filtered_item = {
+                                    'value': item['id'],
+                                    'label': item['libelle']
+                                }
+                                filtered_data.append(filtered_item)
+
+                            obj['queryset'] = filtered_data
 
                         field_info.append(obj)
 
@@ -886,9 +904,9 @@ class AvanceFieldsStateApiView(APIView):
             default_value = ''
             if (field_name not in  ['montant','heure','marche','id']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
-                    default_value= ''
+                    default_value= []
                 if str(field_instance.__class__.__name__) == 'BooleanField':
-                    default_value= True
+                    default_value= False
 
                 if str(field_instance.__class__.__name__) in ['PositiveSmallIntegerField','DecimalField','PositiveIntegerField',
                                                               'IntegerField',]:
@@ -928,18 +946,39 @@ class CautionFieldsApiView(APIView):
                             'type': str(field_instance.__class__.__name__),
                             "required": field_instance.required,
                             'label': field_instance.label or field_name,
-                            
+
 
                         }
 
-                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
-                            if(str(field_instance.queryset.model.__name__)=="Avance"):
-                                obj['queryset'] = AvanceSerializer(field_instance.queryset.filter(marche=marche), many=True).data
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField" ):
+                            if (str(field_instance.queryset.model.__name__) == "Avance"):
+                                serialized_data = AvanceSerializer(field_instance.queryset.filter(marche=marche),
+                                                                   many=True).data
+                                print(serialized_data)
+                                filtered_data = []
+                                for item in serialized_data:
+                                    filtered_item = {
+                                        'value': item['id'],
+                                        'label': item['type']
+                                    }
+                                    filtered_data.append(filtered_item)
+
+                                obj['queryset'] = filtered_data
+
 
 
                             else:
                                 anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                                obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                                serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                                filtered_data = []
+                                for item in serialized_data:
+                                    filtered_item = {
+                                        'value': item['id'],
+                                        'label': item['libelle']
+                                    }
+                                    filtered_data.append(filtered_item)
+
+                                obj['queryset'] = filtered_data
 
                         field_info.append(obj)
 
@@ -981,7 +1020,7 @@ class CautionFieldsStateApiView(APIView):
             default_value = ''
             if (field_name not in  ['est_recupere','marche','montant']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
-                    default_value= ''
+                    default_value = ''
                 if str(field_instance.__class__.__name__) == 'BooleanField':
                     default_value= True
 
@@ -1098,7 +1137,7 @@ class OdsFieldsStateApiView(APIView):
             default_value = ''
             if (field_name not in  ['marche']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
-                    default_value= ''
+                    default_value= []
                 if str(field_instance.__class__.__name__) == 'BooleanField':
                     default_value= True
 
@@ -1340,7 +1379,7 @@ class AttFieldsStateApiView(APIView):
             if(  field_name in ['qte_mois','montant_mois',"date"] ):
 
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
-                    default_value= ''
+                    default_value = []
                 if str(field_instance.__class__.__name__) == 'BooleanField':
                     default_value= True
 

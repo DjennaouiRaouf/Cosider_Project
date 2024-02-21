@@ -9,6 +9,7 @@ from import_export.results import RowResult
 from rest_framework import generics, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework import status
+from rest_framework.exceptions import NotFound
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -459,6 +460,18 @@ class GetTimeLine(generics.ListAPIView):
 class UpdateMarcheView(generics.UpdateAPIView):
     queryset = Marche.objects.all()
     serializer_class = MarcheSerializer
+    lookup_field = "pk"
+    def get_object(self):
+        pk = self.request.data.get(Marche._meta.pk.name)
+
+        try:
+            obj = Marche.objects.get(pk=pk)
+        except Marche.DoesNotExist:
+            raise NotFound("Object n'éxiste pas")
+
+        self.check_object_permissions(self.request, obj)
+
+        return obj
 
 
 
@@ -514,7 +527,7 @@ class LibCaut(generics.ListAPIView):
 
 
 class AddAvanceApiView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated,AddAvancePermission]
+    #permission_classes = [IsAuthenticated,AddAvancePermission]
     queryset = Avance.objects.all()
     serializer_class = AvanceSerializer
 
@@ -528,7 +541,7 @@ class AddAvanceApiView(generics.CreateAPIView):
             self.perform_create(serializer)
             custom_response = {
                 'status': 'success',
-                'message': 'Avance ajouté',
+                'message': 'Avance ajoutée',
                 'data': serializer.data,
             }
 
@@ -588,7 +601,7 @@ class AddCautions(generics.CreateAPIView):
             self.perform_create(serializer)
             custom_response = {
                 'status': 'success',
-                'message': 'Caution ajouté',
+                'message': 'Caution ajoutée',
                 'data': serializer.data,
             }
 
@@ -716,7 +729,7 @@ class GetAttachements(generics.ListAPIView):
                              }
                              }, status=status.HTTP_200_OK)
         else:
-            return Response({'message': "La rechercher n'a pas pu aboutir à un resultat"},status=status.HTTP_404_NOT_FOUND)
+            return Response({'message': "La rechercher n'a pas pu aboutir à un résultat"},status=status.HTTP_404_NOT_FOUND)
 
 
 
@@ -755,7 +768,19 @@ class GetECF(generics.ListAPIView):
 class UpdateCautionApiView(generics.UpdateAPIView):
     queryset = Cautions.objects.all()
     serializer_class = CautionSerializer
+    lookup_field = "pk"
 
+    def get_object(self):
+        pk = self.request.data.get(Cautions._meta.pk.name)
+
+        try:
+            obj = Marche.objects.get(pk=pk)
+        except Marche.DoesNotExist:
+            raise NotFound("Object n'éxiste pas")
+
+        self.check_object_permissions(self.request, obj)
+
+        return obj
 
 
 class DeleteInvoiceApiView(generics.DestroyAPIView):

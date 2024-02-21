@@ -129,7 +129,7 @@ class NTSerializer(serializers.ModelSerializer):
 class DQESerializer(serializers.ModelSerializer):
     class Meta:
         model=DQE
-        fields='__all__'
+        fields=['id','marche','code_tache','libelle','prix_u','unite','quantite','prix_q','est_tache_composite','est_tache_complementaire']
 
 
     def get_fields(self, *args, **kwargs):

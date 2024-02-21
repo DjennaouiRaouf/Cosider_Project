@@ -339,14 +339,13 @@ class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,Simp
 @admin.register(TypeAvance)
 class  TypeAvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     resource_class = TypeAvanceResource
-    list_display = ("id", "libelle","reduction" ,"max")
+    list_display = ("id", "libelle" ,"max")
     list_filter = (SafeDeleteAdminFilter,)
 
     def max(self,obj):
         return str(obj.taux_max)+'%'
 
-    def reduction(self, obj):
-        return str(obj.taux_reduction_facture) + '%'
+
 
     def get_import_formats(self):
         formats = (

@@ -117,13 +117,11 @@ class AttachementsFilter(django_filters.FilterSet):
 
 class WorkStateFilter(django_filters.FilterSet):
     marche = django_filters.CharFilter(field_name='dqe__marche', label="Marche")
-    code_tache = django_filters.CharFilter(field_name='dqe__code_tache', label="Code Tache")
-    mm = django_filters.RangeFilter(field_name='date__month', label='Mois')
-    aa = django_filters.RangeFilter(field_name='date__year', label='Année')
+    date = django_filters.DateFromToRangeFilter(field_name='date', label='Date')
 
     class Meta:
         model = Attachements
-        fields=['marche','mm','aa']
+        fields=['marche','date']
 
 
 class OpImpFilter(django_filters.FilterSet):

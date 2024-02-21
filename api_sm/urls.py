@@ -29,11 +29,11 @@ urlpatterns = [
     path('getsites/', GetSitesView.as_view()),
 
     path('getmarche/',GetMarcheView.as_view()),
-    path('updatemarche/<str:pk>/',UpdateMarcheView.as_view()),
+    path('updatemarche/',UpdateMarcheView.as_view()),
 
     path('addatt/', AddAttachementApiView.as_view()),
 
-    path('recupcaution/<str:pk>/',UpdateCautionApiView.as_view()),
+    path('recupcaution/',UpdateCautionApiView.as_view()),
     path('userprofile/',UserProfile.as_view()),
     path('editusr/',EditUserProfile.as_view()),
 

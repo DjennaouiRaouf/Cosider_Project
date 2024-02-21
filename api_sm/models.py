@@ -252,18 +252,19 @@ class Marche(SafeDeleteModel):
     delai_paiement_f=models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)],
                                          null=True
                                                  , verbose_name='Délai de paiement')
-    rabais =  models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='Rabais',
+    rabais =  models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='Taux de rabais',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    tva = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='TVA',
+                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
+    rg = models.DecimalField(default=0, max_digits=38, decimal_places=2,
+                             validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
+                             , verbose_name='Taux de retenue de garantie')
     ht=models.DecimalField(default=0, max_digits=38, decimal_places=2,  verbose_name='Montant Hors taxe',
                               validators=[MinValueValidator(0), MaxValueValidator(100)], null=False,editable=False)
     ttc = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='Montant avec taxe',
                                   validators=[MinValueValidator(0), MaxValueValidator(100)], null=False, editable=False)
 
-    tva = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='TVA',
-                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    rg = models.DecimalField(default=0, max_digits=38, decimal_places=2,
-                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
-                                              , verbose_name='Taux de retenue de garantie')
+
 
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
    
@@ -312,25 +313,23 @@ class DQE(SafeDeleteModel): # le prix final
     code_tache = models.CharField(db_column='Code_Tache',null=False, max_length=30
                                   ,verbose_name="Code de la tache")
     libelle = models.TextField(db_column='Libelle_Tache',verbose_name="Libelle")
-
+    prix_q = models.DecimalField(
+        max_digits=38, decimal_places=2,
+        validators=[MinValueValidator(0)], default=0, editable=False
+        , verbose_name='Montant'
+    )
     unite =models.ForeignKey(TabUniteDeMesure,on_delete=models.DO_NOTHING,  null=False, verbose_name='Unité de mesure')
+    prix_u = models.DecimalField(
+        max_digits=38, decimal_places=2,
+        validators=[MinValueValidator(0)], default=0
+        , verbose_name='Prix unitaire'
+    )
 
     est_tache_composite = models.BooleanField(db_column='Est_Tache_Composite', blank=True,
                                               null=False,default=False,verbose_name="Tache composée")
     est_tache_complementaire = models.BooleanField(db_column='Est_Tache_Complementaire', blank=True,
                                                    null=False,default=False,verbose_name="Tache complementaire")
 
-
-    prix_u = models.DecimalField(
-        max_digits=38, decimal_places=2,
-        validators=[MinValueValidator(0)], default=0
-        ,verbose_name='Prix unitaire'
-    )
-    prix_q = models.DecimalField(
-        max_digits=38, decimal_places=2,
-        validators=[MinValueValidator(0)], default=0,editable=False
-        ,verbose_name='Montant'
-    )
 
     quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantité')
 
@@ -426,7 +425,7 @@ class Avance(SafeDeleteModel):
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
 
 
-    montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,null=False,verbose_name='Montant')
+    montant = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,null=False,verbose_name='Montant d\'avance')
 
     fin=models.DecimalField(default=80, max_digits=38, decimal_places=2, verbose_name="% Fin",
                                       validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
