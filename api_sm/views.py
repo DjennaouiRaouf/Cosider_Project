@@ -617,7 +617,7 @@ class AddCautions(generics.CreateAPIView):
 
 
 class GetODS(generics.ListAPIView):
-    permission_classes = [IsAuthenticated,ViewODSPermission]
+    #permission_classes = [IsAuthenticated,ViewODSPermission]
     queryset = Ordre_De_Service.objects.all()
     serializer_class = Ordre_De_ServiceSerializer
     filter_backends = [DjangoFilterBackend]
@@ -902,6 +902,7 @@ class WorkState(generics.ListAPIView):
 
         # Call the parent class's list method to get the default response
         response_data = super().list(request, *args, **kwargs).data
+        marche=self.request.query_params.get('marche', None)
 
         qs=queryset.values('date__month', 'date__year').distinct().annotate(
             month_year=Concat(
@@ -911,10 +912,14 @@ class WorkState(generics.ListAPIView):
                 output_field=CharField()
             ),
             count=Count('id'),amount=Sum('qte_cumule')).order_by('date__year', 'date__month').values('month_year', 'amount')
+        sum=DQE.objects.filter(Q(marche=marche)).aggregate(
+            models.Sum('quantite'))["quantite__sum"]
+
+
 
 
         if (response_data):
-            return Response({"x":qs.values_list('month_year',flat=True),"y":qs.values_list('amount',flat=True)}, status=status.HTTP_200_OK)
+            return Response({"x":qs.values_list('month_year',flat=True),"y1":qs.values_list('amount',flat=True),"y2":[sum]*len(qs)}, status=status.HTTP_200_OK)
         else:
             return Response({'message': "La rechercher n'a pas pu aboutir à un resultat"},
                             status=status.HTTP_404_NOT_FOUND)

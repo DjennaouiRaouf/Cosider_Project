@@ -1082,7 +1082,7 @@ class ODSFieldsApiView(APIView):
                         }
                         try:
                             if field_instance.choices:
-                                print(f"Field '{field_name}' is a choice field with options:")
+
                                 obj['choices']=['']
                                 for choice in field_instance.choices:
                                     obj['choices'].append(choice)
@@ -1142,6 +1142,14 @@ class OdsFieldsFilterApiView(APIView):
 
                         'label': field_instance.label or field_name,
                     }
+                    try:
+                        if field_instance.choices:
+
+                            obj['choices'] = ['']
+                            for choice in field_instance.choices:
+                                obj['choices'].append(choice)
+                    except:
+                        pass
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
                         obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
