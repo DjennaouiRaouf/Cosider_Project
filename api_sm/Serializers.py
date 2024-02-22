@@ -104,23 +104,19 @@ class SituationNtSerializer(serializers.ModelSerializer):
 
 
 class NTSerializer(serializers.ModelSerializer):
-    code_site=serializers.PrimaryKeyRelatedField(queryset=Sites.objects.all(),write_only=True,label='Code du site')
-    nt = serializers.CharField(write_only=True, label='Numero du travail')
     class Meta:
         model=NT
         fields ='__all__'
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
-        fields.pop('id', None)
         fields.pop('deleted_by_cascade', None)
         return fields
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['id'] = instance.id
-        representation['code_site'] = instance.code_site.id
-        representation['nt'] = instance.nt
+
+
 
         return representation
 
@@ -436,7 +432,7 @@ class Ordre_De_ServiceSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-
+        del representation['marche']
         return representation
 
 

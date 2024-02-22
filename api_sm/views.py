@@ -198,7 +198,7 @@ class GetSitesView(generics.ListAPIView):
 
 
 class GetMarcheView(generics.ListAPIView):
-    permission_classes = [permissions.IsAuthenticated, ViewMarchePermission]
+    #permission_classes = [permissions.IsAuthenticated, ViewMarchePermission]
     queryset = Marche.objects.all()
     serializer_class = MarcheSerializer
     filter_backends = [DjangoFilterBackend]
@@ -206,7 +206,7 @@ class GetMarcheView(generics.ListAPIView):
 
 
 class GetDQEView(generics.ListAPIView):
-    permission_classes = [permissions.IsAuthenticated,ViewDQEPermission]
+    #permission_classes = [permissions.IsAuthenticated,ViewDQEPermission]
     queryset = DQE.objects.all()
     serializer_class = DQESerializer
     filter_backends = [DjangoFilterBackend]
@@ -237,7 +237,7 @@ class ImportDQEAPIView(ImportMixin,  APIView):
 
 
 class GetNTView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated,ViewNTPermission]
+    #permission_classes = [IsAuthenticated,ViewNTPermission]
     queryset = NT.objects.all()
     serializer_class = NTSerializer
     filter_backends = [DjangoFilterBackend]
@@ -626,7 +626,7 @@ class GetODS(generics.ListAPIView):
 
 
 class AddODS(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated,AddODSPermission]
+    #permission_classes = [IsAuthenticated,AddODSPermission]
     queryset = Ordre_De_Service.objects.all()
     serializer_class = Ordre_De_ServiceSerializer
 
@@ -915,6 +915,40 @@ class WorkState(generics.ListAPIView):
 
         if (response_data):
             return Response({"x":qs.values_list('month_year',flat=True),"y":qs.values_list('amount',flat=True)}, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': "La rechercher n'a pas pu aboutir à un resultat"},
+                            status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+class GetDQEStateView(generics.ListAPIView):
+    #permission_classes = [permissions.IsAuthenticated,ViewDQEPermission]
+    queryset = DQE.objects.all()
+    serializer_class = DQESerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = DQEFilter
+
+    def list(self, request, *args, **kwargs):
+        # Apply filtering
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Call the parent class's list method to get the default response
+        response_data = super().list(request, *args, **kwargs).data
+        X=[]
+        Y1=[]
+        Y2=[]
+        for q in queryset:
+            try:
+                X.append(Attachements.objects.filter(dqe=q).values_list('dqe__code_tache').latest('date')[0])
+                Y1.append(Attachements.objects.filter(dqe=q).values_list('qte_cumule').latest('date')[0])
+                Y2.append(Attachements.objects.filter(dqe=q).values_list('dqe__quantite').latest('date')[0])
+            except Attachements.DoesNotExist:
+                pass
+
+
+        if (response_data):
+            return Response({"x":X,"y1":Y1,"y2":Y2},status=status.HTTP_200_OK)
         else:
             return Response({'message': "La rechercher n'a pas pu aboutir à un resultat"},
                             status=status.HTTP_404_NOT_FOUND)

@@ -207,7 +207,7 @@ class NTAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExp
 class ODS(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     resource_class = ODSResource
-    list_display = ("marche","date_interruption","date_reprise","motif",)
+    list_display = ("marche","date","rep_int")
     list_filter = (SafeDeleteAdminFilter,)
 
 

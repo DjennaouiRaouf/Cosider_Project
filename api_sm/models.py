@@ -244,7 +244,7 @@ class Marche(SafeDeleteModel):
     libelle = models.CharField(null=False, max_length=500
                                , verbose_name='Libelle')
     ods_depart = models.DateField(null=False, blank=True
-                                  , verbose_name='ODS de départ')
+                                  , verbose_name='ODS de démarrage')
     delais = models.PositiveIntegerField(default=0, null=False
                                          , verbose_name='Délai des travaux')
     revisable = models.BooleanField(default=True, null=False
@@ -359,20 +359,19 @@ class DQE(SafeDeleteModel): # le prix final
 
 class Ordre_De_Service(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=True, related_name="ods_marche")
-    date_interruption = models.DateField(null=True, blank=True,verbose_name='Date Interruption')
-    date_reprise = models.DateField(null=True, blank=True,verbose_name='Date Reprise')
+    Types = [
+        ('Interruption', 'Interruption'),
+        ('Reprise', 'Interruption'),
 
-    motif = models.TextField(null=False, blank=True,verbose_name='Motif')
+    ]
+    marche = models.ForeignKey(Marche, on_delete=models.DO_NOTHING, null=True, related_name="ods_marche")
+    date = models.DateField(null=True,blank=True,verbose_name='Date Interruption')
+    rep_int=models.CharField(null=False,default='Interruption',max_length=300,choices=Types,verbose_name='Reprise/Interruption')
+    motif = models.TextField(null=True, blank=True,verbose_name='Motif')
 
     objects = DeletedModelManager()
 
-    def save(self, *args, **kwargs):
-        if(self.date_reprise and self.date_reprise):
-           if (self.date_reprise > self.date_interruption):
-                super(Ordre_De_Service, self).save(*args, **kwargs)
-           else:
-               raise  ValidationError('Date de reprise doit etre superieur à la date d\'interruption')
+
 
 
     class Meta:

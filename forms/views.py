@@ -190,6 +190,8 @@ class DQEFieldsApiView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+
+
 class MarcheFieldsFilterApiView(APIView):
     def get(self,request):
         field_info = []
@@ -205,12 +207,23 @@ class MarcheFieldsFilterApiView(APIView):
             }
             if str(field_instance.__class__.__name__) == 'ModelChoiceFilter':
                 anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                filtered_data = []
+                for item in serialized_data:
+                    filtered_item = {
+                        'value': item['id'],
+                        'label': item['libelle']
+                    }
+                    filtered_data.append(filtered_item)
+
+                obj['queryset'] = filtered_data
+
 
 
             field_info.append(obj)
 
         return Response({'fields': field_info},status=status.HTTP_200_OK)
+
 
 
 class MarcheFieldsStateApiView(APIView):
@@ -1057,6 +1070,7 @@ class ODSFieldsApiView(APIView):
 
             if (flag == 'f'):  # react form
                 field_info = []
+                print(fields)
                 for field_name, field_instance in fields.items():
 
                     if( not field_name in ['marche',] ):
@@ -1066,6 +1080,15 @@ class ODSFieldsApiView(APIView):
                             "required": field_instance.required,
                             'label': field_instance.label or field_name,
                         }
+                        try:
+                            if field_instance.choices:
+                                print(f"Field '{field_name}' is a choice field with options:")
+                                obj['choices']=['']
+                                for choice in field_instance.choices:
+                                    obj['choices'].append(choice)
+                        except:
+                            pass
+
                         if(str(field_instance.style.get("base_template")).find('textarea')!=-1):
                             obj['textarea']=True
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
@@ -1078,17 +1101,18 @@ class ODSFieldsApiView(APIView):
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    obj = {
-                        'field': field_name,
-                        'headerName': field_instance.label or field_name,
-                        'info': str(field_instance.__class__.__name__),
-                        'cellRenderer' : 'InfoRenderer'
-                    }
-                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
-                        obj['related'] = str(field_instance.queryset.model.__name__)
+                    if(field_name not in ['marche']):
+                        obj = {
+                            'field': field_name,
+                            'headerName': field_instance.label or field_name,
+                            'info': str(field_instance.__class__.__name__),
+
+                        }
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                            obj['related'] = str(field_instance.queryset.model.__name__)
 
 
-                    field_info.append(obj)
+                        field_info.append(obj)
 
 
             return Response({'fields': field_info,

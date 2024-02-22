@@ -31,11 +31,31 @@ class MarcheFilter(django_filters.FilterSet):
     tva = django_filters.NumberFilter(field_name='tva', label='TVA')
     rg = django_filters.NumberFilter(field_name='rg', label='Retenue de garantie')
     client=django_filters.BooleanFilter(field_name='nt__code_client__est_client_cosider', label='Cosider client')
+    has_rg = django_filters.BooleanFilter(field_name='rg', label='Avec retenue de garantie ?',method='filter_has_rg',)
+    has_tva = django_filters.BooleanFilter(field_name='tva', label='Avec TVA ?',method='filter_has_tva',)
+    has_rabais = django_filters.BooleanFilter(field_name='rabais', label='Avec Rabais ? ',method='filter_has_rabais',)
 
-
+    def filter_has_rabais(self, queryset, name, value):
+        if value is False:
+            return queryset.filter(**{f"{name}__exact": 0})  
+        elif value is True:
+            return queryset.exclude(**{f"{name}__exact": 0})  
+        return queryset
+    def filter_has_tva(self, queryset, name, value):
+        if value is False:
+            return queryset.filter(**{f"{name}__exact": 0})  
+        elif value is True:
+            return queryset.exclude(**{f"{name}__exact": 0})  
+        return queryset
+    def filter_has_rg(self, queryset, name, value):
+        if value is False:
+            return queryset.filter(**{f"{name}__exact": 0})  
+        elif value is True:
+            return queryset.exclude(**{f"{name}__exact": 0})  
+        return queryset
     class Meta:
         model = Marche
-        fields=['code_contrat','date_signature','rabais','code_site','nt','tva','rg','client']
+        fields=['code_contrat','date_signature','code_site','client','nt','tva','rg','rabais','has_rg','has_tva',]
 
 
 class DQEFilter(django_filters.FilterSet):
@@ -89,7 +109,7 @@ class Ordre_De_ServiceFilter(django_filters.FilterSet):
 
     class Meta:
         model = Ordre_De_Service
-        fields=['marche','date_interruption','date_reprise']
+        fields=['marche','date','rep_int']
 
 
 class TypeAvanceFilter(django_filters.FilterSet):
