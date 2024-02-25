@@ -142,11 +142,24 @@ class DQESerializer(serializers.ModelSerializer):
 class MarcheSerializer(serializers.ModelSerializer):
     code_site=serializers.PrimaryKeyRelatedField(source="nt_code_site",queryset=Sites.objects.all(),write_only=True,label='Code du site')
     nt=serializers.CharField(source="nt_nt",write_only=True,label='Numero du travail')
+    creances=serializers.SerializerMethodField(label='Créances')
     class Meta:
         model = Marche
         fields = "__all__"
 
-
+    def get_creances(self, obj):
+        sum=0
+        try:
+            factures=Factures.objects.filter(marche=obj.id)
+            for facture in factures:
+                try:
+                    e=Encaissement.objects.filter(facture=facture).latest('date_encaissement')
+                    sum=sum+e.montant_creance
+                except Encaissement.DoesNotExist:
+                    return 0
+            return sum
+        except Factures.DoesNotExist:
+            return 0
 
     def create(self, validated_data):
         code_site = validated_data.pop('nt_code_site')
@@ -278,6 +291,7 @@ class EncaissementSerializer(serializers.ModelSerializer):
         representation = super().to_representation(instance)
         representation['montant_creance']=instance.montant_creance
         representation['montant_encaisse'] = instance.montant_encaisse
+        del representation['facture']
 
         return representation
 

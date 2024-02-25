@@ -193,6 +193,20 @@ def pre_save_factures(sender, instance, **kwargs):
             instance.montant_factureHT + (instance.montant_factureHT * instance.marche.tva / 100), 2)
 
 
+@receiver(pre_save, sender=Encaissement)
+def pre_save_encaissement(sender, instance, **kwargs):
+    try:
+        sum = Encaissement.objects.filter(facture=instance.facture).aggregate(models.Sum('montant_encaisse'))[
+                "montant_encaisse__sum"]
+    except Encaissement.DoesNotExist:
+            sum=0
+    sum=sum+instance.montant_encaisse
+    instance.montant_creance = round(instance.facture.montant_factureTTC - sum,2)
+    if(instance.montant_creance == 0):
+        instance.facture.paye=True
+        instance.facture.save()
+    if(instance.montant_creance < 0):
+        raise ValidationError('Le paiement de la facture est terminer')
 
 @receiver(pre_save, sender=Remboursement)
 def pre_save_remboursement(sender, instance, **kwargs):

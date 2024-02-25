@@ -11,7 +11,7 @@ from safedelete.models import SafeDeleteModel
 from simple_history.models import HistoricalRecords
 from simple_history.signals import pre_create_historical_record
 
-from api_sch.models import TabAgence, TabFiliale
+from api_sch.models import TabAgence
 
 
 class DeletedModelManager(SafeDeleteManager):
@@ -617,25 +617,12 @@ class Encaissement(SafeDeleteModel):
                                      validators=[MinValueValidator(0)], default=0)
     montant_creance = models.DecimalField(max_digits=38, decimal_places=2, blank=True,verbose_name="Montant en créance",
                                            validators=[MinValueValidator(0)], default=0,editable=False)
-    agence =models.CharField(db_column='Code_Agence', null=False, max_length=15)
+    agence = models.ForeignKey(TabAgence, on_delete=models.CASCADE, db_constraint=False)
     numero_piece = models.CharField(max_length=300,null=False,verbose_name="Numero de piéce")
     objects = DeletedModelManager()
 
 
-    def save(self, *args, **kwargs):
-        sum = Encaissement.objects.filter(facture=self.facture).aggregate(models.Sum('montant_encaisse'))[
-            "montant_encaisse__sum"]
-        if(sum==None):
-            sum=0
-        sum=sum+self.montant_encaisse
-        self.montant_creance = round(self.facture.montant_factureTTC - sum,2)
-        if(self.montant_creance == 0):
-            self.facture.paye=True
-            self.facture.save()
-        if(self.montant_creance >= 0):
-            super(Encaissement, self).save(*args, **kwargs)
-        else:
-            raise ValidationError('Le paiement de la facture est terminer')
+
 
 
 
@@ -683,7 +670,7 @@ class Cautions(SafeDeleteModel):
     date_soumission = models.DateField(null=False,verbose_name="Date dépot")
     taux = models.DecimalField(default=0,max_digits=38, decimal_places=2,
                                      validators=[MinValueValidator(0), MaxValueValidator(100)], null=False)
-    agence = models.ForeignKey(TabAgence,db_column='Code_Agence', db_constraint=False,on_delete=models.DO_NOTHING)
+    agence = models.ForeignKey('api_sch.TabAgence', on_delete=models.CASCADE, db_constraint=False)
     montant = models.DecimalField(
         max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0,
@@ -703,3 +690,11 @@ class Cautions(SafeDeleteModel):
 
 
 
+'''
+CREATE VIEW Tab_Banque AS
+SELECT * FROM CA_CH.dbo.Tab_Banque;
+
+CREATE VIEW Tab_Agence AS
+SELECT * FROM CA_CH.dbo.Tab_Agence;
+
+'''

@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.humanize.templatetags import humanize
+from django import forms
 from django.utils.html import format_html
 from django_admin_relation_links import AdminChangeLinksMixin
 from djangoql.admin import DjangoQLSearchMixin
@@ -484,7 +485,6 @@ class RembAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
 
 
 
-
 @admin.register(Cautions)
 class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
 
@@ -701,7 +701,7 @@ class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ExportMixin,admin.Mo
 
 class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,admin.ModelAdmin):
 
-    list_display = ('numero_facture','date_encaissement','mode_paiement','montant_facture','encaisse','creance')
+    list_display = ('numero_facture','agence','date_encaissement','mode_paiement','montant_facture','encaisse','creance')
     save_as = True
     list_filter = (SafeDeleteAdminFilter,)
 

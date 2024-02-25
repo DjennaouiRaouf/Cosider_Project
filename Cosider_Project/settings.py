@@ -131,7 +131,8 @@ DATABASES = {
     },
 
 }
-DATABASE_ROUTERS = ['api_sm.routers.AppRouter']
+
+DATABASE_ROUTERS = ['api_sm.routers.DatabaseRouter']
 
 
 AUTH_PASSWORD_VALIDATORS = [

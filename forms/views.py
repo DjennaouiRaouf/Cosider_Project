@@ -717,7 +717,16 @@ class EncaissementFieldsApiView(APIView):
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                            obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                            serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                            filtered_data = []
+                            for item in serialized_data:
+                                filtered_item = {
+                                    'value': item['id'],
+                                    'label': item['libelle']
+                                }
+                                filtered_data.append(filtered_item)
+
+                            obj['queryset'] = filtered_data
 
                         field_info.append(obj)
 
@@ -725,16 +734,17 @@ class EncaissementFieldsApiView(APIView):
             if (flag == 'l'):  # data grid list (react ag-grid)
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    obj = {
-                        'field': field_name,
-                        'headerName': field_instance.label or field_name,
-                        'info': str(field_instance.__class__.__name__),
-                        'cellRenderer': 'InfoRenderer'
-                    }
-                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
-                        obj['related'] = str(field_instance.queryset.model.__name__)
+                    if( field_name not in ['facture']):
+                        obj = {
+                            'field': field_name,
+                            'headerName': field_instance.label or field_name,
+                            'info': str(field_instance.__class__.__name__),
+                            'cellRenderer': 'InfoRenderer'
+                        }
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                            obj['related'] = str(field_instance.queryset.model.__name__)
 
-                    field_info.append(obj)
+                        field_info.append(obj)
 
 
             return Response({'fields': field_info,
@@ -1010,7 +1020,7 @@ class CautionFieldsApiView(APIView):
                             if (str(field_instance.queryset.model.__name__) == "Avance"):
                                 serialized_data = AvanceSerializer(field_instance.queryset.filter(marche=marche),
                                                                    many=True).data
-                                print(serialized_data)
+
                                 filtered_data = []
                                 for item in serialized_data:
                                     filtered_item = {
