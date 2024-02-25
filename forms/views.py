@@ -307,7 +307,16 @@ class MarcheFieldsApiView(APIView):
 
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                            obj['queryset']=anySerilizer(field_instance.queryset, many=True).data
+                            serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                            filtered_data = []
+                            for item in serialized_data:
+                                filtered_item = {
+                                    'value': item['id'],
+                                    'label': item['libelle']
+                                }
+                                filtered_data.append(filtered_item)
+
+                            obj['queryset'] = filtered_data
 
                         field_info.append(obj)
 
@@ -524,28 +533,30 @@ class NTFieldsApiView(APIView):
             model_name = model_class.__name__
             if (flag == 'f'):  # react form
                 field_info = []
+
                 for field_name, field_instance in fields.items():
-                    obj = {
-                        'name': field_name,
-                        'type': str(field_instance.__class__.__name__),
-                        "required": field_instance.required,
-                        'label': field_instance.label or field_name,
-                        
-                    }
-                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
-                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                        serialized_data = anySerilizer(field_instance.queryset, many=True).data
-                        filtered_data = []
-                        for item in serialized_data:
-                            filtered_item = {
-                                'value': item['id'],
-                                'label': item['libelle']
-                            }
-                            filtered_data.append(filtered_item)
+                    if (field_name not in ['id']):
+                        obj = {
+                            'name': field_name,
+                            'type': str(field_instance.__class__.__name__),
+                            "required": field_instance.required,
+                            'label': field_instance.label or field_name,
 
-                        obj['queryset'] = filtered_data
+                        }
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                            anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                            serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                            filtered_data = []
+                            for item in serialized_data:
+                                filtered_item = {
+                                    'value': item['id'],
+                                    'label': item['libelle']
+                                }
+                                filtered_data.append(filtered_item)
 
-                    field_info.append(obj)
+                            obj['queryset'] = filtered_data
+
+                        field_info.append(obj)
 
 
             if (flag == 'l'):  # data grid list (react ag-grid)
@@ -840,6 +851,38 @@ class DetailFactureFieldsFilterApiView(APIView):
 
 
 
+class AvanceFieldsFilterApiView(APIView):
+    def get(self,request):
+        filter_fields = list(AvanceFilter.base_filters.keys())
+
+        serializer = AvanceSerializer()
+        fields = serializer.get_fields()
+        field_info = []
+        for field_name, field_instance in fields.items():
+            if field_name in filter_fields:
+                if (field_name not in ['marche']):
+
+                    obj = {
+                        'name': field_name,
+                        'type': str(field_instance.__class__.__name__),
+
+                        'label': field_instance.label or field_name,
+                    }
+                    try:
+                        if field_instance.choices:
+
+                            obj['choices'] = ['']
+                            for choice in field_instance.choices:
+                                obj['choices'].append(choice)
+                    except:
+                        pass
+                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                        anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
+                        obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                    field_info.append(obj)
+
+        return Response({'fields': field_info},status=status.HTTP_200_OK)
+
 
 
 class AvanceFieldsApiView(APIView):
@@ -1033,7 +1076,7 @@ class CautionFieldsStateApiView(APIView):
             default_value = ''
             if (field_name not in  ['est_recupere','marche','montant']):
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
-                    default_value = ''
+                    default_value = []
                 if str(field_instance.__class__.__name__) == 'BooleanField':
                     default_value= True
 
