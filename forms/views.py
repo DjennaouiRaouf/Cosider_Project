@@ -706,7 +706,7 @@ class EncaissementFieldsApiView(APIView):
             if (flag == 'f'):  # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
-                    if( not field_name in ['montant_creance','facture',] ):
+                    if( not field_name in ['montant_creance','facture','id'] ):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -741,6 +741,8 @@ class EncaissementFieldsApiView(APIView):
                             'info': str(field_instance.__class__.__name__),
                             'cellRenderer': 'InfoRenderer'
                         }
+                        if (field_name in ['id']):
+                            obj['hide'] = True
                         if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                             obj['related'] = str(field_instance.queryset.model.__name__)
 
@@ -803,7 +805,16 @@ class EncaissementFieldsFilterApiView(APIView):
                     }
                     if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
                         anySerilizer = create_dynamic_serializer(field_instance.queryset.model)
-                        obj['queryset'] = anySerilizer(field_instance.queryset, many=True).data
+                        serialized_data = anySerilizer(field_instance.queryset, many=True).data
+                        filtered_data = []
+                        for item in serialized_data:
+                            filtered_item = {
+                                'value': item['id'],
+                                'label': item['libelle']
+                            }
+                            filtered_data.append(filtered_item)
+
+                        obj['queryset'] = filtered_data
                     field_info.append(obj)
 
         return Response({'fields': field_info},status=status.HTTP_200_OK)

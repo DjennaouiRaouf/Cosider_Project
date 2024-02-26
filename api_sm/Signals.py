@@ -4,7 +4,7 @@ from datetime import datetime
 
 from _decimal import Decimal
 from django.db import IntegrityError
-from django.db.models import Q, Count
+from django.db.models import Q, Count, F
 from django.db.models.signals import post_save, pre_save, post_delete, pre_delete
 from django.dispatch import *
 from num2words import num2words
@@ -193,20 +193,38 @@ def pre_save_factures(sender, instance, **kwargs):
             instance.montant_factureHT + (instance.montant_factureHT * instance.marche.tva / 100), 2)
 
 
-@receiver(pre_save, sender=Encaissement)
+
+@receiver(pre_save,  sender=Encaissement)
 def pre_save_encaissement(sender, instance, **kwargs):
-    try:
-        sum = Encaissement.objects.filter(facture=instance.facture).aggregate(models.Sum('montant_encaisse'))[
-                "montant_encaisse__sum"]
-    except Encaissement.DoesNotExist:
+    if not instance.pk:
+        try:
+
+            sum = Encaissement.objects.filter(facture=instance.facture).aggregate(models.Sum('montant_encaisse'))[
+                        "montant_encaisse__sum"]
+
+        except Encaissement.DoesNotExist:
+                pass
+
+        if(not sum):
             sum=0
-    sum=sum+instance.montant_encaisse
-    instance.montant_creance = round(instance.facture.montant_factureTTC - sum,2)
-    if(instance.montant_creance == 0):
-        instance.facture.paye=True
-        instance.facture.save()
-    if(instance.montant_creance < 0):
-        raise ValidationError('Le paiement de la facture est terminer')
+        sum=sum+instance.montant_encaisse
+        instance.montant_creance=instance.facture.montant_factureTTC-sum
+        if(instance.montant_creance == 0):
+            instance.facture.paye=True
+            instance.facture.save()
+        if(instance.montant_creance < 0):
+            raise ValidationError('Le paiement de la facture est terminer')
+
+@receiver(post_softdelete, sender=Encaissement)
+def update_on_softdelete(sender, instance, **kwargs):
+    try:
+        encaissements=Encaissement.objects.filter(Q(id__gt=instance.id))
+        if(encaissements):
+            encaissements.update(montant_creance=F('montant_creance') + instance.montant_encaisse)
+
+    except Encaissement.DoesNotExist:
+        pass
+
 
 @receiver(pre_save, sender=Remboursement)
 def pre_save_remboursement(sender, instance, **kwargs):
@@ -308,11 +326,15 @@ def update_on_softdelete(sender, instance, **kwargs):
     num_sit = (-1) * (instance.num_situation)
     DetailFacture.objects.filter(facture=instance.pk).update(facture=None)
     Remboursement.objects.filter(facture=instance.pk).update(facture=None)
+    Encaissement.objects.filter(facture=instance.pk).update(facture=None)
+
     Factures.objects.filter(numero_facture=instance.pk).update(numero_facture=num_f, num_situation=num_sit)
     DetailFacture.objects.filter(facture=None).update(facture=num_f)
     Remboursement.objects.filter(facture=None).update(facture=num_f)
+    Encaissement.objects.filter(facture=None).update(facture=num_f)
     DetailFacture.objects.filter(facture=num_f).delete()
     Remboursement.objects.filter(facture=num_f).delete()
+    Encaissement.objects.filter(facture=num_f).delete()
 
 
 @receiver(pre_save, sender=DetailFacture)

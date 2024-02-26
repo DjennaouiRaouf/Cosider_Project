@@ -610,15 +610,17 @@ class ModePaiement(SafeDeleteModel):
 
 class Encaissement(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=False,blank=True,verbose_name="Facture")
+
+    facture=models.ForeignKey(Factures,on_delete=models.DO_NOTHING,null=True,blank=True,verbose_name="Facture")
     date_encaissement=models.DateField(null=False,verbose_name="Date d'encaissement")
-    mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,null=False,blank=True,verbose_name="Mode de paiement")
+    mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,null=False,verbose_name="Mode de paiement")
     montant_encaisse=models.DecimalField(max_digits=38, decimal_places=2, blank=True,verbose_name="Montant encaissé",
                                      validators=[MinValueValidator(0)], default=0)
     montant_creance = models.DecimalField(max_digits=38, decimal_places=2, blank=True,verbose_name="Montant en créance",
                                            validators=[MinValueValidator(0)], default=0,editable=False)
     agence = models.ForeignKey(TabAgence, on_delete=models.CASCADE, db_constraint=False)
     numero_piece = models.CharField(max_length=300,null=False,verbose_name="Numero de piéce")
+
     objects = DeletedModelManager()
 
 

@@ -17,6 +17,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from tablib import Dataset
+
+from api_sch.models import TabFiliale
 from .Filters import *
 from .Resources import DQEResource
 from .Serializers import *
@@ -392,7 +394,7 @@ class AddFactureApiView(generics.CreateAPIView):
 
             custom_response = {
                     'status': 'success',
-                    'message': 'Facture ajouté',
+                    'message': 'Facture ajoutée',
                     'data': serializer.data,
             }
 
@@ -416,7 +418,6 @@ class AddEncaissement(generics.CreateAPIView):
 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-
             self.perform_create(serializer)
             custom_response = {
                 'status': 'success',
@@ -433,6 +434,9 @@ class AddEncaissement(generics.CreateAPIView):
             }
 
             return Response(custom_response, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 
 class OptionImpressionApiView(generics.ListAPIView):
@@ -787,12 +791,13 @@ class DeleteInvoiceApiView(generics.DestroyAPIView):
     queryset = Factures.objects.all()
     serializer_class = FactureSerializer
 
+
     def delete(self, request, *args, **kwargs):
         pk_list = request.data.get(Factures._meta.pk.name)
         if pk_list:
             queryset = self.filter_queryset(self.get_queryset())
             queryset = queryset.filter(pk__in=pk_list)
-            self.perform_destroy(queryset)
+            queryset.delete()
 
         return Response({'Message': pk_list}, status=status.HTTP_200_OK)
 
@@ -957,3 +962,27 @@ class GetDQEStateView(generics.ListAPIView):
         else:
             return Response({'message': "La rechercher n'a pas pu aboutir à un resultat"},
                             status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+class DelEnc(generics.DestroyAPIView,DestroyModelMixin):
+    #permission_classes = [IsAuthenticated]
+    queryset = Encaissement.objects.all()
+    serializer_class = EncaissementSerializer
+
+    def delete(self, request, *args, **kwargs):
+        pk_list = request.data.get(Encaissement._meta.pk.name)
+        if pk_list:
+            queryset = self.filter_queryset(self.get_queryset())
+            queryset = queryset.filter(pk__in=pk_list)
+            self.perform_destroy(queryset)
+
+        return Response({'Message': pk_list},status=status.HTTP_200_OK)
+
+
+class DeletedEncaissement(generics.ListAPIView):
+    queryset = Encaissement.all_objects.deleted_only()
+    serializer_class = EncaissementSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = EncaissementFilter

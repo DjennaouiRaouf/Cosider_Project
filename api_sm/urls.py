@@ -46,7 +46,7 @@ urlpatterns = [
     path('getnt/',GetNTView.as_view()),
     path('getmdqe/<str:marche>/',GetDQEbyId.as_view()),
 
-
+    path('delenc/',DelEnc.as_view()),
 
     path('addfacture/',AddFactureApiView.as_view()),
     path('getfacture/',GetFacture.as_view()),
@@ -82,7 +82,7 @@ urlpatterns = [
     path('addcautions/',AddCautions.as_view()),
 
     path('annulefacture/',DeleteInvoiceApiView.as_view()),
-
+    path('delencaissements/',DeletedEncaissement.as_view()),
 
     path('ods/',GetODS.as_view()),
     path('addods/', AddODS.as_view()),

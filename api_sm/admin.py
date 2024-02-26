@@ -701,12 +701,10 @@ class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ExportMixin,admin.Mo
 
 class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,admin.ModelAdmin):
 
-    list_display = ('numero_facture','agence','date_encaissement','mode_paiement','montant_facture','encaisse','creance')
+    list_display = ('numero_facture','agence','date_encaissement','mode_paiement','encaisse','creance')
     save_as = True
     list_filter = (SafeDeleteAdminFilter,)
 
-    def montant_facture(self,obj):
-        return humanize.intcomma(obj.facture.a_payer)
 
     def encaisse(self, obj):
         return humanize.intcomma(obj.montant_encaisse)
