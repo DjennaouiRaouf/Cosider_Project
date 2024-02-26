@@ -200,7 +200,10 @@ class FactureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=Factures
-        fields='__all__'
+        fields=['numero_facture','num_situation','du','au','client','pole','num_travail','lib_nt','somme','tva','rabais',
+                'retenue_garantie','montant_precedent','montant_mois','montant_cumule','montant_rb','montant_rg',"montant_avf_remb",
+                'montant_ava_remb','montant_factureHT','montant_factureTTC','taux_realise',
+                'projet','code_contrat','signature','montant_marche']
 
 
 

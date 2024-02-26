@@ -618,10 +618,10 @@ class FactureFieldsApiView(APIView):
 
                     }
                     if(field_name in ['client','signature','montant_marche','pole','lib_nt','projet','somme','marche','heure',
-                                      'num_travail','']):
+                                      'num_travail','code_contrat']):
                         obj['hide']= True
                     if (field_name in ['montant_cumule','montant_mois','montant_precedent','montant_rg','montant_taxe','montant_rb',"montant_factureHT",'montant_factureTTC',
-                                       "montant_avf_remb","montant_ava_remb"]):
+                                       "montant_avf_remb","montant_ava_remb",'taux_realise']):
                         obj['cellRenderer'] = 'InfoRenderer'
                     field_info.append(obj)
 
