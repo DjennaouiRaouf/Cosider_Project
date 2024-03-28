@@ -910,9 +910,11 @@ class GetDQEStateView(generics.ListAPIView):
         Y2=[]
         for q in queryset:
             try:
+                attachement=Attachements.objects.filter(dqe=q).latest('date')
 
-                print(Attachements.objects.filter(dqe=q).values_list('dqe__code_tache').latest('date')[0])
-
+                X.append(attachement.dqe.code_tache)
+                Y1.append(attachement.qte_cumule)
+                Y2.append(attachement.dqe.quantite)
             except Attachements.DoesNotExist:
                 pass
 
