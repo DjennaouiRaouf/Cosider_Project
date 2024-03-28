@@ -44,7 +44,8 @@ admin.site.register(User, UserAdmin)
 @admin.register(OptionImpression)
 class OptionImpressionAdmin(SafeDeleteAdmin,admin.ModelAdmin):
     list_per_page = lp
-    list_display = ('key', 'src','type')
+    list_display = [field.name for field in OptionImpression._meta.fields if field.name not in ['deleted', 'deleted_by_cascade']]
+
 
 @admin.register(TimeLine)
 class TimeLineAdmin(SafeDeleteAdmin,admin.ModelAdmin):
@@ -87,7 +88,7 @@ class TabUniteDeMesure(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin
 class ClientAdmin(DjangoQLSearchMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     list_per_page = lp
     resource_class=ClientResource
-    list_display = ('id','libelle','type_client','est_client_cosider','nif','raison_social','adresse')
+    list_display = [field.name for field in Clients._meta.fields if field.name not in ['deleted', 'deleted_by_cascade']]
     list_filter = (
         SafeDeleteAdminFilter,
     )
@@ -234,25 +235,15 @@ class DQEAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.M
     save_as=True
     list_per_page = lp
     resource_class = DQEResource
-    list_display = ('id',"marche","code_tache","libelle","qte","prix_unitaire","prix_quntite",)
-    history_list_display = ("marche","code_tache","libelle",'unite',"qte","prix_unitaire","prix_quntite",)
+    list_display = [field.name for field in DQE._meta.fields if field.name not in ['deleted', 'deleted_by_cascade']]+['prix_q',]
     list_filter = (SafeDeleteAdminFilter,
 
                    )
     search_fields = ('marche__id',)
 
 
-    def prix_unitaire(self,obj):
-        return humanize.intcomma(obj.prix_u)+" DA"
-
-    prix_unitaire.short_description="Prix unitaire"
-    def prix_quntite(self,obj):
-        return humanize.intcomma(obj.prix_q)+" DA"
-    def qte(self,obj):
-        return str(obj.quantite)+" "+obj.unite.libelle
-
-    prix_quntite.short_description = "Prix quantite"
-
+    def prix_q(self,obj):
+        return obj.prix_q
 
     def id(self,obj):
         return obj.marche.nt.id
@@ -294,27 +285,19 @@ class MarcheAdmin(DjangoQLSearchMixin,AdminChangeLinksMixin,SafeDeleteAdmin,Simp
     save_as = True
     list_per_page = lp
     resource_class = MarcheResource
-    history_list_display = ("history_id",'nt','libelle' ,'ods_depart' ,'delais','pht' ,'pttc' ,'revisable','rg' ,'rabais'
-    ,'tva','date_signature')
-    list_display = ('id','nt_link','libelle' ,'ods_depart' ,'delais','pht' ,'pttc' ,'revisable','rg' ,'rabais'
-    ,'tva','date_signature')
-
-
+    list_display = [field.name for field in Marche._meta.fields if field.name not in ['deleted', 'deleted_by_cascade']]+['montant_ht','montant_ttc',]
     list_filter = (SafeDeleteAdminFilter,
 
                    )
     search_fields = ('nt__nt','id')
     change_links = ('nt',)
 
-    def pht(self,obj):
-        return humanize.intcomma(obj.ht)
+    def montant_ttc(self, obj):
+        return obj.ttc
 
-    pht.short_description = 'HT'
+    def montant_ht(self, obj):
+        return obj.ht
 
-    def pttc(self, obj):
-        return humanize.intcomma(obj.ttc)
-
-    pttc.short_description = 'TTC'
 
     def get_import_formats(self):
         formats = (
@@ -532,20 +515,26 @@ class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
 class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     save_as = True
     resource_class = AttachementsResource
-    list_display=("id","dqe",'qte_contr',"qte_precedente","qte_mois","qte_cumule","prix_u","montant_prec",'montant_m','montant_c','date',)
+    list_display = [field.name for field in Attachements._meta.fields if
+                    field.name not in ['deleted', 'deleted_by_cascade','qte','montant']] + ['qte_precedente', 'qte','qte_cumule',
+                                                                                            'montant_precedent','montant','montant_cumule']
+
     list_filter = (SafeDeleteAdminFilter,)
 
 
-    def prix_u(self,obj):
-        return humanize.intcomma(obj.dqe.prix_u)
-    def qte_contr(self,obj):
-        return obj.dqe.quantite
-    def montant_prec(self,obj):
-        return humanize.intcomma(obj.montant_precedent)
-    def montant_m(self,obj):
-        return humanize.intcomma(obj.montant_mois)
-    def montant_c(self,obj):
-        return humanize.intcomma(obj.montant_cumule)
+    def qte_precedente(self,obj):
+        return obj.qte_precedente
+
+    def qte_cumule(self,obj):
+        return obj.qte_cumule
+
+
+    def montant_precedente(self,obj):
+        return obj.montant_precedent
+
+    def montant_cumule(self,obj):
+        return obj.montant_cumule
+
 
 
     def get_import_formats(self):
@@ -568,38 +557,19 @@ class AttachementAdmin(AdminChangeLinksMixin,SafeDeleteAdmin,SimpleHistoryAdmin,
 
 
 
-    def qte_rest(self,obj):
-        return (str(obj.qte_restante)+"/"+str(obj.dqe.quantite))
-
-    def dqe(self,obj):
-        return obj.dqe
-
-    def designation(self, obj):
-        return obj.dqe.designation
-
-
-
-
 @admin.register(Factures)
 class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,admin.ModelAdmin):
-    list_display = ('numero_facture','num_situation','du','au',"montant_prec",'montant_m','montant_c','montant_global_ht',
-                    'montant_avf','montant_ava','etat','realise')
+    list_display =  [field.name for field in Factures._meta.fields if
+                    field.name not in ['deleted', 'deleted_by_cascade','montant']] + ['montant_precedent','montant','montant_cumule']
+
     list_filter = (SafeDeleteAdminFilter,)
 
     def realise(self,obj):
         return str(obj.taux_realise)+"%"
-    def montant_avf(self,obj):
-        return humanize.intcomma(obj.montant_avf_remb)
-
-    def montant_ava(self, obj):
-        return humanize.intcomma(obj.montant_ava_remb)
-
-    def montant_prec(self,obj):
-        return humanize.intcomma(obj.montant_precedent)
-    def montant_m(self,obj):
-        return humanize.intcomma(obj.montant_mois)
-    def montant_c(self,obj):
-        return humanize.intcomma(obj.montant_cumule)
+    def montant_precedent(self,obj):
+        return obj.montant_precedent
+    def montant_cumule(self,obj):
+        return obj.montant_cumule
 
     def montant_global_ht(self,obj):
         return humanize.intcomma(obj.montant_factureHT)
@@ -640,8 +610,8 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
 
 @admin.register(DetailFacture)
 class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ExportMixin,admin.ModelAdmin):
-    list_display = ("numero_facture","code_tache","detail_designation","montant_precedent","montant_mois"
-                    ,"montant_cumule","qte_cumule","qte_mois")
+    list_display =  [field.name for field in DetailFacture._meta.fields if
+                    field.name not in ['deleted', 'deleted_by_cascade']]
 
     list_filter = (SafeDeleteAdminFilter,)
     def get_import_formats(self):
@@ -668,34 +638,7 @@ class DetailFactureAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ExportMixin,admin.Mo
     def has_change_permission(self, request, obj=None):
         return False
 
-    def montant_precedent(self,obj):
-        return humanize.intcomma(obj.detail.montant_precedent)
-    def montant_mois(self,obj):
-        return humanize.intcomma(obj.detail.montant_mois)
-    def montant_cumule(self,obj):
-        return humanize.intcomma(obj.detail.montant_cumule)
 
-    def qte_cumule(self,obj):
-        return humanize.intcomma(obj.detail.qte_cumule)
-
-    def qte_mois(self, obj):
-        return humanize.intcomma(obj.detail.qte_mois)
-
-    def numero_facture(self, obj):
-        return obj.facture.numero_facture
-    def detail_designation(self,obj):
-        return obj.detail.dqe.libelle
-
-    def code_tache(self,obj):
-        return obj.detail.dqe.code_tache
-
-
-    def detail_montant_rg(self, obj):
-        return obj.detail.montant_rg
-    def detail_montant_rb(self, obj):
-        return obj.detail.montant_rb
-    def detail_montant(self, obj):
-        return obj.detail.montant_final
 
 
 

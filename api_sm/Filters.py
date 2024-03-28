@@ -61,7 +61,7 @@ class MarcheFilter(django_filters.FilterSet):
 class DQEFilter(django_filters.FilterSet):
     class Meta:
         model = DQE
-        fields=['marche__id','code_tache']
+        fields=['marche','code_tache']
 
 class FactureFilter(django_filters.FilterSet):
     class Meta:

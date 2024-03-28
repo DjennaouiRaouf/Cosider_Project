@@ -123,9 +123,14 @@ class NTSerializer(serializers.ModelSerializer):
 
 
 class DQESerializer(serializers.ModelSerializer):
+    prix_q = serializers.SerializerMethodField()
+
+    def get_prix_q(self, obj):
+        return obj.prix_q
+
     class Meta:
         model=DQE
-        fields=['id','marche','code_tache','libelle','prix_u','unite','quantite','prix_q','est_tache_composite','est_tache_complementaire']
+        fields = '__all__'
 
 
     def get_fields(self, *args, **kwargs):
@@ -142,6 +147,14 @@ class DQESerializer(serializers.ModelSerializer):
 class MarcheSerializer(serializers.ModelSerializer):
     code_site=serializers.PrimaryKeyRelatedField(source="nt_code_site",queryset=Sites.objects.all(),write_only=True,label='Code du site')
     nt=serializers.CharField(source="nt_nt",write_only=True,label='Numero du travail')
+    montant_ht = serializers.SerializerMethodField()
+    montant_ttc = serializers.SerializerMethodField()
+
+    def get_montant_ht(self, obj):
+        return obj.ht
+
+    def get_montant_ttc(self, obj):
+        return obj.ttc
     
     class Meta:
         model = Marche
@@ -200,10 +213,7 @@ class FactureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=Factures
-        fields=['numero_facture','num_situation','du','au','client','pole','num_travail','lib_nt','somme','tva','rabais',
-                'retenue_garantie','montant_precedent','montant_mois','montant_cumule','montant_rb','montant_rg',"montant_avf_remb",
-                'montant_ava_remb','montant_factureHT','montant_factureTTC','taux_realise',
-                'projet','code_contrat','signature','montant_marche']
+        fields="__all__"
 
 
 
@@ -442,25 +452,6 @@ class Ordre_De_ServiceSerializer(serializers.ModelSerializer):
         return representation
 
 
-class AttachementsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Attachements
-        fields = '__all__'
-
-    def get_fields(self, *args, **kwargs):
-        fields = super().get_fields(*args, **kwargs)
-        fields.pop('id', None)
-        fields.pop('deleted', None)
-        fields.pop('deleted_by_cascade', None)
-
-        return fields
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-
-        return representation
-
-
 
 
 
@@ -468,27 +459,36 @@ class AttachementsSerializer(serializers.ModelSerializer):
     code_tache = serializers.CharField(source='dqe.code_tache', read_only=True, label="Code Tache")
     libelle_tache = serializers.CharField(source='dqe.libelle', read_only=True, label="Designation")
     unite = serializers.CharField(source='dqe.unite.libelle', read_only=True, label="Unite")
+    montant_precedent = serializers.SerializerMethodField()
+    montant_cumule = serializers.SerializerMethodField()
+    qte_precedente = serializers.SerializerMethodField()
+    qte_cumule = serializers.SerializerMethodField()
 
+    def get_montant_precedent(self, obj):
+        return 0
 
-    class Meta:
-        model=Attachements
-        fields='__all__'
+    def get_montant_cumule(self, obj):
+        return obj.montant_cumule
+
+    def get_qte_precedente(self, obj):
+        return obj.qte_precedente
+
+    def get_qte_cumule(self, obj):
+        return obj.qte_cumule
 
 
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
         fields.pop('deleted_by_cascade', None)
-        fields.pop('id', None)
-        fields.pop('heure', None)
 
         return fields
 
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
+    class Meta:
+        model = Attachements
+        fields ='__all__'
 
-        return representation
 
 
 

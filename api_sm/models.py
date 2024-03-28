@@ -238,9 +238,6 @@ class Marche(SafeDeleteModel):
     nt = models.ForeignKey(NT, on_delete=models.DO_NOTHING, db_column='nt', null=False
                            , verbose_name='Numero Travail',to_field="id")
 
-
-
-
     libelle = models.CharField(null=False, max_length=500
                                , verbose_name='Libelle')
     ods_depart = models.DateField(null=False, blank=True
@@ -259,43 +256,37 @@ class Marche(SafeDeleteModel):
     rg = models.DecimalField(default=0, max_digits=38, decimal_places=2,
                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False
                              , verbose_name='Taux de retenue de garantie')
-    ht=models.DecimalField(default=0, max_digits=38, decimal_places=2,  verbose_name='Montant Hors taxe',
-                              validators=[MinValueValidator(0), MaxValueValidator(100)], null=False,editable=False)
-    ttc = models.DecimalField(default=0, max_digits=38, decimal_places=2, verbose_name='Montant avec taxe',
-                                  validators=[MinValueValidator(0), MaxValueValidator(100)], null=False, editable=False)
 
 
 
     date_signature = models.DateField(null=False, verbose_name='Date de signature')
    
     objects = DeletedModelManager()
-    #history = HistoricalRecords()
+    history = HistoricalRecords()
+
+    @property
+    def ht(self):
+        try:
+            dqes = DQE.objects.filter(marche=self.id)
+            sum = 0
+            for dqe in dqes:
+                sum = sum + dqe.prix_q
+            return sum
+        except DQE.DoesNotExist:
+            return 0
+
+    @property
+    def ttc(self):
+        return round(self.ht + (self.ht * self.tva / 100), 4)
 
     def __str__(self):
         return self.id
-
-    def save_without_historical_record(self, *args, **kwargs):
-        self.skip_history_when_saving = True
-        try:
-            ret = self.save(*args, **kwargs)
-        finally:
-            del self.skip_history_when_saving
-        return ret
-
-    def save_with_historical_record(self, *args, **kwargs):
-        self.skip_history_when_saving = False
-        try:
-            ret = self.save(*args, **kwargs)
-        finally:
-            del self.skip_history_when_saving
-        return ret
 
 
 
 class Meta:
         verbose_name = 'Marchés'
         verbose_name_plural = 'Marchés'
-        unique_together=(('nt','num_avenant'),)
         app_label = 'api_sm'
         
 
@@ -308,33 +299,26 @@ class DQE(SafeDeleteModel): # le prix final
     id=models.CharField(db_column='id',max_length=500,primary_key=True,verbose_name="id",editable=False)
     marche = models.ForeignKey(Marche,on_delete=models.DO_NOTHING,  null=False,related_name="marche_dqe",
                                to_field="id",verbose_name="Code du marché")
-
-
     code_tache = models.CharField(db_column='Code_Tache',null=False, max_length=30
                                   ,verbose_name="Code de la tache")
     libelle = models.TextField(db_column='Libelle_Tache',verbose_name="Libelle")
-    prix_q = models.DecimalField(
-        max_digits=38, decimal_places=2,
-        validators=[MinValueValidator(0)], default=0, editable=False
-        , verbose_name='Montant'
-    )
     unite =models.ForeignKey(TabUniteDeMesure,on_delete=models.DO_NOTHING,  null=False, verbose_name='Unité de mesure')
     prix_u = models.DecimalField(
         max_digits=38, decimal_places=2,
         validators=[MinValueValidator(0)], default=0
         , verbose_name='Prix unitaire'
     )
-
     est_tache_composite = models.BooleanField(db_column='Est_Tache_Composite', blank=True,
                                               null=False,default=False,verbose_name="Tache composée")
     est_tache_complementaire = models.BooleanField(db_column='Est_Tache_Complementaire', blank=True,
                                                    null=False,default=False,verbose_name="Tache complementaire")
-
-
     quantite = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantité')
 
-   
     objects = DeletedModelManager()
+
+    @property
+    def prix_q(self):
+        return round(self.quantite * self.prix_u, 4)
 
 
     def __str__(self):
@@ -458,32 +442,72 @@ class Avance(SafeDeleteModel):
 
 class Attachements(SafeDeleteModel):
     _safedelete_policy = SOFT_DELETE_CASCADE
-
+    marche=models.ForeignKey(Marche, on_delete=models.DO_NOTHING,null=False, blank=False)
     dqe = models.ForeignKey(DQE, on_delete=models.DO_NOTHING)# item + quantité marche + prix unitaire
-
-    qte_precedente = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         editable=False,verbose_name='Quantité precedent')
-    qte_mois = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantité Mois')
-    qte_cumule= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                    editable=False,verbose_name='Quantité cumule')
-
+    qte = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Quantité Mois')
     prix_u = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                      editable=False,verbose_name='Prix unitaire')
-    montant_precedent=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                          editable=False,verbose_name='Montant précedent')
-    montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois',editable=False)
-    montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         editable=False,verbose_name='Montant cumulé')
-
+    montant= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,verbose_name='Montant du Mois',editable=False)
     date=models.DateField(null=False,verbose_name='Date')
     objects = DeletedModelManager()
 
+    @property
+    def qte_cumule(self):
+        try:
+            previous_cumule = Attachements.objects.filter(dqe=self.dqe,date__lt=self.date)
+            sum = self.qte
+            if (previous_cumule):
+                for pc in previous_cumule:
+                    sum += pc.qte
+                return sum
+            else:
+                return self.qte
+        except Attachements.DoesNotExist:
+            return self.qte
+    @property
+    def qte_precedente(self):
+        try:
+            previous_cumule = Attachements.objects.filter(dqe=self.dqe, date__lt=self.date)
+            sum = 0
+            if (previous_cumule):
+                for pc in previous_cumule:
+                    sum += pc.qte
+                return sum
+            else:
+                return 0
+        except Attachements.DoesNotExist:
+            return 0
+    @property
+    def montant_precedent(self):
+        try:
+            previous_cumule = Attachements.objects.filter(dqe=self.dqe, date__lt=self.date)
+            sum = 0
+            if (previous_cumule):
+                for pc in previous_cumule:
+                    sum += pc.montant
+                return sum
+            else:
+                return 0
+        except Attachements.DoesNotExist:
+            return 0
+
+    @property
+    def montant_cumule(self):
+        try:
+            previous_cumule = Attachements.objects.filter(dqe=self.dqe,date__lt=self.date)
+            sum = self.montant
+            if (previous_cumule):
+                for pc in previous_cumule:
+                    sum += pc.montant
+                return sum
+            else:
+                return self.montant
+        except Attachements.DoesNotExist:
+            return self.montant
 
     def __str__(self):
         return  str(self.id)+"-"+self.dqe.code_tache
 
-    def save(self, *args, **kwargs):
-        super(Attachements, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Attachements'
@@ -501,16 +525,10 @@ class Factures(SafeDeleteModel):
     du = models.DateField(null=False,verbose_name='Du')
     au = models.DateField(null=False,verbose_name='Au')
     paye = models.BooleanField(default=False, null=False,editable=False)
-    date = models.DateTimeField(auto_now=True, editable=False)
-    montant_precedent=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                          verbose_name="Montant Precedent"
-                                          ,editable=False)
-    montant_mois= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+    date = models.DateField(auto_now=True, editable=False)
+    montant= models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                       verbose_name="Montant du Mois"
                                       ,editable=False)
-    montant_cumule = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         verbose_name="Montant Cumulé"
-                                         ,editable=False)
 
     montant_rb = models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                        verbose_name="Montant du rabais"
@@ -544,6 +562,34 @@ class Factures(SafeDeleteModel):
 
     objects = DeletedModelManager()
 
+    @property
+    def montant_precedent(self):
+        try:
+            previous_cumule = Factures.objects.filter(marche=self.marche, date__lt=self.date)
+            sum = 0
+            if (previous_cumule):
+                for pc in previous_cumule:
+                    sum += pc.montant
+                return sum
+            else:
+                return 0
+        except Factures.DoesNotExist:
+            return 0
+
+    @property
+    def montant_cumule(self):
+        try:
+            previous_cumule = Factures.objects.filter(marche=self.marche, date__lt=self.date)
+            sum = self.montant
+            if (previous_cumule):
+                for pc in previous_cumule:
+                    sum += pc.montant
+                return sum
+            else:
+                return self.montant
+        except Factures.DoesNotExist:
+            return self.montant
+
 
 
     class Meta:
@@ -556,7 +602,7 @@ class Remboursement(SafeDeleteModel):
     facture = models.ForeignKey(Factures, on_delete=models.DO_NOTHING, null=True, blank=True, to_field="numero_facture")
     avance=models.ForeignKey(Avance, on_delete=models.DO_NOTHING, null=True, blank=True)
 
-    montant_mois =models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
+    montant =models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                          verbose_name="Montant Mois"
                                          ,editable=False)
     montant_cumule=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,

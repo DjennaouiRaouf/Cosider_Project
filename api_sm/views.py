@@ -696,46 +696,6 @@ class GetAttachements(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend]
     filterset_class = AttachementsFilter
 
-    def list(self, request, *args, **kwargs):
-        # Apply filtering
-        queryset = self.filter_queryset(self.get_queryset())
-
-        # Call the parent class's list method to get the default response
-        response_data = super().list(request, *args, **kwargs).data
-        smontant_precedent = queryset.aggregate(montant_precedent=models.Sum('montant_precedent'))['montant_precedent']
-        smontant_mois = queryset.aggregate(montant_mois=models.Sum('montant_mois'))['montant_mois']
-        smontant_cumule = queryset.aggregate(montant_cumule=models.Sum('montant_cumule'))['montant_cumule']
-        marche=Marche.objects.get(id=self.request.query_params.get('marche', None))
-        mm=self.request.query_params.get('mm', None)
-        aa=self.request.query_params.get('aa', None)
-
-        num_situation = len(
-            Attachements.objects.values('date__month', 'date__year').distinct().annotate(count=Count('id')).filter(Q(dqe__marche=marche)&Q(date__year__lte=aa) & Q(date__month__lte=mm)) )
-
-    
-        filiale=TabFiliale.objects.first()
-        if( response_data):
-            return Response({'attachement': response_data,
-                             'extra': {
-                                 'num_situation':num_situation,
-                                 'smontant_precedent': smontant_precedent ,
-                                 'smontant_mois':smontant_mois,
-                                 'smontant_cumule':smontant_cumule,
-                                 'mm': num2words(smontant_mois, to='currency', lang='fr_DZ').upper(),
-                                 'client':str(marche.nt.code_client.libelle),
-                                 'objet': marche.nt.libelle,
-                                 'projet': marche.libelle,
-                                 'contrat':marche.id,
-                                 'du':marche.date_signature,
-                                 'nt':marche.nt.nt,
-                                 'filiale':'Cosider '+filiale.libelle_filiale
-
-                             }
-                             }, status=status.HTTP_200_OK)
-        else:
-            return Response({'message': "La rechercher n'a pas pu aboutir à un résultat"},status=status.HTTP_404_NOT_FOUND)
-
-
 
 
 
@@ -950,9 +910,9 @@ class GetDQEStateView(generics.ListAPIView):
         Y2=[]
         for q in queryset:
             try:
-                X.append(Attachements.objects.filter(dqe=q).values_list('dqe__code_tache').latest('date')[0])
-                Y1.append(Attachements.objects.filter(dqe=q).values_list('qte_cumule').latest('date')[0])
-                Y2.append(Attachements.objects.filter(dqe=q).values_list('dqe__quantite').latest('date')[0])
+
+                print(Attachements.objects.filter(dqe=q).values_list('dqe__code_tache').latest('date')[0])
+
             except Attachements.DoesNotExist:
                 pass
 

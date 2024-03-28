@@ -137,6 +137,7 @@ class DQEFieldsApiView(APIView):
             if(flag=='f'): # react form
                 field_info = []
                 for field_name, field_instance in fields.items():
+
                     if (not field_name in ['prix_q','id','marche']):
                         if( field_name in ['prix_u','quantite']):
                             readOnly=False
@@ -1394,7 +1395,8 @@ class AttachementsFieldsApiView(APIView):
                 field_info = []
                 for field_name, field_instance in fields.items():
 
-                    if(  field_name in ['qte_mois','montant_mois',"date"] ):
+                    if(  field_name in ['qte','montant',
+                                        "date"] ):
                         obj = {
                             'name': field_name,
                             'type': str(field_instance.__class__.__name__),
@@ -1425,27 +1427,30 @@ class AttachementsFieldsApiView(APIView):
                     'cellRenderer': 'InfoRenderer'
                 }
                 for field_name, field_instance in fields.items():
+                    if(field_name in ['marche']):
+                        pass
+                    else:
+                        obj = {
+                            'field': field_name,
+                            'headerName': field_instance.label or field_name,
+                            'info': str(field_instance.__class__.__name__),
 
-                    obj = {
-                        'field': field_name,
-                        'headerName': field_instance.label or field_name,
-                        'info': str(field_instance.__class__.__name__),
+                        }
+                        if(field_name in ['prix_u']):
+                            obj['cellRenderer'] = 'InfoRenderer'
+                        if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
+                            obj['related'] = str(field_instance.queryset.model.__name__)
 
-                    }
-                    if(field_name in ['prix_u']):
-                        obj['cellRenderer'] = 'InfoRenderer'
-                    if (str(field_instance.__class__.__name__) == "PrimaryKeyRelatedField"):
-                        obj['related'] = str(field_instance.queryset.model.__name__)
-                    field_info2.append(obj)
-                    if (field_name in ['qte_precedente','qte_mois','qte_cumule']):
-                        obj['cellRenderer'] = 'InfoRenderer'
-                        obj1['children'].append(obj)
+                        field_info2.append(obj)
+                        if (field_name in ['qte_precedente','qte','qte_cumule']):
+                            obj['cellRenderer'] = 'InfoRenderer'
+                            obj1['children'].append(obj)
 
-                    if (field_name in ['montant_precedent','montant_mois','montant_cumule']):
-                        obj['cellRenderer'] = 'InfoRenderer'
-                        obj2['children'].append(obj)
-                    if (field_name not in ['montant_precedent', 'montant_mois', 'montant_cumule','qte_precedente','qte_mois','qte_cumule','marche']):
-                        field_info.append(obj)
+                        if (field_name in ['montant_precedent','montant','montant_cumule']):
+                            obj['cellRenderer'] = 'InfoRenderer'
+                            obj2['children'].append(obj)
+                        if (field_name not in ['montant_precedent', 'montant', 'montant_cumule','qte_precedente','qte','qte_cumule']):
+                            field_info.append(obj)
 
                 field_info.append(obj1)
                 field_info.append(obj2)
@@ -1472,7 +1477,7 @@ class AttFieldsStateApiView(APIView):
 
         for field_name, field_instance in fields.items():
             default_value = ''
-            if(  field_name in ['qte_mois','montant_mois',"date"] ):
+            if(  field_name in ['qte','montant',"date"] ):
 
                 if str(field_instance.__class__.__name__) == 'PrimaryKeyRelatedField':
                     default_value = []
