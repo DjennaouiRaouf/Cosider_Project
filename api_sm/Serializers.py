@@ -211,6 +211,12 @@ class FactureSerializer(serializers.ModelSerializer):
     rabais=serializers.CharField(source='marche.rabais', read_only=True, label="Rabais")
     retenue_garantie = serializers.CharField(source='marche.rg', read_only=True, label="Retenue de Garantie")
 
+    montant_precedent=serializers.SerializerMethodField(label="Montant Precedent")
+
+    montant_cumule=serializers.SerializerMethodField(label="Montant Cumule")
+
+
+
     class Meta:
         model=Factures
         fields="__all__"
@@ -220,6 +226,13 @@ class FactureSerializer(serializers.ModelSerializer):
 
     def get_somme(self, obj):
         return num2words(obj.montant_factureTTC, to='currency', lang='fr_DZ').upper()
+
+    def get_montant_precedent(self,obj):
+        return obj.montant_precedent
+
+    def get_montant_cumule(self,obj):
+        return obj.montant_cumule
+
     def get_fields(self, *args, **kwargs):
         fields = super().get_fields(*args, **kwargs)
         fields.pop('deleted', None)
@@ -230,12 +243,6 @@ class FactureSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['montant_precedent'] = instance.montant_precedent
-        representation['montant_mois'] = instance.montant_mois
-        representation['montant_cumule'] = instance.montant_cumule
-        representation['montant_rg']=instance.montant_rg
-        representation['montant_rb']=instance.montant_rb
-
 
         return representation
 
