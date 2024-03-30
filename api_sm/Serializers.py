@@ -500,6 +500,10 @@ class AttachementsSerializer(serializers.ModelSerializer):
 
 
 class RemboursementSerializer(serializers.ModelSerializer):
+    montant_creance=serializers.SerializerMethodField()
+
+    def get_montant_creance(self, obj):
+        return obj.montant_creance
     class Meta:
         model = Remboursement
         fields = '__all__'

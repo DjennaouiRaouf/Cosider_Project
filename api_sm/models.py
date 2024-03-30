@@ -11,7 +11,6 @@ from safedelete.models import SafeDeleteModel
 from simple_history.models import HistoricalRecords
 from simple_history.signals import pre_create_historical_record
 
-from api_sch.models import TabAgence
 
 
 class DeletedModelManager(SafeDeleteManager):
@@ -662,14 +661,26 @@ class Encaissement(SafeDeleteModel):
     mode_paiement=models.ForeignKey(ModePaiement,on_delete=models.DO_NOTHING,null=False,verbose_name="Mode de paiement")
     montant_encaisse=models.DecimalField(max_digits=38, decimal_places=2, blank=True,verbose_name="Montant encaissé",
                                      validators=[MinValueValidator(0)], default=0)
-    montant_creance = models.DecimalField(max_digits=38, decimal_places=2, blank=True,verbose_name="Montant en créance",
-                                           validators=[MinValueValidator(0)], default=0,editable=False)
-    agence = models.ForeignKey(TabAgence, on_delete=models.CASCADE, db_constraint=False)
+    agence = models.CharField(max_length=500,null=True)
     numero_piece = models.CharField(max_length=300,null=False,verbose_name="Numero de piéce")
 
     objects = DeletedModelManager()
 
+    @property
+    def montant_creance(self):
+        try:
+            enc = Encaissement.objects.filter(facture=self.facture, date_encaissement__lt=self.date_encaissement).aggregate(
+                models.Sum('montant_encaisse'))[
+                "montant_encaisse__sum"]
 
+            if (enc == None):
+                enc = self.montant_encaisse
+            else:
+                enc += self.montant_encaisse
+
+            return (self.facture.montant_factureTTC - enc)
+        except Encaissement.DoesNotExist:
+            return 0
 
 
 

@@ -118,7 +118,7 @@ def pre_save_encaissement(sender, instance, **kwargs):
     if not instance.pk:
         try:
 
-            sum = Encaissement.objects.filter(facture=instance.facture).aggregate(models.Sum('montant_encaisse'))[
+            sum = Encaissement.objects.filter(facture=instance.facture, date_encaissement__lt=instance.date_encaissement).aggregate(models.Sum('montant_encaisse'))[
                         "montant_encaisse__sum"]
 
         except Encaissement.DoesNotExist:
@@ -127,7 +127,7 @@ def pre_save_encaissement(sender, instance, **kwargs):
         if(not sum):
             sum=0
         sum=sum+instance.montant_encaisse
-        instance.montant_creance=instance.facture.montant_factureTTC-sum
+        montant_creance=instance.facture.montant_factureTTC-sum
         if(instance.montant_creance == 0):
             instance.facture.paye=True
             instance.facture.save()
