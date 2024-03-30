@@ -144,6 +144,8 @@ def update_on_softdelete(sender, instance, **kwargs):
     except Encaissement.DoesNotExist:
         pass
 
+
+
 '''
 @receiver(pre_save, sender=Remboursement)
 def pre_save_remboursement(sender, instance, **kwargs):
