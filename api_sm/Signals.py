@@ -82,30 +82,29 @@ def pre_save_attachement(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=Factures)
 def pre_save_factures(sender, instance, **kwargs):
-    if not instance.pk:
-        if (instance.du > instance.au):
-            raise ValidationError('Date de debut doit etre inferieur à la date de fin')
-        else:
-            debut = instance.du
-            fin = instance.au
-            if( not Attachements.objects.filter(dqe__marche=instance.marche, date__lte=fin, date__gte=debut)):
-                raise ValidationError('Facturation impossible les attachements ne sont pas disponible ')
-            m=0
-            attachements=Attachements.objects.filter(dqe__marche=instance.marche, date__lte=fin, date__gte=debut)
-            for attachement in attachements:
-                m+=attachement.montant
+    if (instance.du > instance.au):
+        raise ValidationError('Date de debut doit etre inferieur à la date de fin')
+    else:
+        debut = instance.du
+        fin = instance.au
+        if( not Attachements.objects.filter(dqe__marche=instance.marche, date__lte=fin, date__gte=debut)):
+            raise ValidationError('Facturation impossible les attachements ne sont pas disponible ')
+        m=0
+        attachements=Attachements.objects.filter(dqe__marche=instance.marche, date__lte=fin, date__gte=debut)
+        for attachement in attachements:
+            m+=attachement.montant
 
-            instance.montant = m
-            instance.montant_rb = m * (instance.marche.rabais / 100)
-            instance.montant_rg = round((m - instance.montant_rb) * (instance.marche.rg / 100), 2)
-            instance.montant_factureHT = round(instance.montant - instance.montant_rb - instance.montant_rg, 2)
-            instance.montant_factureTTC = round(
-            instance.montant_factureHT + (instance.montant_factureHT * instance.marche.tva / 100), 2)
-            qte_real = Attachements.objects.filter(Q(marche=instance.marche) & Q(date__lte=fin)).aggregate(
-                    models.Sum('qte'))["qte__sum"]
-            qte_dqe = DQE.objects.filter(Q(marche=instance.marche)).aggregate(
-                    models.Sum('quantite'))["quantite__sum"]
-            instance.taux_realise = round((qte_real / qte_dqe) * 100, 2)
+        instance.montant = m
+        instance.montant_rb = m * (instance.marche.rabais / 100)
+        instance.montant_rg = round((m - instance.montant_rb) * (instance.marche.rg / 100), 2)
+        instance.montant_factureHT = round(instance.montant - instance.montant_rb - instance.montant_rg, 2)
+        instance.montant_factureTTC = round(
+        instance.montant_factureHT + (instance.montant_factureHT * instance.marche.tva / 100), 2)
+        qte_real = Attachements.objects.filter(Q(marche=instance.marche) & Q(date__lte=fin)).aggregate(
+                models.Sum('qte'))["qte__sum"]
+        qte_dqe = DQE.objects.filter(Q(marche=instance.marche)).aggregate(
+                models.Sum('quantite'))["quantite__sum"]
+        instance.taux_realise = round((qte_real / qte_dqe) * 100, 2)
 
     if instance.pk:
         instance.montant_factureHT=round(instance.montant_factureHT-instance.montant_avf_remb-instance.montant_ava_remb,2)
@@ -152,18 +151,15 @@ def pre_save_remboursement(sender, instance, **kwargs):
             raise ValidationError('Cette avance est remboursée')
     else:
         tremb = round(
-            (instance.avance.taux_avance / (instance.avance.fin - instance.facture.taux_realise)) * 100, 2)
+                (instance.avance.taux_avance / (instance.avance.fin - instance.facture.taux_realise)) * 100, 2)
 
-        instance.montant=instance.facture.montant_factureHT * (tremb / 100)
-        if(instance.avance.type.id==1): #forf
-            instance.facture.montant_avf_remb=instance.montant
-        elif (instance.avance.type.id == 2):  # appro
-            instance.facture.montant_ava_remb = instance.montant
+        instance.montant = instance.facture.montant_factureHT * (tremb / 100)
+        if (instance.rst_remb < 0):
+            instance.montant = instance.avance.montant
 
-
-
-
-
+        if (instance.rst_remb == 0):
+            instance.avance.remboursee = True
+            instance.avance.save()
 
 
 

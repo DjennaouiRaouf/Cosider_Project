@@ -608,7 +608,7 @@ class Remboursement(SafeDeleteModel):
     @property
     def montant_cumule(self):
         try:
-            previous_cumule = Remboursement.objects.filter(facture=self.facture,avance=self.avance, facture__date__lt=self.facture.date)
+            previous_cumule = Remboursement.objects.filter(facture__marche=self.facture.marche,avance=self.avance, facture__num_situation__lt=self.facture.num_situation)
             sum = self.montant
             if (previous_cumule):
                 for pc in previous_cumule:
@@ -621,18 +621,7 @@ class Remboursement(SafeDeleteModel):
 
     @property
     def rst_remb(self):
-        try:
-            previous_cumule = Remboursement.objects.filter(facture=self.facture, avance=self.avance, facture__date__lt=self.facture.date)
-            sum = self.montant
-            if (previous_cumule):
-                for pc in previous_cumule:
-                    sum += pc.montant
-                return self.avance.taux_avance-sum
-            else:
-                return self.montant
-        except Remboursement.DoesNotExist:
-            return self.montant
-
+        return self.avance.montant-self.montant_cumule
 
 
 
