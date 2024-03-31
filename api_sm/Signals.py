@@ -156,10 +156,16 @@ def pre_save_remboursement(sender, instance, **kwargs):
         instance.montant = instance.facture.montant_factureHT * (tremb / 100)
         if (instance.rst_remb < 0):
             instance.montant = instance.avance.montant
-
         if (instance.rst_remb == 0):
             instance.avance.remboursee = True
             instance.avance.save()
+
+        if instance.avance.type.id == 1:
+            instance.facture.montant_avf_remb = round(instance.montant, 2)
+        if instance.avance.type.id == 2:
+            instance.facture.montant_ava_remb = round(instance.montant, 2)
+        instance.facture.save()
+
 
 
 
