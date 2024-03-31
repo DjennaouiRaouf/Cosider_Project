@@ -604,12 +604,34 @@ class Remboursement(SafeDeleteModel):
     montant =models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
                                          verbose_name="Montant Mois"
                                          ,editable=False)
-    montant_cumule=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         verbose_name="Montant Cumule"
-                                         ,editable=False)
-    rst_remb=models.DecimalField(max_digits=38, decimal_places=2, validators=[MinValueValidator(0)], default=0,
-                                         verbose_name="Reste à rembourser"
-                                         ,editable=False)
+
+    @property
+    def montant_cumule(self):
+        try:
+            previous_cumule = Remboursement.objects.filter(facture=self.facture,avance=self.avance, facture__date__lt=self.facture.date)
+            sum = self.montant
+            if (previous_cumule):
+                for pc in previous_cumule:
+                    sum += pc.montant
+                return sum
+            else:
+                return self.montant
+        except Remboursement.DoesNotExist:
+            return self.montant
+
+    @property
+    def rst_remb(self):
+        try:
+            previous_cumule = Remboursement.objects.filter(facture=self.facture, avance=self.avance, facture__date__lt=self.facture.date)
+            sum = self.montant
+            if (previous_cumule):
+                for pc in previous_cumule:
+                    sum += pc.montant
+                return self.avance.taux_avance-sum
+            else:
+                return self.montant
+        except Remboursement.DoesNotExist:
+            return self.montant
 
 
 

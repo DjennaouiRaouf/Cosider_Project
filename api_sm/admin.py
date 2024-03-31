@@ -361,7 +361,7 @@ class  AvanceAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
     def taux(self,obj):
         return str(obj.taux_avance)+'%'
     def montant_avance(self,obj):
-        return humanize.intcomma(obj.montant)
+        return (obj.montant)
     def get_import_formats(self):
         formats = (
             base_formats.XLSX,
@@ -439,12 +439,12 @@ class RembAdmin(SafeDeleteAdmin,ImportExportModelAdmin,admin.ModelAdmin):
     def type_avance(self,obj):
         return obj.avance.type.libelle
     def reste_a_remb(self, obj):
-        return humanize.intcomma(obj.rst_remb)
+        return (obj.rst_remb)
     def remb_mois(self, obj):
-        return humanize.intcomma(obj.montant_mois)
+        return (obj.montant)
 
     def remb_cumule(self, obj):
-        return humanize.intcomma(obj.montant_cumule)
+        return (obj.montant_cumule)
     def get_import_formats(self):
         formats = (
             base_formats.XLSX,
@@ -475,7 +475,7 @@ class CautionAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,adm
     list_filter = (SafeDeleteAdminFilter,)
 
     def montant_caution(self,obj):
-        return humanize.intcomma(obj.montant)
+        return (obj.montant)
     def taux_caution(self,obj):
         return  str(obj.taux)+"%"
     def get_import_formats(self):
@@ -572,7 +572,7 @@ class FacturesAdmin(SafeDeleteAdmin,SimpleHistoryAdmin,ImportExportModelAdmin,ad
         return obj.montant_cumule
 
     def montant_global_ht(self,obj):
-        return humanize.intcomma(obj.montant_factureHT)
+        return (obj.montant_factureHT)
     def get_import_formats(self):
 
         formats = (
@@ -650,10 +650,10 @@ class EncaissementAmin(SafeDeleteAdmin,SimpleHistoryAdmin,admin.ModelAdmin):
 
 
     def encaisse(self, obj):
-        return humanize.intcomma(obj.montant_encaisse)
+        return (obj.montant_encaisse)
 
     def creance(self, obj):
-        return humanize.intcomma(obj.montant_creance)
+        return (obj.montant_creance)
 
 
     def has_change_permission(self, request, obj=None):
