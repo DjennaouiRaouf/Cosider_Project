@@ -167,8 +167,6 @@ def pre_save_remboursement(sender, instance, **kwargs):
         instance.facture.save()
 
 
-
-
 '''
 @receiver(pre_save, sender=Remboursement)
 def pre_save_remboursement(sender, instance, **kwargs):
